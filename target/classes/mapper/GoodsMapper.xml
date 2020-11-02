@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xmu.oomall.mapper.GoodsMapper">
-    <select id="getGoodsById" resultType="SPUPo">
-        select * from Blog where id = #{id}
+    <select id="getGoodById" resultType="SPUPo">
+        SELECT * FROM goods_spu WHERE id = #{id}
     </select>
+    <update id="updateGoodsById">
+        <set>
+            <if test="name != null">name = #{name}</if>
+            <if test="brandId != null">brand_id = #{brandId}</if>
+            <if test="categoryId != null">category_id = #{categoryId}</if>
+        </set>
+    </update>
 </mapper>
