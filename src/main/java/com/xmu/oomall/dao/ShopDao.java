@@ -10,11 +10,18 @@ public class ShopDao {
     @Autowired
     ShopPoMapper shopPoMapper;
 
-    int setShopState(int id, short state){
+    int setShopState(long id, byte state){
         ShopPo shopPo = new ShopPo();
         shopPo.setState(state);
         shopPo.setId(id);
         return shopPoMapper.updateByPrimaryKeySelective(shopPo);
     }
 
+    int addShop(ShopPo shopPo){
+        return shopPoMapper.insert(shopPo);
+    }
+
+    int delShop(long id){
+        return shopPoMapper.deleteByPrimaryKey(id);
+    }
 }

@@ -10,11 +10,11 @@ public class BrandDao {
     @Autowired
     BrandPoMapper brandPoMapper;
 
-    BrandPo getBrandById(int id){
+    BrandPo getBrandById(long id){
         return brandPoMapper.selectByPrimaryKey(id);
     }
 
-    int addBrandById(int id,String name,String detail){
+    int addBrandById(long id,String name,String detail){
         BrandPo brandPo = new BrandPo();
         brandPo.setId(id);
         brandPo.setName(name);
@@ -23,7 +23,7 @@ public class BrandDao {
         return brandPoMapper.insert(brandPo);
     }
 
-    int setBrandById(int id,String name,String detail){
+    int setBrandById(long id,String name,String detail){
         BrandPo brandPo = new BrandPo();
         brandPo.setId(id);
         brandPo.setName(name);
@@ -31,7 +31,7 @@ public class BrandDao {
         return brandPoMapper.updateByPrimaryKey(brandPo);
     }
 
-    int deleteBrandById(int id){
+    int deleteBrandById(long id){
         return brandPoMapper.deleteByPrimaryKey(id);
     }
 }
