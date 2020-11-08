@@ -188,7 +188,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="coupon_flash_sale" domainObjectName="FlashSalePo"
+        <table tableName="good_flash_sale" domainObjectName="FlashSalePo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -198,7 +198,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="coupon_flash_sale_item" domainObjectName="FlashSaleItemPo"
+        <table tableName="good_flash_sale_item" domainObjectName="FlashSaleItemPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -268,7 +268,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="shop" domainObjectName="ShopPo"
+        <table tableName="good_shop" domainObjectName="ShopPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
