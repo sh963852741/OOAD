@@ -12,10 +12,6 @@
 	<artifactId>goods</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<properties>
-		<java.version>14</java.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

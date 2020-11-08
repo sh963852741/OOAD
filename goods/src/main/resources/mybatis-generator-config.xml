@@ -86,7 +86,7 @@
             注意，如果context是MyBatis3Simple：只支持ANNOTATEDMAPPER和XMLMAPPER
         -->
         <javaClientGenerator type="XMLMAPPER"
-                             targetPackage="com.xmu.oomall.mapper" targetProject="src/main/java">
+                             targetPackage="cn.edu.xmu.ooad.mapper" targetProject="src/main/java">
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
 
