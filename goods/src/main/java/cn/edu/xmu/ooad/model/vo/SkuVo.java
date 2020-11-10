@@ -10,7 +10,7 @@ import javax.validation.constraints.Min;
 @ApiModel(value = "Sku视图")
 public class SkuVo {
 
-    //api上面参数有点不懂 暂时这样
+    SpuSpecVo spuSpec;
     String sn;
     String name;
     Long originalPrice;
