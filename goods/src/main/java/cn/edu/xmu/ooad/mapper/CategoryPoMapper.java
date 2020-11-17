@@ -2,7 +2,6 @@ package cn.edu.xmu.ooad.mapper;
 
 import cn.edu.xmu.ooad.model.po.CategoryPo;
 import cn.edu.xmu.ooad.model.po.CategoryPoExample;
-
 import java.util.List;
 
 public interface CategoryPoMapper {

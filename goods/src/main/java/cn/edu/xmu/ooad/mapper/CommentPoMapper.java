@@ -2,7 +2,6 @@ package cn.edu.xmu.ooad.mapper;
 
 import cn.edu.xmu.ooad.model.po.CommentPo;
 import cn.edu.xmu.ooad.model.po.CommentPoExample;
-
 import java.util.List;
 
 public interface CommentPoMapper {

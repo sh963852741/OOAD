@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>cn.edu.xmu</groupId>
+    <groupId>cn.edu.xmu.ooad</groupId>
     <artifactId>core</artifactId>
     <packaging>jar</packaging>
 
