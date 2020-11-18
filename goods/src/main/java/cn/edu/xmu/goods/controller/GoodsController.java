@@ -1,7 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.*;
-import cn.edu.xmu.ooad.model.vo.*;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 

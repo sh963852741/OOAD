@@ -22,7 +22,7 @@
     <description>object oriented mall system</description>
 
     <properties>
-        <java.version>14</java.version>
+        <java.version>11</java.version>
     </properties>
 
     <dependencyManagement>
