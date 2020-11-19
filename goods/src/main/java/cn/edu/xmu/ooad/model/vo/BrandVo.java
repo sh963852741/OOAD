@@ -1,17 +1,25 @@
 package cn.edu.xmu.ooad.model.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import cn.edu.xmu.ooad.model.bo.Brand;
+
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
+
 @Data
-@ApiModel(value = "品牌视图")
 public class BrandVo {
+    @NotBlank(message = "商品名不能为空")
+    private String name;
+    private String detail;
 
-    @ApiModelProperty(value = "品牌名称")
-    String name;
-
-    @ApiModelProperty(value = "品牌详细描述")
-    String detail;
-
+    /**
+     * 构造函数
+     */
+    public Brand createBrand() {
+        Brand brand = new Brand();
+        brand.setName(this.name);
+        brand.setDetail(this.detail);
+        return brand;
+    }
 }

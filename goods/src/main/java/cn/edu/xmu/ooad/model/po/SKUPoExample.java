@@ -36,7 +36,7 @@ public class SKUPoExample {
      * @mbg.generated
      */
     public SKUPoExample() {
-        oredCriteria = new ArrayList<Criteria>();
+        oredCriteria = new ArrayList<>();
     }
 
     /**
@@ -159,7 +159,7 @@ public class SKUPoExample {
 
         protected GeneratedCriteria() {
             super();
-            criteria = new ArrayList<Criterion>();
+            criteria = new ArrayList<>();
         }
 
         public boolean isValid() {
@@ -913,7 +913,6 @@ public class SKUPoExample {
      * @mbg.generated do_not_delete_during_merge
      */
     public static class Criteria extends GeneratedCriteria {
-
         protected Criteria() {
             super();
         }

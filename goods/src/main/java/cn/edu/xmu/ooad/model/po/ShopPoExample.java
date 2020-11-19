@@ -35,7 +35,7 @@ public class ShopPoExample {
      * @mbg.generated
      */
     public ShopPoExample() {
-        oredCriteria = new ArrayList<Criteria>();
+        oredCriteria = new ArrayList<>();
     }
 
     /**
@@ -158,7 +158,7 @@ public class ShopPoExample {
 
         protected GeneratedCriteria() {
             super();
-            criteria = new ArrayList<Criterion>();
+            criteria = new ArrayList<>();
         }
 
         public boolean isValid() {
@@ -392,7 +392,6 @@ public class ShopPoExample {
      * @mbg.generated do_not_delete_during_merge
      */
     public static class Criteria extends GeneratedCriteria {
-
         protected Criteria() {
             super();
         }
