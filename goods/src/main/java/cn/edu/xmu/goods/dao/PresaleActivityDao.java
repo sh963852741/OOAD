@@ -14,15 +14,15 @@ public class PresaleActivityDao {
     @Autowired
     PresaleActivityPoMapper presaleActivityPoMapper;
 
-    List<PresaleActivityPo> getActivitiesBySPUId(long id){
-        PresaleActivityPoExample example = new PresaleActivityPoExample();
-        PresaleActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSpuIdEqualTo(id);
+//    public List<PresaleActivityPo> getActivitiesBySPUId(long id){
+//        PresaleActivityPoExample example = new PresaleActivityPoExample();
+//        PresaleActivityPoExample.Criteria criteria = example.createCriteria();
+//        criteria.andGoodsSpuIdEqualTo(id);
+//
+//        return presaleActivityPoMapper.selectByExample(example);
+//    }
 
-        return presaleActivityPoMapper.selectByExample(example);
-    }
-
-    List<PresaleActivityPo> getEffectiveActivities(int page,int pageSize, long shopId, int timeline){
+    public List<PresaleActivityPo> getEffectiveActivities(int page,int pageSize, long shopId, int timeline, long spuId){
         PageHelper.startPage(page, pageSize);
 
         PresaleActivityPoExample example = new PresaleActivityPoExample();
@@ -43,19 +43,20 @@ public class PresaleActivityDao {
             criteria.andEndTimeLessThan(LocalDateTime.now());
         }
         criteria.andShopIdEqualTo(shopId);
+        criteria.andGoodsSpuIdEqualTo(spuId);
 
         return presaleActivityPoMapper.selectByExample(example);
     }
 
-    boolean addActivity(PresaleActivityPo po){
+    public boolean addActivity(PresaleActivityPo po){
         return presaleActivityPoMapper.insert(po) == 1;
     }
 
-    boolean delActivity(long id){
+    public boolean delActivity(long id){
         return presaleActivityPoMapper.deleteByPrimaryKey(id) == 1;
     }
 
-    boolean updateActivity(PresaleActivityPo po) {
+    public boolean updateActivity(PresaleActivityPo po) {
         return presaleActivityPoMapper.updateByPrimaryKey(po) == 1;
     }
 }
