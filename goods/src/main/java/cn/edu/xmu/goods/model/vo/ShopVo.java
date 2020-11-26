@@ -11,11 +11,11 @@ public class ShopVo {
     private String name;
     private long id;
     private byte state;
-    public Shop createShop() {
-        Shop shop = new Shop();
-        shop.setId(this.id);
-        shop.setName(this.name);
-        shop.setState(this.state);
-        return shop;
-    }
+//    public Shop createShop() {
+//        Shop shop = new Shop();
+//        shop.setId(this.id);
+//        shop.setName(this.name);
+//        shop.setState(this.state);
+//        return shop;
+//    }
 }

@@ -2,7 +2,6 @@ package cn.edu.xmu.goods.service;
 
 
 import cn.edu.xmu.goods.dao.GoodsDao;
-import cn.edu.xmu.goods.model.bo.Good;
 import cn.edu.xmu.goods.model.vo.SkuSelectVo;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ public class GoodsService {
      * @Date: 2020/11/25 20:09
      */
     public ReturnObject getGoodsStates(){
-            return goodsDao.getGoodState();
+            return null;
     }
 
     public ReturnObject getAllSkus(SkuSelectVo vo,Integer page,Integer PageInfo){
