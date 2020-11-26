@@ -42,6 +42,8 @@ public class BrandTests {
         String responseString = this.mvc.perform(post("/shops/1/brands").content(requestJson).contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.data.name").value("测试品牌名"))
+                .andExpect(jsonPath("$.data.detail").value("这是一个测试品牌名"))
                 .andReturn().getResponse().getContentAsString();
     }
 
@@ -50,21 +52,24 @@ public class BrandTests {
         String responseString = this.mvc.perform(get("/brands"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
+
                 .andReturn().getResponse().getContentAsString();
     }
 
     @Test
     public void modifyBrand() throws Exception {
         String requestJson = "{\"name\": \"测试品牌名-改\",\"detail\": \"这是一个测试品牌名-改\"}";
-        String responseString = this.mvc.perform(put("/shops/1/brands/1").content(requestJson))
+        String responseString = this.mvc.perform(put("/shops/0/brands/1").content(requestJson).contentType("application/json;charset=UTF-8"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.data.name").value("测试品牌名-改"))
+                .andExpect(jsonPath("$.data.detail").value("这是一个测试品牌名-改"))
                 .andReturn().getResponse().getContentAsString();
     }
 
     @Test
     public void deleteBrand() throws Exception {
-        String responseString = this.mvc.perform(delete("/shops/1/brands/1"))
+        String responseString = this.mvc.perform(delete("/shops/0/brands/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();

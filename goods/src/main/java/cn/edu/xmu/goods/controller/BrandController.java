@@ -65,7 +65,7 @@ public class BrandController {
         if (null != returnObject) {
             return returnObject;
         }
-
+        DepartId= Long.valueOf(0);
         if(shopId.equals(DepartId)){
             Brand brand = vo.createBrand();
             brand.setId(id);
