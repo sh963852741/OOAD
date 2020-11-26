@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class PresaleFinderVo {
+public class ActivityFinderVo {
     @ApiModelProperty(value = "商铺ID")
     Long shopId;
 

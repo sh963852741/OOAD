@@ -19,13 +19,15 @@ public class PresaleActivityDao {
      * 顾客获取某SPU的预售活动信息，此函数为高频读
      * @param page
      * @param pageSize
-     * @param id SPU的ID
+     * @param spuId SPU的ID
      * @return
      */
-    public List<PresaleActivityPo> getActivitiesBySPUId(int page, int pageSize, long id, int timeline){
+    public List<PresaleActivityPo> getActivitiesBySPUId(int page, int pageSize, long spuId, int timeline){
+        PageHelper.startPage(page, pageSize);
+
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSpuIdEqualTo(id);
+        criteria.andGoodsSpuIdEqualTo(spuId);
 
         if (timeline == 0) {
             /* 获取未开始的活动 */

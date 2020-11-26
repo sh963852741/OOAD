@@ -1,6 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
-import cn.edu.xmu.goods.model.vo.GrouponVO;
+import cn.edu.xmu.goods.model.vo.GrouponVo;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,7 +83,7 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/groupons")
-    public Object createGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的团购活动信息" ,required=true )  @Valid @RequestBody GrouponVO grouponVO){
+    public Object createGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的团购活动信息" ,required=true )  @Valid @RequestBody GrouponVo grouponVO){
         return null;
     }
 
@@ -99,7 +99,7 @@ public class GrouponController {
             @ApiResponse(code = 907, message = "团购活动状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/groupons/{id}")
-    public Object changeGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "团购活动id",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的团购活动信息" ,required=true )  @Valid @RequestBody GrouponVO grouponVO){
+    public Object changeGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "团购活动id",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的团购活动信息" ,required=true )  @Valid @RequestBody GrouponVo grouponVO){
         return null;
     }
 
