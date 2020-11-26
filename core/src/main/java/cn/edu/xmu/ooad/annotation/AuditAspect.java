@@ -12,7 +12,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -21,9 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @auther mingqiu
@@ -78,27 +74,34 @@ public class AuditAspect {
 
         //检验/shop的api中传入token是否和departId一致
         String pathInfo=request.getPathInfo();
-        logger.debug("getPathInfo = "+ pathInfo);
-        String paths[]=pathInfo.split("/");
-        for(int i=0;i<paths.length;i++){
-            //如果departId为0,可以操作所有的shop
-            if(departId==0){
-                break;
-            }
-            if(paths[i].equals("shops")){
-                if(i+1<paths.length){
-                    //找到路径上对应id 将其与string类型的departId比较
-                    String pathId=paths[i+1];
-                    logger.debug("did ="+pathId);
-                    if(!pathId.equals(departId.toString())){
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        return ResponseUtil.fail(ResponseCode.FIELD_NOTVALID, "departId不匹配");
-                    }
-                    logger.debug("success match Id!");
+        if(null!=pathInfo)
+        {
+            logger.debug("getPathInfo = "+ pathInfo);
+            String paths[]=pathInfo.split("/");
+            for(int i=0;i<paths.length;i++){
+                //如果departId为0,可以操作所有的shop
+                if(departId==0){
+                    break;
                 }
-                break;
+                if(paths[i].equals("shops")){
+                    if(i+1<paths.length){
+                        //找到路径上对应id 将其与string类型的departId比较
+                        String pathId=paths[i+1];
+                        logger.debug("did ="+pathId);
+                        if(!pathId.equals(departId.toString())){
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            return ResponseUtil.fail(ResponseCode.FIELD_NOTVALID, "departId不匹配");
+                        }
+                        logger.debug("success match Id!");
+                    }
+                    break;
+                }
             }
         }
+        else{
+            logger.error("the api path is null");
+        }
+
 
         logger.debug("around: userId ="+userId+" departId="+departId);
         if (userId == null) {
