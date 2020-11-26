@@ -1,8 +1,20 @@
 package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.*;
+import cn.edu.xmu.goods.service.GoodsService;
+import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 商品控制器
@@ -13,6 +25,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController /*Restful的Controller对象*/
 @RequestMapping(value = "/goods", produces = "application/json;charset=UTF-8")
 public class GoodsController {
+
+
+    private  static  final Logger logger = LoggerFactory.getLogger(GoodsController.class);
+
+    @Autowired
+    private GoodsService goodsService;
+
+    @Autowired
+    private HttpServletResponse httpServletResponse;
+
     /**
      * 获得商品SPU的所有状态
      * @param
@@ -25,7 +47,8 @@ public class GoodsController {
     })
     @GetMapping("/spus/states")
     public Object getSpuStates(){
-        return null;
+        ReturnObject<List> returnObject=goodsService.getGoodsStates();
+        return Common.decorateReturnObject(returnObject);
     }
 
     /**
@@ -47,12 +70,19 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/skus")
-    public Object getSkus( @RequestParam Object vo,@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize){
-        return null;
+    public Object getSkus(@Validated  SkuSelectVo vo, @RequestParam(required = false, defaultValue = "1") Integer page, @RequestParam(required = false, defaultValue = "10") Integer pageSize,BindingResult bindingResult){
+        logger.debug("getAllSkus: page = "+ page +"  pageSize ="+pageSize);
+        Object obj=Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(null!=obj){
+            logger.info("validate fail");
+            return obj;
+        }
+        ReturnObject returnObject=goodsService.getAllSkus(vo,page,pageSize);
+        return returnObject;
     }
 
     /**
-     * 获得sky的详细信息
+     * 获得sku的详细信息
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37

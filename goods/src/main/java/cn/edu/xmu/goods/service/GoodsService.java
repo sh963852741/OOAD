@@ -3,8 +3,10 @@ package cn.edu.xmu.goods.service;
 
 import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.bo.Good;
+import cn.edu.xmu.goods.model.vo.SkuSelectReturnVo;
 import cn.edu.xmu.goods.model.vo.SkuSelectVo;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,8 @@ public class GoodsService {
             return goodsDao.getGoodState();
     }
 
-    public ReturnObject getAllSkus(SkuSelectVo vo,Integer page,Integer PageInfo){
-        return null;
+    public ReturnObject getAllSkus(SkuSelectVo vo,Integer page,Integer pageSize){
+        return goodsDao.getAllSkus(vo, page, pageSize);
     }
 
     public ReturnObject getSkuDetails(Integer SkuId){
