@@ -70,7 +70,7 @@ public class BrandController {
             Brand brand = vo.createBrand();
             brand.setId(id);
 
-            ReturnObject<Object> retObject = brandService.setBrand(id,brand);
+            ReturnObject<Object> retObject = brandService.setBrand(id,vo);
             httpServletResponse.setStatus(HttpStatus.OK.value());
             return Common.decorateReturnObject(retObject);
         }
@@ -100,9 +100,8 @@ public class BrandController {
         if (null != returnObject) {
             return returnObject;
         }
-        Brand brand = vo.createBrand();
 
-        ReturnObject<VoObject> retObject = brandService.addBrand(brand);
+        ReturnObject<VoObject> retObject = brandService.addBrand(vo);
         httpServletResponse.setStatus(HttpStatus.OK.value());
         return Common.decorateReturnObject(retObject);
     }

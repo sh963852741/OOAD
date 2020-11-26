@@ -1,8 +1,13 @@
 package cn.edu.xmu.goods.model.vo;
 
+import cn.edu.xmu.goods.model.po.PresaleActivityPo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Data
 @ApiModel(value = "新建预售视图")
@@ -21,11 +26,24 @@ public class PresaleVo {
     Long quantity;
 
     @ApiModelProperty(value = "预售开始时间")
-    String beginTime;
+    LocalDateTime beginTime;
 
     @ApiModelProperty(value = "预售结束时间")
-    String endTime;
+    LocalDateTime endTime;
 
     @ApiModelProperty(value = "付款时间")
-    String payTime;
+    LocalDateTime payTime;
+
+    public PresaleActivityPo createPo(){
+        PresaleActivityPo po = new PresaleActivityPo();
+        po.setBeginTime(beginTime);
+        po.setEndTime(endTime);
+        po.setAdvancePayPrice(advancePayPrice);
+        po.setPayTime(payTime);
+        po.setRestPayPrice(restPayPrice);
+        po.setAdvancePayPrice(advancePayPrice);
+        po.setName(name);
+
+        return po;
+    }
 }
