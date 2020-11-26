@@ -22,6 +22,8 @@ public enum ResponseCode {
     RESOURCE_ID_OUTSCOPE(505,"操作的资源id不是自己的对象"),
     FILE_NO_WRITE_PERMISSION(506,"目录文件夹没有写入的权限"),
     RESOURCE_FALSIFY(507, "信息签名不正确"),
+    IMG_FORMAT_ERROR(508,"图片格式不正确"),
+    IMG_SIZE_EXCEED(509,"图片大小超限"),
     //--------------------------------------------
 
 
@@ -64,6 +66,8 @@ public enum ResponseCode {
     MOBILE_NOTVERIFIED(749,"电话号码未确认"),
     USERPROXY_BIGGER(750,"开始时间要小于失效时间"),
     USERPROXY_SELF(751,"自己不可以代理自己"),
+    USERPROXY_DEPART_CONFLICT(752,"两个代理双方的部门冲突"),
+    USERPROXY_DEPART_MANAGER_CONFLICT(753,"管理员无此部门权限"),
     /***************************************************
      *    订单模块错误码
      **************************************************/
