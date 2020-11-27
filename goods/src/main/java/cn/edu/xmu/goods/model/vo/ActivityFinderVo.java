@@ -18,5 +18,5 @@ public class ActivityFinderVo {
     Integer pageSize;
 
     @ApiModelProperty(value = "时间线")
-    Integer timeline;
+    Byte timeline;
 }

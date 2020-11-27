@@ -9,7 +9,8 @@ public class Coupon {
         PENDING((byte)0,"尚未开始"),
         AVAILABLE((byte)1,"可用"),
         EXPIRED((byte)2,"已过期"),
-        CANCELLED((byte)3,"已作废");
+        CANCELLED((byte)3,"已作废"),
+        USED((byte)4,"已使用");
 
         private static final Map<Byte, Coupon.CouponStatus> typeMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值

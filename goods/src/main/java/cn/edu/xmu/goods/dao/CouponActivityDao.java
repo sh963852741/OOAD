@@ -20,7 +20,7 @@ public class CouponActivityDao {
     @Autowired
     CouponSPUPoMapper couponSPUPoMapper;
 
-    List<CouponActivityPo> getActivitiesBySPUId(long id){
+    public List<CouponActivityPo> getActivitiesBySPUId(long id){
         CouponSPUPoExample example = new CouponSPUPoExample();
         CouponSPUPoExample.Criteria criteria = example.createCriteria();
         criteria.andSpuIdEqualTo(id);
@@ -33,7 +33,17 @@ public class CouponActivityDao {
         return activities;
     }
 
-    List<CouponActivityPo> getEffectiveActivities(int page, int pageSize, long shopId, int timeline){
+    public List<CouponActivityPo> getInvalidActivities(int page, int pageSize, long shopId) {
+        PageHelper.startPage(page, pageSize);
+
+        CouponActivityPoExample example = new CouponActivityPoExample();
+        CouponActivityPoExample.Criteria criteria = example.createCriteria();
+        criteria.andShopIdEqualTo(shopId);
+
+        return couponActivityPoMapper.selectByExample(example);
+    }
+
+    public List<CouponActivityPo> getEffectiveActivities(int page, int pageSize, long shopId, int timeline){
         PageHelper.startPage(page, pageSize);
 
         CouponActivityPoExample example = new CouponActivityPoExample();
@@ -58,19 +68,20 @@ public class CouponActivityDao {
         return couponActivityPoMapper.selectByExample(example);
     }
 
-    boolean addActivity(CouponActivityPo po){
+    public boolean addActivity(CouponActivityPo po){
         return couponActivityPoMapper.insert(po) == 1;
     }
 
-    boolean delActivity(long id){
+    public boolean delActivity(long id){
         return couponActivityPoMapper.deleteByPrimaryKey(id) == 1;
     }
 
-    boolean updateActivity(CouponActivityPo po) {
+    public boolean updateActivity(CouponActivityPo po, long id) {
+        po.setId(id);
         return couponActivityPoMapper.updateByPrimaryKey(po) == 1;
     }
 
-    CouponActivityPo getActivityById(long id){
+    public CouponActivityPo getActivityById(long id){
         return couponActivityPoMapper.selectByPrimaryKey(id);
     }
 }
