@@ -4,7 +4,9 @@ import cn.edu.xmu.goods.model.vo.CategoryRetVo;
 import cn.edu.xmu.goods.model.vo.CategoryVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.goods.model.po.CategoryPo;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -36,11 +38,22 @@ public class Category implements VoObject, Serializable {
         po.setPid(this.getPid());
         return po;
     }
-    public CategoryPo gotCategoryPo() {
+    public CategoryPo getCategoryPo() {
         CategoryPo po = new CategoryPo();
         po.setId(this.getId());
         po.setName(this.getName());
         po.setPid(this.getPid());
         return po;
     }
+    public SimpleCategory createSimpleCategory(){
+        return new SimpleCategory(this.getId(),this.getName());
+    }
+}
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class SimpleCategory{
+    private Long id;
+    private String name;
 }

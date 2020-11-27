@@ -3,6 +3,7 @@ package cn.edu.xmu.goods.controller;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -130,14 +132,16 @@ public class GoodsController {
     @ApiImplicitParams({
             @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
             @ApiImplicitParam(name="shopId",value = "商店id", required = true, dataType="Integer", paramType="path"),
-            @ApiImplicitParam(name="id", value = "spuId",required = true, dataType="Integer", paramType="path")
+            @ApiImplicitParam(name="id", value = "skuId",required = true, dataType="Integer", paramType="path")
     })
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/skus/{id}/uploadImg")
-    public Object skuUploadImg(@PathVariable Integer shopId,@PathVariable Integer id){
-        return null;
+    public Object skuUploadImg(@RequestParam("img") MultipartFile multipartFile, @PathVariable Integer shopId, @PathVariable Integer id){
+        logger.debug("uploadImg: id = "+ id +" img :" + multipartFile.getOriginalFilename());
+        ReturnObject returnObject=goodsService.upLoadSkuImg(multipartFile,shopId,id);
+        return Common.getNullRetObj(returnObject,httpServletResponse);
     }
 
     /**
@@ -157,7 +161,8 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/skus/{id}")
     public Object deleteSku(@PathVariable Integer shopId,@PathVariable Integer id){
-        return null;
+       ReturnObject ret= goodsService.deleteSkuById(shopId,id);
+       return Common.getNullRetObj(ret,httpServletResponse);
     }
 
     /**
@@ -177,7 +182,8 @@ public class GoodsController {
     })
     @PutMapping("/shops/{shopId}/skus/{id}")
     public Object changeSku(@PathVariable Integer shopId, @PathVariable Integer id, @RequestBody SkuChangeVo skuChangeVo){
-        return null;
+        ReturnObject ret=goodsService.updateSku(shopId,id,skuChangeVo);
+        return Common.getNullRetObj(ret,httpServletResponse);
     }
 
     /**
@@ -195,7 +201,8 @@ public class GoodsController {
     })
     @GetMapping("/categories/{id}/subcategories")
     public Object selectCategories(@PathVariable Integer id){
-        return null;
+        ReturnObject ret=goodsService.getSubCategories(id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -213,7 +220,8 @@ public class GoodsController {
     })
     @PostMapping("/categories/{id}/subcategories")
     public Object addCategories(@PathVariable Integer id,@RequestBody String name){
-        return null;
+        ReturnObject ret=goodsService.newCategory(id,name);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -232,7 +240,8 @@ public class GoodsController {
     })
     @PutMapping("/categories/{id}")
     public Object changeCategories(@PathVariable Integer id,@RequestBody String name){
-        return null;
+        ReturnObject ret=goodsService.changeCategory(id,name);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -251,7 +260,8 @@ public class GoodsController {
     })
     @DeleteMapping("/categories/{id}")
     public Object deleteCategories(@PathVariable Integer id){
-        return null;
+        ReturnObject ret=goodsService.deleteCategoryById(id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -270,7 +280,9 @@ public class GoodsController {
     })
     @GetMapping("/spus/{id}")
     public Object getSpu(@PathVariable Integer id){
-        return null;
+        ReturnObject ret=goodsService.getSpuById(id);
+        return Common.decorateReturnObject(ret);
+
     }
 
     /**
@@ -289,7 +301,8 @@ public class GoodsController {
     })
     @PostMapping("/shops/{id}/spus")
     public Object addSpu(@PathVariable Integer id, @RequestBody SpuVo spuVo){
-        return null;
+        ReturnObject ret=goodsService.newSpu(id,spuVo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -308,8 +321,10 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{id}/uploadImg")
-    public Object uploadSpuImg(@PathVariable Integer id, @PathVariable Integer shopId){
-        return null;
+    public Object uploadSpuImg(@RequestParam("img") MultipartFile multipartFile, @PathVariable Integer shopId, @PathVariable Integer id){
+        logger.debug("uploadImg: id = "+ id +" img :" + multipartFile.getOriginalFilename());
+        ReturnObject returnObject=goodsService.upLoadSpuImg(multipartFile,shopId,id);
+        return Common.getNullRetObj(returnObject,httpServletResponse);
     }
 
 
@@ -330,7 +345,8 @@ public class GoodsController {
     })
     @PutMapping("/shops/{shopId}/spus/{id}")
     public Object changeSpu(@PathVariable Integer id, @PathVariable Integer shopId,@RequestBody SpuVo spuVo){
-        return null;
+        ReturnObject ret=goodsService.updateSpu(id,shopId,spuVo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -350,7 +366,8 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/spus/{id}")
     public Object deleteSpu(@PathVariable Integer id, @PathVariable Integer shopId){
-        return null;
+        ReturnObject ret=goodsService.deleteSpuById(id,shopId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -359,7 +376,7 @@ public class GoodsController {
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
      */
-    @ApiOperation(value = "店家逻辑删除SPU")
+    @ApiOperation(value = "店家逻辑上架SPU")
     @ApiImplicitParams({
             @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
             @ApiImplicitParam(name="id", value = "spuid",required = true, dataType="Integer", paramType="path"),
@@ -370,7 +387,8 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/spus/{id}/onshelves")
     public Object onShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId){
-        return null;
+        ReturnObject ret=goodsService.onShelfSpu(id,shopId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -390,7 +408,8 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/spus/{id}/offshelves")
     public Object offShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId){
-        return null;
+        ReturnObject ret=goodsService.offShelfSpu(id,shopId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -409,8 +428,9 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{id}/floatPrices")
-    public Object addFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId, @RequestBody FloatPriceVo floatPriceVo){
-        return null;
+    public Object addFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId, @RequestBody FloatPriceVo floatPriceVo ,Long userId){
+        ReturnObject ret=goodsService.newFloatPrice(id,shopId,floatPriceVo,userId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -429,8 +449,9 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/floatPrices/{id}")
-    public Object deleteFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId){
-        return null;
+    public Object deleteFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId ,Long userId){
+        ReturnObject ret=goodsService.deleteFloatPrice(id,shopId ,userId);
+        return ret;
     }
 
 
@@ -551,7 +572,8 @@ public class GoodsController {
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/categories/{id}")
     public Object addSputoCategory(@PathVariable Integer shopId,@PathVariable Integer spuId,@PathVariable Integer id){
-        return null;
+        ReturnObject ret=goodsService.addSpuToCategory(shopId,spuId,id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -572,7 +594,8 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/spus/{spuId}/categories/{id}")
     public Object deleteSpufromCategory(@PathVariable Integer shopId,@PathVariable Integer spuId,@PathVariable Integer id){
-        return null;
+        ReturnObject ret=goodsService.removeSpuFromCategory(shopId,spuId,id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -593,7 +616,8 @@ public class GoodsController {
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/brands/{id}")
     public Object addSputoBrand(@PathVariable Integer shopId,@PathVariable Integer spuId,@PathVariable Integer id){
-        return null;
+        ReturnObject ret=goodsService.addSpuToBrand(shopId,spuId,id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -614,7 +638,8 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/spus/{spuId}/brands/{id}")
     public Object deleteSpufromBrand(@PathVariable Integer shopId,@PathVariable Integer spuId,@PathVariable Integer id){
-        return null;
+        ReturnObject ret=goodsService.removeSpuFromBrand(shopId,spuId,id);
+        return Common.decorateReturnObject(ret);
     }
 
 

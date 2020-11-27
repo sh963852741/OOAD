@@ -14,7 +14,7 @@ public class CategoryDao {
     @Autowired
     CategoryPoMapper categoryPoMapper;
     public ReturnObject<Category> addCategory(Category category) {
-        CategoryPo categoryPo = category.gotCategoryPo();
+        CategoryPo categoryPo = category.getCategoryPo();
         ReturnObject<Category> retObj = null;
         try{
             int ret = categoryPoMapper.insertSelective(categoryPo);
@@ -38,7 +38,7 @@ public class CategoryDao {
         return retObj;
     }
     public ReturnObject<Category> setCategory(Category category){
-        CategoryPo categoryPo = category.gotCategoryPo();
+        CategoryPo categoryPo = category.getCategoryPo();
         ReturnObject<Category> retObj = null;
         try{
             int ret = categoryPoMapper.updateByPrimaryKeySelective(categoryPo);
