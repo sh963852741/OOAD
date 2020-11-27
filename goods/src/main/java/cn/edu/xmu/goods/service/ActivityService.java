@@ -33,23 +33,23 @@ public class ActivityService {
     GoodsService goodsService;
 
     //region 预售活动部分
-    public ReturnObject getPresaleActivityStatus(){
+    public ReturnObject getPresaleActivityStatus() {
         return new ReturnObject(PresaleActivity.PresaleStatus.values());
     }
 
     public ReturnObject getPresaleActivities(ActivityFinderVo activityFinderVo, boolean all) {
-        if(activityFinderVo.getSpuId() != null && !all) {
+        if (activityFinderVo.getSpuId() != null && !all) {
             List presaleList = presaleActivityDao.getActivitiesBySPUId(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
         } else {
             List presaleList = presaleActivityDao.getEffectiveActivities(
-                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(),all);
+                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
         }
         return null;
     }
 
     public ReturnObject addPresaleActivity(PresaleActivityVo presaleActivityVo) {
-        if(presaleActivityDao.addActivity(presaleActivityVo.createPo())){
+        if (presaleActivityDao.addActivity(presaleActivityVo.createPo())) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
@@ -57,7 +57,7 @@ public class ActivityService {
     }
 
     public ReturnObject modifyPresaleActivity(Long id, PresaleActivityVo presaleActivityVo) {
-        if(presaleActivityDao.updateActivity(presaleActivityVo.createPo(), id)){
+        if (presaleActivityDao.updateActivity(presaleActivityVo.createPo(), id)) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -65,7 +65,7 @@ public class ActivityService {
     }
 
     public ReturnObject delPresaleActivity(long id) {
-        if(presaleActivityDao.delActivity(id)){
+        if (presaleActivityDao.delActivity(id)) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -74,23 +74,23 @@ public class ActivityService {
     //endregion
 
     //region 团购活动部分
-    public ReturnObject grouponActivityStatus(){
+    public ReturnObject grouponActivityStatus() {
         return new ReturnObject(GrouponActivity.GrouponStatus.values());
     }
 
     public ReturnObject getGrouponActivities(ActivityFinderVo activityFinderVo, boolean all) {
-        if(activityFinderVo.getSpuId() != null && !all) {
+        if (activityFinderVo.getSpuId() != null && !all) {
             List presaleList = grouponActivityDao.getActivitiesBySPUId(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
         } else {
             List presaleList = grouponActivityDao.getEffectiveActivities(
-                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(),all);
+                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
         }
         return null;
     }
 
     public ReturnObject addGrouponActivity(GrouponActivityVo grouponActivityVo) {
-        if(grouponActivityDao.addActivity(grouponActivityVo.createPo())){
+        if (grouponActivityDao.addActivity(grouponActivityVo.createPo())) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
@@ -98,7 +98,7 @@ public class ActivityService {
     }
 
     public ReturnObject modifyGrouponActivity(Long id, GrouponActivityVo grouponActivityVo) {
-        if(grouponActivityDao.updateActivity(grouponActivityVo.createPo(), id)){
+        if (grouponActivityDao.updateActivity(grouponActivityVo.createPo(), id)) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -106,7 +106,7 @@ public class ActivityService {
     }
 
     public ReturnObject delGrouponActivity(long id) {
-        if(grouponActivityDao.delActivity(id)){
+        if (grouponActivityDao.delActivity(id)) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -115,12 +115,12 @@ public class ActivityService {
     //endregion
 
     //region 优惠活动部分
-    public ReturnObject couponActivityStatus(){
+    public ReturnObject couponActivityStatus() {
         return new ReturnObject(CouponActivity.CouponStatus.values());
     }
 
     public ReturnObject getCouponActivities(ActivityFinderVo activityFinderVo) {
-        if(activityFinderVo.getTimeline() == CouponActivity.CouponStatus.CANCELED.getCode()) {
+        if (activityFinderVo.getTimeline() == CouponActivity.CouponStatus.CANCELED.getCode()) {
             List presaleList = couponActivityDao.getInvalidActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId());
         } else {
@@ -131,7 +131,7 @@ public class ActivityService {
     }
 
     public ReturnObject addCouponActivity(CouponActivityVo couponActivityVo) {
-        if(couponActivityDao.addActivity(couponActivityVo.createPo())){
+        if (couponActivityDao.addActivity(couponActivityVo.createPo())) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
@@ -139,7 +139,7 @@ public class ActivityService {
     }
 
     public ReturnObject modifyCouponActivity(Long id, CouponActivityVo couponActivityVo) {
-        if(couponActivityDao.updateActivity(couponActivityVo.createPo(), id)){
+        if (couponActivityDao.updateActivity(couponActivityVo.createPo(), id)) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -147,7 +147,7 @@ public class ActivityService {
     }
 
     public ReturnObject delCouponActivity(long id) {
-        if(couponActivityDao.delActivity(id)){
+        if (couponActivityDao.delActivity(id)) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -157,7 +157,7 @@ public class ActivityService {
 
     //region 优惠券部分
     public ReturnObject getCouponList(Long userId, Byte state, Integer page, Integer pageSize) {
-        List Coupons = couponDao.getCouponList(userId,state,page,pageSize);
+        List Coupons = couponDao.getCouponList(userId, state, page, pageSize);
         return new ReturnObject(Coupons);
     }
 
@@ -165,7 +165,40 @@ public class ActivityService {
         CouponPo po = new CouponPo();
         po.setState(Coupon.CouponStatus.USED.getCode());
 
-        if(couponDao.modifyCoupon(po)==1){
+        if (couponDao.modifyCoupon(po) == 1) {
+            return new ReturnObject();
+        } else {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+    }
+
+    public ReturnObject delCoupon(Long couponId, Long userId) {
+        CouponPo po = new CouponPo();
+        po.setState(Coupon.CouponStatus.DELETED.getCode());
+
+        if (couponDao.modifyCoupon(po) == 1) {
+            return new ReturnObject();
+        } else {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+    }
+
+    public ReturnObject refundCoupon(Long couponId, Long userId) {
+        CouponPo po = new CouponPo();
+        po.setState(Coupon.CouponStatus.AVAILABLE.getCode());
+
+        if (couponDao.modifyCoupon(po) == 1) {
+            return new ReturnObject();
+        } else {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+    }
+
+    public ReturnObject claimCoupon(Long couponId, Long userId) {
+        CouponPo po = new CouponPo();
+        po.setState(Coupon.CouponStatus.AVAILABLE.getCode());
+
+        if (couponDao.modifyCoupon(po) == 1) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
