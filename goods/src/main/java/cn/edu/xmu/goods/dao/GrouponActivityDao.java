@@ -6,10 +6,12 @@ import cn.edu.xmu.goods.model.po.GrouponActivityPo;
 import cn.edu.xmu.goods.model.po.GrouponActivityPoExample;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public class GrouponActivityDao {
 
     @Autowired

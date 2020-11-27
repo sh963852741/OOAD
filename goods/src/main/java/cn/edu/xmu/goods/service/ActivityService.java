@@ -16,9 +16,11 @@ import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ActivityService {
     @Autowired
     PresaleActivityDao presaleActivityDao;

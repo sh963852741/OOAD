@@ -8,11 +8,12 @@ import cn.edu.xmu.goods.model.po.CouponSPUPo;
 import cn.edu.xmu.goods.model.po.CouponSPUPoExample;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@Repository
 public class CouponActivityDao {
 
     @Autowired

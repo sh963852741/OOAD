@@ -5,9 +5,10 @@ import cn.edu.xmu.goods.model.po.CouponPo;
 import cn.edu.xmu.goods.model.po.CouponPoExample;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public class CouponDao {
     @Autowired
     CouponPoMapper couponPoMapper;
