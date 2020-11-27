@@ -3,11 +3,12 @@ package cn.edu.xmu.goods.service;
 import cn.edu.xmu.goods.dao.CouponActivityDao;
 import cn.edu.xmu.goods.dao.GrouponActivityDao;
 import cn.edu.xmu.goods.dao.PresaleActivityDao;
+import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.bo.GrouponActivity;
 import cn.edu.xmu.goods.model.bo.PresaleActivity;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
-import cn.edu.xmu.goods.model.vo.GrouponVo;
-import cn.edu.xmu.goods.model.vo.PresaleVo;
+import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
+import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +42,16 @@ public class ActivityService {
         return null;
     }
 
-    public ReturnObject addPresaleActivity(PresaleVo presaleVo) {
-        if(presaleActivityDao.addActivity(presaleVo.createPo())){
+    public ReturnObject addPresaleActivity(PresaleActivityVo presaleActivityVo) {
+        if(presaleActivityDao.addActivity(presaleActivityVo.createPo())){
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
-    public ReturnObject modifyPresaleActivity(Long id, PresaleVo presaleVo) {
-        if(presaleActivityDao.updateActivity(presaleVo.createPo(), id)){
+    public ReturnObject modifyPresaleActivity(Long id, PresaleActivityVo presaleActivityVo) {
+        if(presaleActivityDao.updateActivity(presaleActivityVo.createPo(), id)){
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -82,16 +83,16 @@ public class ActivityService {
         return null;
     }
 
-    public ReturnObject addGrouponActivity(GrouponVo grouponVo) {
-        if(grouponActivityDao.addActivity(grouponVo.createPo())){
+    public ReturnObject addGrouponActivity(GrouponActivityVo grouponActivityVo) {
+        if(grouponActivityDao.addActivity(grouponActivityVo.createPo())){
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
-    public ReturnObject modifyGrouponActivity(Long id, GrouponVo grouponVo) {
-        if(grouponActivityDao.updateActivity(grouponVo.createPo(), id)){
+    public ReturnObject modifyGrouponActivity(Long id, GrouponActivityVo grouponActivityVo) {
+        if(grouponActivityDao.updateActivity(grouponActivityVo.createPo(), id)){
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -108,6 +109,9 @@ public class ActivityService {
     //endregion
 
     //region 优惠活动部分
+    public ReturnObject conponActivityStatus(){
+        return new ReturnObject(CouponActivity.CouponStatus.values());
+    }
 
     //endregion
 }

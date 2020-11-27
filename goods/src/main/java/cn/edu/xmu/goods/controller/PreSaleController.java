@@ -1,6 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
-import cn.edu.xmu.goods.model.vo.PresaleVo;
+import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,7 +70,7 @@ public class PreSaleController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/presales")
-    public Object createPresaleofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleVo presaleVo){
+    public Object createPresaleofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleActivityVo presaleActivityVo){
         return null;
     }
 
@@ -85,7 +85,7 @@ public class PreSaleController {
             @ApiResponse(code = 906, message = "预售活动状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/presales/{id}")
-    public Object changePresaleofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "预售活动id",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleVo presaleVo){
+    public Object changePresaleofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "预售活动id",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleActivityVo presaleActivityVo){
         return null;
     }
 

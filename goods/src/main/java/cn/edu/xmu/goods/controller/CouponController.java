@@ -1,6 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
-import cn.edu.xmu.goods.model.vo.CouponVo;
+import cn.edu.xmu.goods.model.vo.CouponActivityVo;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +40,7 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/couponactivities")
-    public Object addCouponactivity(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "spu ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "可修改的优惠活动信息" ,required=true )  @Valid @RequestBody CouponVo couponVo){
+    public Object addCouponactivity(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "spu ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "可修改的优惠活动信息" ,required=true )  @Valid @RequestBody CouponActivityVo couponActivityVo){
         return null;
     }
 
@@ -126,7 +126,7 @@ public class CouponController {
             @ApiResponse(code = 904, message = "优惠活动状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/couponactivities/{id}")
-    public Object shopsShopIdCouponactivitiesIdPut(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "可修改的优惠活动信息" ,required=true )  @Valid @RequestBody CouponVo couponVo){
+    public Object shopsShopIdCouponactivitiesIdPut(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "可修改的优惠活动信息" ,required=true )  @Valid @RequestBody CouponActivityVo couponActivityVo){
         return null;
     }
 

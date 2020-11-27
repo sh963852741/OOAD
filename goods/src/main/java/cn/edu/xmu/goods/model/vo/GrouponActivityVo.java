@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @ApiModel(value = "新建团购视图")
-public class GrouponVo {
+public class GrouponActivityVo {
 
     @ApiModelProperty(value = "活动名称")
     String name;

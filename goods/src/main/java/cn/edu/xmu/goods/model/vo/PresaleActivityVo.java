@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @ApiModel(value = "新建预售视图")
-public class PresaleVo {
+public class PresaleActivityVo {
 
     @ApiModelProperty(value = "预售名称")
     String name;
