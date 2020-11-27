@@ -9,7 +9,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-
+	<groupId>cn.edu.xmu.goods</groupId>
 	<artifactId>goods</artifactId>
 	<packaging>jar</packaging>
 

@@ -9,7 +9,6 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 
@@ -117,9 +116,8 @@ public class JwtHelper {
             Claim claimDepartId = claims.get("departId");
             return new UserAndDepart(claimUserId.asLong(), claimDepartId.asLong());
         } catch (JWTVerificationException exception) {
-//			exception.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public Date getAfterDate(Date date, int year, int month, int day, int hour, int minute, int second) {

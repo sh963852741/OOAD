@@ -60,7 +60,7 @@
             <property name="useJSR310Types" value="true"/>
         </javaTypeResolver>
         <!-- 生成模型的包名和位置 -->
-        <javaModelGenerator targetPackage="cn.edu.xmu.ooad.model.po"
+        <javaModelGenerator targetPackage="cn.edu.xmu.goods.model.po"
                             targetProject="src/main/java">
             <!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
             <property name="enableSubPackages" value="false" />
@@ -86,7 +86,7 @@
             注意，如果context是MyBatis3Simple：只支持ANNOTATEDMAPPER和XMLMAPPER
         -->
         <javaClientGenerator type="XMLMAPPER"
-                             targetPackage="cn.edu.xmu.ooad.mapper" targetProject="src/main/java">
+                             targetPackage="cn.edu.xmu.goods.mapper" targetProject="src/main/java">
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
 
@@ -128,7 +128,7 @@
 
         注意，table里面很多参数都是对javaModelGenerator，context等元素的默认属性的一个复写；
         -->
-        <table tableName="good_brand" domainObjectName="BrandPo"
+        <table tableName="brand" domainObjectName="BrandPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -138,7 +138,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_comment" domainObjectName="CommentPo"
+        <table tableName="comment" domainObjectName="CommentPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -148,7 +148,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_comment" domainObjectName="CommentPo"
+        <table tableName="coupon" domainObjectName="CouponPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -158,7 +158,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_coupon" domainObjectName="CouponPo"
+        <table tableName="coupon_activity" domainObjectName="CouponActivityPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -168,7 +168,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_coupon_activity" domainObjectName="CouponActivityPo"
+        <table tableName="coupon_spu" domainObjectName="CouponSPUPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -178,7 +178,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_coupon_spu" domainObjectName="CouponSPUPo"
+        <table tableName="flash_sale" domainObjectName="FlashSalePo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -188,7 +188,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_flash_sale" domainObjectName="FlashSalePo"
+        <table tableName="flash_sale_item" domainObjectName="FlashSaleItemPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -198,7 +198,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_flash_sale_item" domainObjectName="FlashSaleItemPo"
+        <table tableName="float_price" domainObjectName="FloatPricePo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -208,7 +208,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_float_price" domainObjectName="FloatPricePo"
+        <table tableName="goods_category" domainObjectName="CategoryPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -218,7 +218,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_goods_category" domainObjectName="CategoryPo"
+        <table tableName="goods_spu" domainObjectName="SPUPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -228,7 +228,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_goods_spu" domainObjectName="SPUPo"
+        <table tableName="goods_sku" domainObjectName="SKUPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -238,7 +238,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_goods_sku" domainObjectName="SKUPo"
+        <table tableName="groupon_activity" domainObjectName="GrouponActivityPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -248,7 +248,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_groupon_activity" domainObjectName="GrouponActivityPo"
+        <table tableName="presale_activity" domainObjectName="PresaleActivityPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -258,17 +258,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="good_presale_activity" domainObjectName="PresaleActivityPo"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="true"
-               selectByExampleQueryId="false">
-            <!-- 如果设置为true，生成的model类会直接使用column本身的名字，而不会再使用驼峰命名方法，比如BORN_DATE，生成的属性名字就是BORN_DATE,而不会是bornDate -->
-            <property name="useActualColumnNames" value="false"/>
-            <!--mysql 配置-->
-            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
-        </table>
-
-        <table tableName="good_shop" domainObjectName="ShopPo"
+        <table tableName="shop" domainObjectName="ShopPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
