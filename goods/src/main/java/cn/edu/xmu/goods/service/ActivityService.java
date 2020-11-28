@@ -8,7 +8,9 @@ import cn.edu.xmu.goods.model.bo.Coupon;
 import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.bo.GrouponActivity;
 import cn.edu.xmu.goods.model.bo.PresaleActivity;
+import cn.edu.xmu.goods.model.po.CouponActivityPo;
 import cn.edu.xmu.goods.model.po.CouponPo;
+import cn.edu.xmu.goods.model.po.GrouponActivityPo;
 import cn.edu.xmu.goods.model.po.PresaleActivityPo;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
 import cn.edu.xmu.goods.model.vo.CouponActivityVo;
@@ -87,33 +89,36 @@ public class ActivityService {
     }
 
     public ReturnObject getGrouponActivities(ActivityFinderVo activityFinderVo, boolean all) {
+        List<GrouponActivityPo> grouponList;
         if (activityFinderVo.getSpuId() != null && !all) {
-            List presaleList = grouponActivityDao.getActivitiesBySPUId(
+            grouponList = grouponActivityDao.getActivitiesBySPUId(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
         } else {
-            List presaleList = grouponActivityDao.getEffectiveActivities(
+            grouponList = grouponActivityDao.getEffectiveActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
         }
-        return null;
+        List<GrouponActivityVo> retList = grouponList.stream().map(e -> new GrouponActivityVo(e)).collect(Collectors.toList());
+        return new ReturnObject(retList);
     }
 
-    public ReturnObject addGrouponActivity(GrouponActivityVo grouponActivityVo) {
-        if (grouponActivityDao.addActivity(grouponActivityVo.createPo())) {
-            return new ReturnObject();
+    public ReturnObject<GrouponActivityVo> addGrouponActivity(GrouponActivityVo grouponActivityVo, long spuId, long shopId) {
+        GrouponActivityPo po = grouponActivityVo.createPo();
+        if (grouponActivityDao.addActivity(po, spuId, shopId)) {
+            return new ReturnObject(new GrouponActivityVo(po));
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
-    public ReturnObject modifyGrouponActivity(Long id, GrouponActivityVo grouponActivityVo) {
+    public ReturnObject<GrouponActivityVo> modifyGrouponActivity(Long id, GrouponActivityVo grouponActivityVo, long shopId) {
         if (grouponActivityDao.updateActivity(grouponActivityVo.createPo(), id)) {
-            return new ReturnObject();
+            return new ReturnObject(grouponActivityVo);
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
     }
 
-    public ReturnObject delGrouponActivity(long id) {
+    public ReturnObject<?> delGrouponActivity(long id) {
         if (grouponActivityDao.delActivity(id)) {
             return new ReturnObject();
         } else {

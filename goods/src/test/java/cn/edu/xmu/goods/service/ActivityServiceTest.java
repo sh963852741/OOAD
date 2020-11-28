@@ -1,7 +1,9 @@
 package cn.edu.xmu.goods.service;
 
+import cn.edu.xmu.goods.model.bo.GrouponActivity;
 import cn.edu.xmu.goods.model.po.PresaleActivityPo;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
+import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
 import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -111,6 +113,7 @@ class ActivityServiceTest {
     }
     //endregion
 
+    //region 团购
     @Test
     void grouponActivityStatus() {
         ReturnObject ret = activityService.getPresaleActivityStatus();
@@ -120,22 +123,74 @@ class ActivityServiceTest {
     @Test
     @Order(2)
     void getGrouponActivities() {
+        ActivityFinderVo vo = new ActivityFinderVo();
+        vo.setPage(1);
+        vo.setPageSize(10);
+        vo.setShopId(1L);
+        vo.setTimeline((byte)2);
+        ReturnObject ret = activityService.getGrouponActivities(vo, true);
+        assertEquals(ResponseCode.OK, ret.getCode());
+    }
+
+    @Test
+    @Order(2)
+    void getGrouponActivitiesBySPU() {
+        ActivityFinderVo vo = new ActivityFinderVo();
+        vo.setPage(1);
+        vo.setPageSize(10);
+        vo.setShopId(1L);
+        vo.setTimeline((byte)2);
+        vo.setSpuId(647L);
+        ReturnObject<List<GrouponActivityVo>> ret = activityService.getGrouponActivities(vo, true);
+        assertEquals(ResponseCode.OK, ret.getCode());
+        assertTrue(ret.getData().size() > 0);
     }
 
     @Test
     @Order(1)
     void addGrouponActivity() {
+        GrouponActivityVo vo =new GrouponActivityVo();
+        vo.setName("测试团购活动");
+        vo.setBeginTime(LocalDateTime.now().minusHours(3));
+        vo.setStrategy("{}");
+        vo.setEndTime(LocalDateTime.now().plusDays(1));
+
+        ReturnObject<GrouponActivityVo> ret = activityService.addGrouponActivity(vo, 647L, 1L);
+        assertEquals(ResponseCode.OK, ret.getCode());
+        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        assertNotNull(ret.getData().getId());
+        activityIdHash.put("runningGActivity", ret.getData().getId());
     }
 
     @Test
     @Order(2)
     void modifyGrouponActivity() {
+        assertTrue(activityIdHash.containsKey("runningGActivity"));
+
+        GrouponActivityVo vo =new GrouponActivityVo();
+        vo.setName("测试团购活动-改");
+        vo.setBeginTime(LocalDateTime.now().minusHours(5));
+        vo.setStrategy("{\"data\": \"123\"}");
+        vo.setEndTime(LocalDateTime.now().plusDays(1));
+
+        ReturnObject<GrouponActivityVo> ret = activityService.modifyGrouponActivity(activityIdHash.get("runningGActivity"), vo, 1L);
+        assertEquals(ResponseCode.OK, ret.getCode());
+        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        // assertNotNull(ret.getData().getId());
     }
 
     @Test
     @Order(3)
     void delGrouponActivity() {
+        assertTrue(activityIdHash.containsKey("runningGActivity"));
+
+        ReturnObject<?> ret = activityService.delGrouponActivity(activityIdHash.get("runningGActivity"));
+        assertEquals(ResponseCode.OK, ret.getCode());
+        activityIdHash.remove("runningGActivity");
     }
+    //endregion
 
     @Test
     void couponActivityStatus() {
