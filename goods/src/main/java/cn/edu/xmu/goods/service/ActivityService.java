@@ -9,6 +9,7 @@ import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.bo.GrouponActivity;
 import cn.edu.xmu.goods.model.bo.PresaleActivity;
 import cn.edu.xmu.goods.model.po.CouponPo;
+import cn.edu.xmu.goods.model.po.PresaleActivityPo;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
 import cn.edu.xmu.goods.model.vo.CouponActivityVo;
 import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
@@ -40,19 +41,21 @@ public class ActivityService {
     }
 
     public ReturnObject getPresaleActivities(ActivityFinderVo activityFinderVo, boolean all) {
+        List<PresaleActivityPo> presaleList;
         if (activityFinderVo.getSpuId() != null && !all) {
-            List presaleList = presaleActivityDao.getActivitiesBySPUId(
+            presaleList = presaleActivityDao.getActivitiesBySPUId(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
         } else {
-            List presaleList = presaleActivityDao.getEffectiveActivities(
+            presaleList = presaleActivityDao.getEffectiveActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
         }
-        return null;
+        return new ReturnObject(presaleList);
     }
 
-    public ReturnObject addPresaleActivity(PresaleActivityVo presaleActivityVo) {
-        if (presaleActivityDao.addActivity(presaleActivityVo.createPo())) {
-            return new ReturnObject();
+    public ReturnObject addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId) {
+        PresaleActivityPo po = presaleActivityVo.createPo();
+        if (presaleActivityDao.addActivity(po, spuId) == 1) {
+            return new ReturnObject(po);
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
