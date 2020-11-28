@@ -1,6 +1,7 @@
 package cn.edu.xmu.goods.service;
 
 import cn.edu.xmu.goods.dao.CategoryDao;
+import cn.edu.xmu.goods.model.po.CategoryPo;
 import cn.edu.xmu.goods.model.vo.CategoryVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.goods.model.bo.Category;
@@ -13,42 +14,58 @@ import org.springframework.stereotype.Service;
 public class CategoryService {
     @Autowired
     private CategoryDao categoryDao;
-    public ReturnObject<Object> deleteCategory(Long id) {
-        return categoryDao.deleteCategoryById(id);
+
+    /**
+     * 功能描述: 获取商品分类关系
+     * @Param: [id]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/26 22:13
+     */
+    public ReturnObject getSubCategories(Integer id) {
+        return categoryDao.getSubCategories(id.longValue());
     }
 
-    public ReturnObject<VoObject> addCategory(CategoryVo vo) {
-        Category category = vo.createCategory();
-        ReturnObject<Category> retObj = categoryDao.addCategory(category);
-        ReturnObject<VoObject> retCategory = null;
-        if (retObj.getCode().equals(ResponseCode.OK)) {
-            retCategory = new ReturnObject<>(retObj.getData());
-        } else {
-            retCategory = new ReturnObject<>(retObj.getCode(), retObj.getErrmsg());
-        }
-        return retCategory;
+    /**
+     * 功能描述: 新建商品分类
+     * @Param: [id, name]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/27 8:51
+     */
+    public ReturnObject newCategory(Integer id, String name) {
+        CategoryPo categoryPo=new CategoryPo();
+        categoryPo.setPid(id.longValue());
+        categoryPo.setName(name);
+        ReturnObject ret=categoryDao.insertCategory(categoryPo);
+        return ret;
     }
-    public ReturnObject <Object> setCategory( Long id, CategoryVo vo) {
-        Category category = vo.createCategory();
-        category.setId(id);
-        ReturnObject<Category> retObj = categoryDao.setCategory(category);
-        ReturnObject<Object> retCategory;
-        if (retObj.getCode().equals(ResponseCode.OK)) {
-            retCategory = new ReturnObject<>(retObj.getData());
-        } else {
-            retCategory = new ReturnObject<>(retObj.getCode(), retObj.getErrmsg());
-        }
-        return retCategory;
+
+    /**
+     * 功能描述: 修改商品类目
+     * @Param: [id, name]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/27 16:40
+     */
+    public ReturnObject changeCategory(Integer id, String name) {
+        CategoryPo po=new CategoryPo();
+        po.setId(id.longValue());
+        po.setName(name);
+        ReturnObject ret=categoryDao.updateCategory(po);
+        return ret;
     }
-    public ReturnObject<Object> getCategory(Long id) {
-        ReturnObject<Category> retObj = categoryDao.getCategoryById(id);
-        ReturnObject<Object> retCategory = null;
-        if (retObj.getCode().equals(ResponseCode.OK)) {
-            retCategory = new ReturnObject<>(retObj.getData());
-        } else {
-            retCategory = new ReturnObject<>(retObj.getCode(), retObj.getErrmsg());
-        }
-        return retCategory;
+
+    /**
+     * 功能描述: 删除商品类目
+     * @Param: [id]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/27 16:52
+     */
+    public ReturnObject deleteCategoryById(Integer id) {
+        ReturnObject ret=categoryDao.deleteCategoryById(id.longValue());
+        return ret;
     }
 
 }
