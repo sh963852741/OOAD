@@ -4,7 +4,10 @@ import cn.edu.xmu.goods.model.vo.BrandSimpleRetVo;
 import cn.edu.xmu.goods.model.vo.BrandVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.goods.model.po.BrandPo;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 @Data
@@ -21,7 +24,6 @@ public  class Brand implements VoObject, Serializable {
         this.name = po.getName();
         this.imageUrl = po.getImageUrl();
         this.detail = po.getDetail();
-
     }
 
     @Override
@@ -48,4 +50,17 @@ public  class Brand implements VoObject, Serializable {
         po.setDetail(this.getDetail());
         return po;
     }
+    public SimpleBrand createSimpleBrand(){
+        return new SimpleBrand(this.getId(),this.getName(),this.getImageUrl());
+    }
+
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class SimpleBrand{
+    private Long id;
+    private String name;
+    private String imageUrl;
 }

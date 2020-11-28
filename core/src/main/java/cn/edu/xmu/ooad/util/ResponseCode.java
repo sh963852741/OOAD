@@ -89,7 +89,8 @@ public enum ResponseCode {
     USER_HASSHOP(908,"用户已经有店铺"),
     COUPON_NOTBEGIN(909,"未到优惠卷领取时间"),
     COUPON_FINISH(910,"优惠卷领罄"),
-    COUPON_END(911,"优惠卷活动终止");
+    COUPON_END(911,"优惠卷活动终止"),
+    CATEGORY_SET_ERROR(912,"不能向一级目录中添加商品");
 
     private int code;
     private String message;
