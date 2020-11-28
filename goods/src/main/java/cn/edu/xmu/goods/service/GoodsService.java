@@ -75,6 +75,13 @@ public class GoodsService {
         return goodsDao.getAllSkus(vo, page, pageSize);
     }
 
+    /**
+     * 功能描述: 获取sku详细信息
+     * @Param: [SkuId]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/28 10:03
+     */
     public ReturnObject getSkuDetails(Integer SkuId){
         return null;
     }
@@ -190,59 +197,6 @@ public class GoodsService {
         sku.setId(id.longValue());
         ReturnObject ret=goodsDao.updateSku(sku);
 
-        return ret;
-    }
-
-    /**
-     * 功能描述: 获取商品分类关系
-     * @Param: [id]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/26 22:13
-     */
-    public ReturnObject getSubCategories(Integer id) {
-        return goodsDao.getSubCategories(id.longValue());
-    }
-
-    /**
-     * 功能描述: 新建商品分类
-     * @Param: [id, name]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 8:51
-     */
-    public ReturnObject newCategory(Integer id, String name) {
-        CategoryPo categoryPo=new CategoryPo();
-        categoryPo.setPid(id.longValue());
-        categoryPo.setName(name);
-        ReturnObject ret=goodsDao.insertCategory(categoryPo);
-        return ret;
-    }
-
-    /**
-     * 功能描述: 修改商品类目
-     * @Param: [id, name]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:40
-     */
-    public ReturnObject changeCategory(Integer id, String name) {
-        CategoryPo po=new CategoryPo();
-        po.setId(id.longValue());
-        po.setName(name);
-        ReturnObject ret=goodsDao.updateCategory(po);
-        return ret;
-    }
-
-    /**
-     * 功能描述: 删除商品类目
-     * @Param: [id]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:52
-     */
-    public ReturnObject deleteCategoryById(Integer id) {
-        ReturnObject ret=goodsDao.deleteCategoryById(id.longValue());
         return ret;
     }
 
@@ -415,6 +369,13 @@ public class GoodsService {
         return ret;
     }
 
+    /**
+     * 功能描述: 下架spu
+     * @Param: [id, shopId]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/28 10:01
+     */
     public ReturnObject offShelfSpu(Integer id, Integer shopId) {
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
@@ -462,7 +423,6 @@ public class GoodsService {
         return ret;
     }
 
-
     /**
      * 功能描述: 使浮动价格失效
      * @Param: [id, shopId, userId]
@@ -506,12 +466,12 @@ public class GoodsService {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        ReturnObject<Category> ret=categoryDao.getCategoryById(id);
+        ReturnObject<Category> ret=categoryDao.getCategoryById(id.longValue());
         if(ret.getCode()!=ResponseCode.OK){
             return ret;
         }
         Category category=ret.getData();
-        if(category.getPid()!=0){
+        if(category.getPid()==0){
             return new ReturnObject(ResponseCode.CATEGORY_SET_ERROR);
         }
         Spu spu=new Spu();
@@ -538,12 +498,12 @@ public class GoodsService {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        ReturnObject<Category> ret=categoryDao.getCategoryById(id);
+        ReturnObject<Category> ret=categoryDao.getCategoryById(id.longValue());
         if(ret.getCode()!=ResponseCode.OK){
             return ret;
         }
         Category category=ret.getData();
-        if(category.getPid()!=0){
+        if(category.getPid()==0){
             return new ReturnObject(ResponseCode.CATEGORY_SET_ERROR);
         }
         Spu spu=new Spu();
@@ -552,7 +512,6 @@ public class GoodsService {
         ReturnObject returnObject=goodsDao.updateSpu(spu);
         return returnObject;
     }
-
 
     /**
      * 功能描述: 将spu添加到品牌中

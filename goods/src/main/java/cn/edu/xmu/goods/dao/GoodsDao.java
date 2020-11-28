@@ -66,7 +66,6 @@ public class GoodsDao {
         return new ReturnObject<>(stateList);
     }
 
-
     /**
      * 功能描述: 查询所有Sku
      * @Param: [vo, page, pageSize]
@@ -146,7 +145,6 @@ public class GoodsDao {
         return new ReturnObject<>(sku);
     }
 
-
     /**
      * 功能描述: 更新sku
      * @Param: [sku]
@@ -211,92 +209,6 @@ public class GoodsDao {
             return new ReturnObject(spuPo.getShopId());
         }catch (Exception e){
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-    }
-
-    /**
-     * 功能描述: 获取商品分类列表
-     * @Param: [id]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/26 22:15
-     */
-    public ReturnObject getSubCategories(Long id){
-        CategoryPoExample example=new CategoryPoExample();
-        CategoryPoExample.Criteria criteria=example.createCriteria();
-        criteria.andPidEqualTo(id);
-        try {
-            List<CategoryPo> categoryPos = categoryPoMapper.selectByExample(example);
-            ReturnObject<List> ret=new ReturnObject<>(categoryPos);
-            return ret;
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-    }
-
-    /**
-     * 功能描述: 新建商品分类
-     * @Param: [categoryPo]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 8:53
-     */
-    public ReturnObject insertCategory(CategoryPo categoryPo) {
-        try{
-            categoryPo.setGmtCreated(LocalDateTime.now());
-            categoryPo.setGmtModified(categoryPo.getGmtCreated());
-            int ret=categoryPoMapper.insertSelective(categoryPo);
-            if (ret == 0) {
-                logger.debug("insertSku: insert failed: " + categoryPo.getId());
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-            }
-            return new ReturnObject(categoryPo);
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-    }
-
-    /**
-     * 功能描述: 修改商品类目
-     * @Param: [po]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:46
-     */
-    public ReturnObject updateCategory(CategoryPo po) {
-        try{
-            int ret;
-            ret=categoryPoMapper.updateByPrimaryKeySelective(po);
-            if(ret ==0){
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-            }else{
-                return new ReturnObject(ResponseCode.OK);
-            }
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-
-    }
-
-    /**
-     * 功能描述: 根据id删除Category
-     * @Param: id
-     * @Return: returnobject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:53
-     */
-
-    public ReturnObject deleteCategoryById(Long id){
-        try{
-            int ret;
-           ret= categoryPoMapper.deleteByPrimaryKey(id);
-           if(ret==0){
-               return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-           }else{
-               return new ReturnObject(ResponseCode.OK);
-           }
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
     }
 
@@ -393,7 +305,7 @@ public class GoodsDao {
     }
     
     /**
-     * 功能描述: 
+     * 功能描述: 更新floatPrice
      * @Param: 
      * @Return: 
      * @Author: Yifei Wang
