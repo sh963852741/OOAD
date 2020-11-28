@@ -3,78 +3,129 @@ package cn.edu.xmu.goods.dao;
 import cn.edu.xmu.goods.mapper.CategoryPoMapper;
 import cn.edu.xmu.goods.model.bo.Category;
 import cn.edu.xmu.goods.model.po.CategoryPo;
+import cn.edu.xmu.goods.model.po.CategoryPoExample;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public class CategoryDao {
+
+    private  static  final Logger logger = LoggerFactory.getLogger(CategoryDao.class);
+
     @Autowired
-    CategoryPoMapper categoryPoMapper;
-    public ReturnObject<Category> addCategory(Category category) {
-        CategoryPo categoryPo = category.getCategoryPo();
-        ReturnObject<Category> retObj = null;
+    private CategoryPoMapper categoryPoMapper;
+
+    /**
+     * 功能描述: 获取商品分类列表
+     * @Param: [id]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/26 22:15
+     */
+    public ReturnObject getSubCategories(Long id){
+        CategoryPoExample example=new CategoryPoExample();
+        CategoryPoExample.Criteria criteria=example.createCriteria();
+        criteria.andPidEqualTo(id);
+        try {
+            List<CategoryPo> categoryPos = categoryPoMapper.selectByExample(example);
+            ReturnObject<List> ret=new ReturnObject<>(categoryPos);
+            return ret;
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
+    /**
+     * 功能描述: 新建商品分类
+     * @Param: [categoryPo]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/27 8:53
+     */
+    public ReturnObject insertCategory(CategoryPo categoryPo) {
         try{
-            int ret = categoryPoMapper.insertSelective(categoryPo);
+            categoryPo.setGmtCreated(LocalDateTime.now());
+            categoryPo.setGmtModified(categoryPo.getGmtCreated());
+            int ret=categoryPoMapper.insertSelective(categoryPo);
             if (ret == 0) {
-                //插入失败
-                retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("新增失败：" + categoryPo.getName()));
-            } else {
-                //插入成功
-                category.setId(categoryPo.getId());
-                retObj = new ReturnObject<>(category);
+                logger.debug("insertSku: insert failed: " + categoryPo.getId());
+                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
             }
+            return new ReturnObject(categoryPo);
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
-        catch (DataAccessException e) {
-            // 其他数据库错误
-            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
-        }
-        catch (Exception e) {
-            // 其他Exception错误
-            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("发生了严重的数据库错误：%s", e.getMessage()));
-        }
-        return retObj;
     }
-    public ReturnObject<Category> setCategory(Category category){
-        CategoryPo categoryPo = category.getCategoryPo();
-        ReturnObject<Category> retObj = null;
+
+    /**
+     * 功能描述: 修改商品类目
+     * @Param: [po]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/27 16:46
+     */
+    public ReturnObject updateCategory(CategoryPo po) {
         try{
-            int ret = categoryPoMapper.updateByPrimaryKeySelective(categoryPo);
-            if (ret == 0) {
-                retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("品牌id不存在：" + categoryPo.getId()));
-            } else {
-                retObj = new ReturnObject<>();
+            int ret;
+            ret=categoryPoMapper.updateByPrimaryKeySelective(po);
+            if(ret ==0){
+                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            }else{
+                return new ReturnObject(ResponseCode.OK);
             }
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
-        catch (DataAccessException e) {
-            // 其他数据库错误
-            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
-        }
-        catch (Exception e) {
-            // 其他Exception错误
-            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("发生了严重的数据库错误：%s", e.getMessage()));
-        }
-        return retObj;
+
     }
-    public ReturnObject<Object> deleteCategoryById(Long id) {
-        ReturnObject<Object> retObj = null;
-        int ret = categoryPoMapper.deleteByPrimaryKey(id);
-        if (ret == 0) {
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("分类id不存在：" + id));
+
+    /**
+     * 功能描述: 根据id删除Category
+     * @Param: id
+     * @Return: returnobject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/27 16:53
+     */
+    public ReturnObject deleteCategoryById(Long id){
+        try{
+            int ret;
+            ret= categoryPoMapper.deleteByPrimaryKey(id);
+            if(ret==0){
+                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            }else{
+                return new ReturnObject(ResponseCode.OK);
+            }
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
-        else{
-            retObj = new ReturnObject<>();
-        }
-        return retObj;
     }
-    public ReturnObject<Category> getCategoryById(long id) {
-        CategoryPo categoryPo = categoryPoMapper.selectByPrimaryKey(id);
-        if (categoryPo == null) {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+
+    /**
+     * 功能描述: 根据id获取Category
+     * @Param: [id]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/28 10:39
+     */
+    public ReturnObject getCategoryById(Long id){
+        try{
+            CategoryPo categoryPo=categoryPoMapper.selectByPrimaryKey(id);
+            if(categoryPo==null){
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
+            Category category=new Category(categoryPo);
+            return new ReturnObject(category);
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
-        Category category = new Category(categoryPo);
-        return new ReturnObject<>(category);
     }
+
 }
