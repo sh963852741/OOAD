@@ -24,26 +24,28 @@ public class PresaleActivityDao {
      * @param spuId SPU的ID
      * @return
      */
-    public List<PresaleActivityPo> getActivitiesBySPUId(int page, int pageSize, long spuId, int timeline){
+    public List<PresaleActivityPo> getActivitiesBySPUId(int page, int pageSize, long spuId, Byte timeline){
         PageHelper.startPage(page, pageSize);
 
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
         criteria.andGoodsSpuIdEqualTo(spuId);
 
-        if (timeline == 0) {
-            /* 获取未开始的活动 */
-            criteria.andBeginTimeGreaterThan(LocalDateTime.now());
-        } else if (timeline == 1) {
-            /* 获取明天开始的活动 */
-            criteria.andBeginTimeGreaterThan(LocalDateTime.now());
-            criteria.andBeginTimeLessThan(LocalDateTime.now().plusDays(1));
-        } else if(timeline == 2) {
-            /* 获取正在进行中的活动 */
-            criteria.andBeginTimeLessThan(LocalDateTime.now());
-            criteria.andEndTimeGreaterThan(LocalDateTime.now());
-        } else if(timeline == 3) {
-            criteria.andEndTimeLessThan(LocalDateTime.now());
+        if(timeline != null) {
+            if (timeline == 0) {
+                /* 获取未开始的活动 */
+                criteria.andBeginTimeGreaterThan(LocalDateTime.now());
+            } else if (timeline == 1) {
+                /* 获取明天开始的活动 */
+                criteria.andBeginTimeGreaterThan(LocalDateTime.now());
+                criteria.andBeginTimeLessThan(LocalDateTime.now().plusDays(1));
+            } else if (timeline == 2) {
+                /* 获取正在进行中的活动 */
+                criteria.andBeginTimeLessThan(LocalDateTime.now());
+                criteria.andEndTimeGreaterThan(LocalDateTime.now());
+            } else if (timeline == 3) {
+                criteria.andEndTimeLessThan(LocalDateTime.now());
+            }
         }
 
         return presaleActivityPoMapper.selectByExample(example);
@@ -88,8 +90,9 @@ public class PresaleActivityDao {
         return presaleActivityPoMapper.selectByExample(example);
     }
 
-    public int addActivity(PresaleActivityPo po, Long skuId){
+    public int addActivity(PresaleActivityPo po, long skuId, long shopId){
         po.setGoodsSpuId(skuId);
+        po.setShopId(shopId);
         po.setGmtCreated(LocalDateTime.now());
         po.setState(PresaleActivity.PresaleStatus.PENDING.getCode());
         return presaleActivityPoMapper.insert(po);
@@ -101,6 +104,6 @@ public class PresaleActivityDao {
 
     public boolean updateActivity(PresaleActivityPo po, long primaryKeyId) {
         po.setId(primaryKeyId);
-        return presaleActivityPoMapper.updateByPrimaryKey(po) == 1;
+        return presaleActivityPoMapper.updateByPrimaryKeySelective(po) == 1;
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ActivityService {
@@ -40,7 +41,7 @@ public class ActivityService {
         return new ReturnObject(PresaleActivity.PresaleStatus.values());
     }
 
-    public ReturnObject getPresaleActivities(ActivityFinderVo activityFinderVo, boolean all) {
+    public ReturnObject<List<PresaleActivityVo>> getPresaleActivities(ActivityFinderVo activityFinderVo, boolean all) {
         List<PresaleActivityPo> presaleList;
         if (activityFinderVo.getSpuId() != null && !all) {
             presaleList = presaleActivityDao.getActivitiesBySPUId(
@@ -49,21 +50,23 @@ public class ActivityService {
             presaleList = presaleActivityDao.getEffectiveActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
         }
-        return new ReturnObject(presaleList);
+        List<PresaleActivityVo> retList = presaleList.stream().map(e -> new PresaleActivityVo(e)).collect(Collectors.toList());
+        return new ReturnObject(retList);
     }
 
-    public ReturnObject addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId) {
+    public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
-        if (presaleActivityDao.addActivity(po, spuId) == 1) {
-            return new ReturnObject(po);
+        if (presaleActivityDao.addActivity(po, spuId, shopId) == 1) {
+            return new ReturnObject(new PresaleActivityVo(po));
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
-    public ReturnObject modifyPresaleActivity(Long id, PresaleActivityVo presaleActivityVo) {
-        if (presaleActivityDao.updateActivity(presaleActivityVo.createPo(), id)) {
-            return new ReturnObject();
+    public ReturnObject modifyPresaleActivity(Long id, PresaleActivityVo presaleActivityVo, Long shopId) {
+        PresaleActivityPo po = presaleActivityVo.createPo();
+        if (presaleActivityDao.updateActivity(po, id)) {
+            return new ReturnObject(new PresaleActivityVo(po));
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
