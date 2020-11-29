@@ -1,8 +1,10 @@
 package cn.edu.xmu.goods.service;
 
+import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.bo.GrouponActivity;
 import cn.edu.xmu.goods.model.po.PresaleActivityPo;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
+import cn.edu.xmu.goods.model.vo.CouponActivityVo;
 import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
 import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
@@ -192,43 +194,77 @@ class ActivityServiceTest {
     }
     //endregion
 
+    //region 优惠活动
     @Test
     void couponActivityStatus() {
+        ReturnObject<CouponActivity.CouponStatus[]> ret = activityService.getCouponActivityStatus();
+        assertEquals(ResponseCode.OK, ret.getCode());
     }
 
     @Test
+    @Order(2)
     void getCouponActivities() {
+        ActivityFinderVo vo = new ActivityFinderVo();
+        vo.setPage(1);
+        vo.setPageSize(10);
+        vo.setShopId(1L);
+        vo.setTimeline((byte)2);
+        ReturnObject<List<CouponActivityVo>> ret = activityService.getCouponActivities(vo);
+        assertEquals(ResponseCode.OK, ret.getCode());
+        assertTrue(ret.getData().size() > 0);
     }
 
     @Test
+    @Order(1)
     void addCouponActivity() {
+        CouponActivityVo vo =new CouponActivityVo();
+        vo.setName("测试优惠活动");
+        vo.setBeginTime(LocalDateTime.now().minusHours(3));
+        vo.setStrategy("{}");
+        vo.setEndTime(LocalDateTime.now().plusDays(1));
+        vo.setQuantity(30);
+        vo.setQuantityType((byte)1);
+
+        ReturnObject<CouponActivityVo> ret = activityService.addCouponActivity(vo, 1L);
+        assertEquals(ResponseCode.OK, ret.getCode());
+        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        assertEquals(vo.getQuantity(),ret.getData().getQuantity());
+        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        assertEquals(vo.getQuantityType(),ret.getData().getQuantityType());
+        assertNotNull(ret.getData().getId());
+        activityIdHash.put("runningCActivity", ret.getData().getId());
     }
 
     @Test
+    @Order(2)
     void modifyCouponActivity() {
+        assertTrue(activityIdHash.containsKey("runningCActivity"));
+
+        CouponActivityVo vo =new CouponActivityVo();
+        vo.setName("测试优惠活动-改");
+        vo.setBeginTime(LocalDateTime.now().minusHours(3));
+        vo.setStrategy("{}");
+        vo.setEndTime(LocalDateTime.now().plusDays(1));
+        vo.setQuantity(50);
+        vo.setQuantityType((byte)0);
+
+        ReturnObject<CouponActivityVo> ret = activityService.modifyCouponActivity(activityIdHash.get("runningCActivity"), vo, 647L);
+        assertEquals(ResponseCode.OK, ret.getCode());
+        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        assertEquals(vo.getQuantity(),ret.getData().getQuantity());
+        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        assertEquals(vo.getQuantityType(),ret.getData().getQuantityType());
+        // assertNotNull(ret.getData().getId());
     }
 
     @Test
+    @Order(3)
     void delCouponActivity() {
-    }
+        assertTrue(activityIdHash.containsKey("runningCActivity"));
 
-    @Test
-    void getCouponList() {
+        ReturnObject<?> ret = activityService.delCouponActivity(activityIdHash.get("runningCActivity"));
+        assertEquals(ResponseCode.OK, ret.getCode());
+        activityIdHash.remove("runningCActivity");
     }
-
-    @Test
-    void useCoupon() {
-    }
-
-    @Test
-    void delCoupon() {
-    }
-
-    @Test
-    void refundCoupon() {
-    }
-
-    @Test
-    void claimCoupon() {
-    }
+    //endregion 优惠活动
 }

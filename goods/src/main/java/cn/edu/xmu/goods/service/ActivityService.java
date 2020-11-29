@@ -128,32 +128,35 @@ public class ActivityService {
     //endregion
 
     //region 优惠活动部分
-    public ReturnObject couponActivityStatus() {
+    public ReturnObject getCouponActivityStatus() {
         return new ReturnObject(CouponActivity.CouponStatus.values());
     }
 
     public ReturnObject getCouponActivities(ActivityFinderVo activityFinderVo) {
+        List<CouponActivityPo>couponList;
         if (activityFinderVo.getTimeline() == CouponActivity.CouponStatus.CANCELED.getCode()) {
-            List presaleList = couponActivityDao.getInvalidActivities(
+            couponList = couponActivityDao.getInvalidActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId());
         } else {
-            List presaleList = couponActivityDao.getEffectiveActivities(
+            couponList = couponActivityDao.getEffectiveActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline());
         }
-        return null;
+        List<CouponActivityVo> retList = couponList.stream().map(e -> new CouponActivityVo(e)).collect(Collectors.toList());
+        return new ReturnObject(retList);
     }
 
-    public ReturnObject addCouponActivity(CouponActivityVo couponActivityVo) {
-        if (couponActivityDao.addActivity(couponActivityVo.createPo())) {
-            return new ReturnObject();
+    public ReturnObject addCouponActivity(CouponActivityVo couponActivityVo, Long shopId) {
+        CouponActivityPo po = couponActivityVo.createPo();
+        if (couponActivityDao.addActivity(po, shopId)) {
+            return new ReturnObject(new CouponActivityVo(po));
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
-    public ReturnObject modifyCouponActivity(Long id, CouponActivityVo couponActivityVo) {
+    public ReturnObject modifyCouponActivity(Long id, CouponActivityVo couponActivityVo, long shopId) {
         if (couponActivityDao.updateActivity(couponActivityVo.createPo(), id)) {
-            return new ReturnObject();
+            return new ReturnObject(couponActivityVo);
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }

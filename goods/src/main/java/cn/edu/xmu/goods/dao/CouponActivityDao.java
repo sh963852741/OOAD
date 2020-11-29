@@ -65,11 +65,12 @@ public class CouponActivityDao {
             criteria.andEndTimeLessThan(LocalDateTime.now());
         }
         criteria.andShopIdEqualTo(shopId);
-
         return couponActivityPoMapper.selectByExample(example);
     }
 
-    public boolean addActivity(CouponActivityPo po){
+    public boolean addActivity(CouponActivityPo po, long shopId){
+        po.setShopId(shopId);
+        po.setGmtCreated(LocalDateTime.now());
         return couponActivityPoMapper.insert(po) == 1;
     }
 
@@ -79,10 +80,21 @@ public class CouponActivityDao {
 
     public boolean updateActivity(CouponActivityPo po, long id) {
         po.setId(id);
-        return couponActivityPoMapper.updateByPrimaryKey(po) == 1;
+        return couponActivityPoMapper.updateByPrimaryKeySelective(po) == 1;
     }
 
     public CouponActivityPo getActivityById(long id){
         return couponActivityPoMapper.selectByPrimaryKey(id);
+    }
+
+    public boolean addSpuToActivity(long activityId,long spuId){
+        CouponSPUPo po = new CouponSPUPo();
+        po.setActivityId(activityId);
+        po.setSpuId(spuId);
+        return couponSPUPoMapper.insert(po) == 1;
+    }
+
+    public boolean removeSpuFromActivity(long id){
+        return couponSPUPoMapper.deleteByPrimaryKey(id)==1;
     }
 }

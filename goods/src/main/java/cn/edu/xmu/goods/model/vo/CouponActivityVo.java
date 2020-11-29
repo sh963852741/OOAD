@@ -4,10 +4,13 @@ import cn.edu.xmu.goods.model.po.CouponActivityPo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 @Data
+@NoArgsConstructor
 @ApiModel(value = "优惠活动")
 public class CouponActivityVo {
 
@@ -35,6 +38,11 @@ public class CouponActivityVo {
     @ApiModelProperty(value = "优惠规则")
     String strategy;
 
+    Long id;
+    private LocalDateTime gmtCreate;
+    private LocalDateTime gmtModified;
+    public HashMap<String, Object> subData = new HashMap<>();
+
     public CouponActivityPo createPo() {
         CouponActivityPo po = new CouponActivityPo();
         po.setName(name);
@@ -46,5 +54,19 @@ public class CouponActivityVo {
         po.setEndTime(endTime);
         po.setStrategy(strategy);
         return po;
+    }
+
+    public CouponActivityVo(CouponActivityPo po){
+        id = po.getId();
+        name = po.getName();
+        quantity = po.getQuantity();
+        quantityType = po.getQuantitiyType();
+        validTerm = po.getValidTerm();
+        couponTime = po.getCouponTime();
+        beginTime = po.getBeginTime();
+        endTime =po.getEndTime();
+        strategy = po.getStrategy();
+        gmtCreate = po.getGmtCreated();
+        gmtModified = po.getGmtModified();
     }
 }
