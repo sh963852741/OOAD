@@ -21,6 +21,7 @@ import cn.edu.xmu.ooad.util.ReturnObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,6 +131,10 @@ public class ActivityService {
     //region 优惠活动部分
     public ReturnObject getCouponActivityStatus() {
         return new ReturnObject(CouponActivity.CouponStatus.values());
+    }
+
+    public ReturnObject getCouponStatus() {
+        return new ReturnObject(Coupon.CouponStatus.values());
     }
 
     public ReturnObject getCouponActivities(ActivityFinderVo activityFinderVo) {

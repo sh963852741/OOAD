@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class CouponServiceTest {
     @Test
     void getCouponList() {
+
     }
 
     @Test
