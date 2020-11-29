@@ -8,20 +8,19 @@ import cn.edu.xmu.goods.model.bo.Coupon;
 import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.bo.GrouponActivity;
 import cn.edu.xmu.goods.model.bo.PresaleActivity;
-import cn.edu.xmu.goods.model.po.CouponActivityPo;
-import cn.edu.xmu.goods.model.po.CouponPo;
-import cn.edu.xmu.goods.model.po.GrouponActivityPo;
-import cn.edu.xmu.goods.model.po.PresaleActivityPo;
+import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
 import cn.edu.xmu.goods.model.vo.CouponActivityVo;
 import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
 import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
+import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,8 +136,8 @@ public class ActivityService {
         return new ReturnObject(Coupon.CouponStatus.values());
     }
 
-    public ReturnObject getCouponActivities(ActivityFinderVo activityFinderVo) {
-        List<CouponActivityPo>couponList;
+    public ReturnObject<PageInfo<CouponActivityVo>> getCouponActivities(ActivityFinderVo activityFinderVo) {
+        PageInfo<CouponActivityPo> couponList;
         if (activityFinderVo.getTimeline() == CouponActivity.CouponStatus.CANCELED.getCode()) {
             couponList = couponActivityDao.getInvalidActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId());
@@ -146,8 +145,14 @@ public class ActivityService {
             couponList = couponActivityDao.getEffectiveActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline());
         }
-        List<CouponActivityVo> retList = couponList.stream().map(e -> new CouponActivityVo(e)).collect(Collectors.toList());
-        return new ReturnObject(retList);
+
+        List<CouponActivityVo> list = couponList.getList().stream().map(e -> new CouponActivityVo(e)).collect(Collectors.toList());
+        PageInfo<CouponActivityVo> ret = new PageInfo<>(list);
+        ret.setPages(couponList.getPages());
+        ret.setPageNum(couponList.getPageNum());
+        ret.setPageSize(couponList.getPageSize());
+        ret.setTotal(couponList.getTotal());
+        return new ReturnObject(ret);
     }
 
     public ReturnObject addCouponActivity(CouponActivityVo couponActivityVo, Long shopId) {
@@ -167,12 +172,40 @@ public class ActivityService {
         }
     }
 
+    public ReturnObject modifyCouponActivityStatus(Long id, CouponActivity.CouponStatus status){
+        if (couponActivityDao.changeActivityStatus(id, status.getCode())) {
+            return new ReturnObject();
+        } else {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+    }
+
     public ReturnObject delCouponActivity(long id) {
         if (couponActivityDao.delActivity(id)) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
+    }
+
+    public ReturnObject addSPUToCouponActivity(long spuId, long shopId, long activityId){
+        SPUPo spu = goodsService.getSpuById(spuId).getData();
+        if(spu == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
+        } else if(spu.getShopId() != shopId) {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
+        }
+
+        Long insertId = couponActivityDao.addSpuToActivity(activityId, spuId);
+        if(insertId != null){
+            return new ReturnObject();
+        } else {
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
+        }
+    }
+
+    public ReturnObject removeSPUFromCouponActivity(long spuId, long shopId, long activityId){
+        return null;
     }
     //endregion
 

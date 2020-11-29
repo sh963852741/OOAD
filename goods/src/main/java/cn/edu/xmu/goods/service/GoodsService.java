@@ -207,8 +207,8 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:09
      */
-    public ReturnObject getSpuById(Integer id) {
-        ReturnObject ret=goodsDao.getSpuById(id.longValue());
+    public ReturnObject<SPUPo> getSpuById(Long id) {
+        ReturnObject ret=goodsDao.getSpuById(id);
         return ret;
     }
 

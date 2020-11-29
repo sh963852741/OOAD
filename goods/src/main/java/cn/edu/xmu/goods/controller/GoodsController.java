@@ -201,7 +201,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/spus/{id}")
-    public Object getSpu(@PathVariable Integer id){
+    public Object getSpu(@PathVariable Long id){
         ReturnObject ret=goodsService.getSpuById(id);
         return Common.decorateReturnObject(ret);
 
