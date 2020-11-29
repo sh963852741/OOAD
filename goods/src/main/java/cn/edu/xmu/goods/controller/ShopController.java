@@ -1,8 +1,14 @@
 package cn.edu.xmu.goods.controller;
 
 
+import cn.edu.xmu.goods.service.ShopService;
+import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 店铺控制器
@@ -14,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/shop", produces = "application/json;charset=UTF-8")
 public class ShopController {
 
+    @Autowired
+    private ShopService shopService;
     /**
      * 获得店铺的所有状态
      * @param
@@ -24,9 +32,7 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/states")
-    public Object getshopState(){
-        return null;
-    }
+    public Object getshopState(){ return null;}
 
     /**
      * 店家申请店铺
