@@ -219,7 +219,7 @@ public class GoodsDao {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:10
      */
-    public ReturnObject  getSpuById(Long id) {
+    public ReturnObject getSpuById(Long id) {
         try {
             SPUPo spuPo=spuPoMapper.selectByPrimaryKey(id);
             if(spuPo==null){

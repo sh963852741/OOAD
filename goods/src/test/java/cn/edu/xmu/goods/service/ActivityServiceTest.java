@@ -9,6 +9,7 @@ import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
 import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import com.github.pagehelper.PageInfo;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -209,9 +210,9 @@ class ActivityServiceTest {
         vo.setPageSize(10);
         vo.setShopId(1L);
         vo.setTimeline((byte)2);
-        ReturnObject<List<CouponActivityVo>> ret = activityService.getCouponActivities(vo);
+        ReturnObject<PageInfo<CouponActivityVo>> ret = activityService.getCouponActivities(vo);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertTrue(ret.getData().size() > 0);
+        assertTrue(ret.getData().getList().size() > 0);
     }
 
     @Test

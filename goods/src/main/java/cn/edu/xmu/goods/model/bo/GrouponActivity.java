@@ -1,11 +1,13 @@
 package cn.edu.xmu.goods.model.bo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GrouponActivity {
-
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum GrouponStatus {
         PENDING((byte)0,"尚未开始"),
         RUNNING((byte)1,"活动进行中"),
