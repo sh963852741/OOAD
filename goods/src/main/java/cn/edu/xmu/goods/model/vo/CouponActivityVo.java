@@ -87,7 +87,7 @@ public class CouponActivityVo {
         beginTime = po.getBeginTime();
         endTime =po.getEndTime();
         strategy = po.getStrategy();
-        gmtCreate = po.getGmtCreated();
+        gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
     }
 }

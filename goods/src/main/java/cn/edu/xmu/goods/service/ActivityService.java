@@ -21,6 +21,8 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -219,6 +221,30 @@ public class ActivityService {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行删除程序");
         }
     }
+
+    public ReturnObject getSPUInCouponActivity(long activityId,int page,int pageSize){
+        PageInfo<CouponSPUPo> couponSPUPoPageInfo = couponActivityDao.getSPUsInActivity(activityId, page, pageSize);
+        List<HashMap<String,Object>> simpleSpuList = new ArrayList();
+        for(CouponSPUPo couponSPUPo:couponSPUPoPageInfo.getList()){
+            ReturnObject<SPUPo> ret = goodsService.getSpuById(couponSPUPo.getId());
+            HashMap<String,Object> hm = new HashMap<String,Object>(){
+                {
+                    put("id", ret.getData().getId());
+                    put("name", ret.getData().getName());
+                }
+            };
+            simpleSpuList.add(hm);
+        }
+        PageInfo<HashMap<String,Object>> ret = new PageInfo<>(simpleSpuList);
+        ret.setPageNum(couponSPUPoPageInfo.getPageNum());
+        ret.setPages(couponSPUPoPageInfo.getPages());
+        ret.setTotal(couponSPUPoPageInfo.getTotal());
+        ret.setPageSize(couponSPUPoPageInfo.getPageSize());
+
+        return new ReturnObject(ret);
+    }
+
+
     //endregion
 
     //region 优惠券部分

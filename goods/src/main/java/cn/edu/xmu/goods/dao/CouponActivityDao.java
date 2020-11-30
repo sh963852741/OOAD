@@ -3,10 +3,7 @@ package cn.edu.xmu.goods.dao;
 import cn.edu.xmu.goods.mapper.CouponActivityPoMapper;
 import cn.edu.xmu.goods.mapper.CouponSPUPoMapper;
 import cn.edu.xmu.goods.model.bo.CouponActivity;
-import cn.edu.xmu.goods.model.po.CouponActivityPo;
-import cn.edu.xmu.goods.model.po.CouponActivityPoExample;
-import cn.edu.xmu.goods.model.po.CouponSPUPo;
-import cn.edu.xmu.goods.model.po.CouponSPUPoExample;
+import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.ooad.model.VoObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -87,7 +84,7 @@ public class CouponActivityDao {
 
     public boolean addActivity(CouponActivityPo po, long shopId){
         po.setShopId(shopId);
-        po.setGmtCreated(LocalDateTime.now());
+        po.setGmtCreate(LocalDateTime.now());
         return couponActivityPoMapper.insert(po) == 1;
     }
 
@@ -121,5 +118,15 @@ public class CouponActivityDao {
         var x = couponSPUPoMapper.selectByExample(example);
 
         return couponSPUPoMapper.deleteByPrimaryKey(x.get(0).getId())==1;
+    }
+
+    public PageInfo<CouponSPUPo> getSPUsInActivity(long activityID, int page, int pageSize){
+        PageHelper.startPage(page,pageSize);
+
+        CouponSPUPoExample couponSPUPoExample = new CouponSPUPoExample();
+        var criteria = couponSPUPoExample.createCriteria();
+        criteria.andActivityIdEqualTo(activityID);
+        List<CouponSPUPo> list = couponSPUPoMapper.selectByExample(couponSPUPoExample);
+        return PageInfo.of(list);
     }
 }

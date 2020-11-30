@@ -68,7 +68,7 @@ public class PresaleActivityVo {
         payTime = po.getPayTime();
         advancePayPrice = po.getAdvancePayPrice();
         restPayPrice = po.getAdvancePayPrice();
-        gmtCreate = po.getGmtCreated();
+        gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
     }
 }

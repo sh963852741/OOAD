@@ -7,6 +7,7 @@ import cn.edu.xmu.goods.service.ActivityService;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -114,8 +115,16 @@ public class ActivityController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/{id}/couponactivities/invalid")
-    public Object showOwnInvalidCouponActivities(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,@ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
-        return null;
+    public Object showOwnInvalidCouponActivities(@Valid @RequestBody ActivityFinderVo activityFinderVo,
+                                                 BindingResult bindingResult, HttpServletResponse httpServletResponse){
+        var res = Common.processFieldErrors(bindingResult, httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
+        activityFinderVo.setTimeline(CouponActivity.CouponStatus.CANCELED.getCode());
+        ReturnObject ret = activityService.getCouponActivities(activityFinderVo);
+        return ret;
     }
 
 
@@ -129,8 +138,12 @@ public class ActivityController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/couponactivities/{id}/spus")
-    public Object couponactivitiesIdSpusGet(@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,@ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
-        return null;
+    public Object getSpuInCouponActivity(@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,
+                                         @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,
+                                         @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
+        ReturnObject ret = activityService.getSPUInCouponActivity(id,page,pageSize);
+
+        return getPageRetObjectWisely(ret);
     }
 
     /**

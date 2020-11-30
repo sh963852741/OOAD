@@ -287,7 +287,7 @@ public class GoodsDao {
      */
     public ReturnObject newFloatPrice(FloatPricePo po) {
         try{
-            po.setGmtCreated(LocalDateTime.now());
+            po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             int ret;
             ret=floatPricePoMapper.insertSelective(po);

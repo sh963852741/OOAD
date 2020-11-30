@@ -86,7 +86,7 @@ public class FloatPrice implements VoObject {
         this.setCreatedBy(po.getCreatedBy());
         this.setInvalidBy(po.getInvalidBy());
         this.setValid(po.getValid());
-        this.setGmtCreated(po.getGmtCreated());
+        this.setGmtCreated(po.getGmtCreate());
         this.setGmtModified(po.getGmtModified());
     }
 
@@ -101,7 +101,7 @@ public class FloatPrice implements VoObject {
         po.setCreatedBy(this.getCreatedBy());
         po.setInvalidBy(this.getInvalidBy());
         po.setValid(this.getValid());
-        po.setGmtCreated(this.getGmtCreated());
+        po.setGmtCreate(this.getGmtCreated());
         po.setGmtModified(this.getGmtModified());
         return po;
     }
