@@ -205,7 +205,19 @@ public class ActivityService {
     }
 
     public ReturnObject removeSPUFromCouponActivity(long spuId, long shopId, long activityId){
-        return null;
+        SPUPo spu = goodsService.getSpuById(spuId).getData();
+        if(spu == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
+        } else if(spu.getShopId() != shopId) {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
+        }
+
+        boolean success = couponActivityDao.removeSpuFromActivity(activityId, spuId);
+        if(success){
+            return new ReturnObject();
+        } else {
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行删除程序");
+        }
     }
     //endregion
 
