@@ -1,19 +1,19 @@
 package cn.edu.xmu.goods.service;
 
 
+import cn.edu.xmu.goods.dao.BrandDao;
 import cn.edu.xmu.goods.dao.CategoryDao;
 import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.dao.ShopDao;
 import cn.edu.xmu.goods.model.bo.Category;
 import cn.edu.xmu.goods.model.bo.FloatPrice;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.CategoryPo;
 import cn.edu.xmu.goods.model.po.FloatPricePo;
+import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.SPUPo;
-import cn.edu.xmu.goods.model.vo.FloatPriceVo;
-import cn.edu.xmu.goods.model.vo.SkuChangeVo;
-import cn.edu.xmu.goods.model.vo.SkuSelectVo;
-import cn.edu.xmu.goods.model.vo.SpuVo;
+import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -27,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: Yifei Wang
@@ -43,6 +45,12 @@ public class GoodsService {
 
     @Autowired
     private CategoryDao categoryDao;
+
+    @Autowired
+    private BrandDao brandDao;
+
+    @Autowired
+    private ShopDao shopDao;
 
     @Value("${goodsservice.webdav.username}")
     private String davUsername;
@@ -82,8 +90,19 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/28 10:03
      */
-    public ReturnObject getSkuDetails(Integer SkuId){
-        return null;
+    public ReturnObject getSkuDetails(Integer skuId){
+        ReturnObject ret=goodsDao.getSkuById(skuId.longValue());
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        Sku sku=(Sku)ret.getData();
+        SkuRetVo vo=sku.createVo();
+        ReturnObject spuRet=getSpuById(sku.getGoodsSpuId());
+        if(spuRet.getCode()!=ResponseCode.OK){
+            vo.setSpu(null);
+        }
+        vo.setSpu((SpuRetVo) spuRet.getData());
+        return new ReturnObject(vo);
     }
 
     /**
@@ -207,9 +226,14 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:09
      */
-    public ReturnObject<SPUPo> getSpuById(Long id) {
+    public ReturnObject getSpuById(Long id) {
         ReturnObject ret=goodsDao.getSpuById(id);
-        return ret;
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        Spu spu=new Spu((SPUPo) ret.getData());
+        SpuRetVo vo=spu.createVo();
+        return new ReturnObject(vo);
     }
 
     /**
@@ -227,7 +251,12 @@ public class GoodsService {
         po.setSpec(spuVo.getSpecs());
 
         ReturnObject ret=goodsDao.newSpu(po);
-        return ret;
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        Spu spu=new Spu((SPUPo) ret.getData());
+        SpuRetVo vo=spu.createVo();
+        return new ReturnObject(vo);
     }
 
     /**
@@ -341,6 +370,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.DELETE.getCode().byteValue());
+        spu.setState(Spu.State.DELETE.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -365,6 +395,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.NORM.getCode().byteValue());
+        spu.setState(Spu.State.NORM.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -389,6 +420,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
+        spu.setState(Spu.State.OFFSHELF.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -559,5 +591,17 @@ public class GoodsService {
         spu.setBrandId(null);
         ReturnObject returnObject=goodsDao.updateSpu(spu);
         return returnObject;
+    }
+
+
+    /**
+     * 功能描述: 通过spuid获取shopid
+     * @Param:
+     * @Return:
+     * @Author: Yifei Wang
+     * @Date: 2020/11/30 20:08
+     */
+    public ReturnObject getShopIdBySpuId(Long id){
+        return goodsDao.getShopIdBySpuId(id);
     }
 }

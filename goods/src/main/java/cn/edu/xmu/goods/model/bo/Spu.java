@@ -1,7 +1,16 @@
 package cn.edu.xmu.goods.model.bo;
 
+import cn.edu.xmu.goods.dao.BrandDao;
+import cn.edu.xmu.goods.dao.CategoryDao;
+import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.dao.ShopDao;
 import cn.edu.xmu.goods.model.po.SPUPo;
+import cn.edu.xmu.goods.model.vo.SkuSimpleRetVo;
+import cn.edu.xmu.goods.model.vo.SpuRetVo;
 import cn.edu.xmu.goods.model.vo.SpuVo;
+import cn.edu.xmu.goods.utility.SpringContextHelper;
+import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +18,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +29,8 @@ public class Spu {
      * 后台SPU状态
      */
     public enum State {
-        OFFSHELF(2,"下架"),
-        DELETE(3, "逻辑删除"),
+        OFFSHELF(0,"未上架"),
+        DELETE(6, "已删除"),
         NORM(4, "正常");
 
 
@@ -118,5 +128,91 @@ public class Spu {
         po.setDisabled(this.getState());
         return po;
     }
+
+    public SpuRetVo createVo(){
+        SpuRetVo vo=new SpuRetVo();
+        vo.setId(this.getId());
+        vo.setDetail(this.getDetail());
+        vo.setGoodsSn(this.getGoodsSn());
+        vo.setDisable(this.getDisabled());
+        vo.setImageUrl(this.getImageUrl());
+        vo.setName(this.getName());
+        vo.setGmtCreate(this.getGmtCreated());
+        vo.setGmtModified(this.getGmtModified());
+        vo.setState(this.getState());
+        vo.setSpec(this.getSpec());
+        vo.setBrand(this.getSimpleBrandVo());
+        vo.setCategory(this.getSimpleCategory());
+        vo.setFreight(this.getSimpleFreight());
+        vo.setShop(this.getSimpleShop());
+        vo.setSkuList(this.getSimpleSkus());
+        return vo;
+    }
+
+    //获取简单的brand
+    private Map<String,Object> getSimpleBrandVo(){
+        Map<String,Object> map=new HashMap<>();
+        BrandDao bean= SpringContextHelper.getBean(BrandDao.class);
+        if(this.getBrandId()==null){
+            return null;
+        }
+        ReturnObject ret=bean.getBrandById(this.getBrandId());
+        if(ret.getCode()!=ResponseCode.OK){
+            return null;
+        }
+        Brand brand=(Brand)ret.getData();
+        map.put("id",brand.getId());
+        map.put("name",brand.getName());
+        map.put("imageUrl",brand.getImageUrl());
+        return map;
+    }
+
+    private Map<String,Object> getSimpleShop(){
+        Map<String,Object>map=new HashMap<>();
+        ShopDao shopDao=SpringContextHelper.getBean(ShopDao.class);
+        if(this.getShopId()==null){
+            return null;
+        }
+        ReturnObject ret=shopDao.getShopById(this.getShopId());
+        if(ret.getCode()!=ResponseCode.OK){
+            return null;
+        }
+        Shop shop=(Shop)ret.getData();
+        map.put("id",shop.getId());
+        map.put("name",shop.getName());
+        return map;
+    }
+
+    private Map<String,Object> getSimpleFreight(){
+        return null;
+    }
+
+    private List<SkuSimpleRetVo> getSimpleSkus(){
+        GoodsDao goodsDao=SpringContextHelper.getBean(GoodsDao.class);
+        ReturnObject ret=goodsDao.getSkusBySpu(this.getId());
+        if(ret.getCode()!=ResponseCode.OK){
+            return null;
+        }
+        return (List<SkuSimpleRetVo>) ret.getData();
+    }
+
+    //获取简单的category
+    private Map<String,Object> getSimpleCategory(){
+        Map<String,Object>map=new HashMap<>();
+        CategoryDao categoryDao=SpringContextHelper.getBean(CategoryDao.class);
+        if(this.getCategoryId()==null){
+            return null;
+        }
+        ReturnObject ret=categoryDao.getCategoryById(this.getCategoryId());
+        if(ret.getCode()!= ResponseCode.OK){
+            return null;
+        }
+        Category category=(Category) ret.getData();
+        map.put("id",category.getId());
+        map.put("name",category.getName());
+        return map;
+    }
+
+
 }
 

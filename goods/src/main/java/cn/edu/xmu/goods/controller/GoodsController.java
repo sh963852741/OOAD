@@ -97,8 +97,9 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/skus/{id}")
-    public Object getSkuDetails(@PathVariable String id){
-        return null;
+    public Object getSkuDetails(@PathVariable Integer id){
+        ReturnObject ret=goodsService.getSkuDetails(id);
+        return Common.decorateReturnObject(ret);
     }
 
 
@@ -307,7 +308,7 @@ public class GoodsController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @DeleteMapping("/shops/{shopId}/spus/{id}/onshelves")
+    @PutMapping("/shops/{shopId}/spus/{id}/onshelves")
     public Object onShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId){
         ReturnObject ret=goodsService.onShelfSpu(id,shopId);
         return Common.decorateReturnObject(ret);
@@ -328,7 +329,7 @@ public class GoodsController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @DeleteMapping("/shops/{shopId}/spus/{id}/offshelves")
+    @PutMapping("/shops/{shopId}/spus/{id}/offshelves")
     public Object offShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId){
         ReturnObject ret=goodsService.offShelfSpu(id,shopId);
         return Common.decorateReturnObject(ret);
@@ -373,7 +374,7 @@ public class GoodsController {
     @DeleteMapping("/shops/{shopId}/floatPrices/{id}")
     public Object deleteFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId ,Long userId){
         ReturnObject ret=goodsService.deleteFloatPrice(id,shopId ,userId);
-        return ret;
+        return Common.decorateReturnObject(ret);
     }
 
 

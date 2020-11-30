@@ -15,15 +15,6 @@ public class ShopService {
     @Autowired
     private ShopDao shopDao;
 
-    @Value("${goodsservice.webdav.username}")
-    private String davUsername;
-
-    @Value("${goodsservice.webdav.password}")
-    private String davPassWord;
-
-    @Value("${goodsservice.webdav.baseUrl}")
-    private String baseUrl;
-
     /**
      * 功能描述: 获取shop详细信息
      * @Param: [ShopId]

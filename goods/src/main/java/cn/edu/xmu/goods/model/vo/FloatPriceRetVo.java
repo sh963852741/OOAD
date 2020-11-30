@@ -14,7 +14,7 @@ public class FloatPriceRetVo {
 
     private Long id;
     private Long activityPrice;
-    private Long quantity;
+    private Integer quantity;
     private LocalDateTime beginTime;
     private LocalDateTime endTime;
     private Long createBy;

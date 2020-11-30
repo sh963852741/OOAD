@@ -1,10 +1,8 @@
 package cn.edu.xmu.goods.model.bo;
 
-import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.ShopPo;
 import cn.edu.xmu.goods.model.vo.ShopRetVo;
 import cn.edu.xmu.goods.model.vo.ShopSimpleRetVo;
-import cn.edu.xmu.goods.model.vo.SkuChangeVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
