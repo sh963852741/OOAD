@@ -1,10 +1,15 @@
 package cn.edu.xmu.goods.model.bo;
 
 
+import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuChangeVo;
+import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.model.vo.SkuSimpleRetVo;
+import cn.edu.xmu.goods.utility.SpringContextHelper;
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,8 +29,8 @@ public class Sku implements VoObject {
      * 后台Sku状态
      */
     public enum State {
-        FORBID(3, "逻辑删除"),
-        NORM(4, "正常");
+        FORBID(6, "已删除"),
+        NORM(4, "上架");
 
         private static final Map<Integer, Sku.State> stateMap;
 
@@ -68,7 +73,7 @@ public class Sku implements VoObject {
 
     private String imageUrl;
 
-    private Long inventory;
+    private Integer inventory;
 
     private Long originalPrice;
 
@@ -87,8 +92,21 @@ public class Sku implements VoObject {
     private Byte disable;
 
     @Override
-    public Object createVo() {
-        return null;
+    public SkuRetVo createVo() {
+        SkuRetVo vo=new SkuRetVo();
+        vo.setId(this.getId());
+        vo.setConfiguration(this.getConfiguration());
+        vo.setDetail(this.getDetail());
+        vo.setGmtCreate(this.getGmtCreate().toString());
+        vo.setImageUrl(this.getImageUrl());
+        vo.setGmtModified(this.getGmtModified().toString());
+        vo.setInventory(this.getInventory());
+        vo.setName(this.getName());
+        vo.setOriginalPrice(this.getOriginalPrice());
+        vo.setPrice(this.getPrice());
+        vo.setSkuSn(this.getSkuSn());
+        vo.setWeight(this.getWeight());
+        return vo;
     }
 
     @Override
@@ -110,7 +128,7 @@ public class Sku implements VoObject {
         this.setDisable(skuPo.getDisabled());
         this.setId(skuPo.getId());
         this.setImageUrl(skuPo.getImageUrl());
-        this.setInventory((long)skuPo.getInventory());
+        this.setInventory(skuPo.getInventory());
         this.setName(skuPo.getName());
         this.setOriginalPrice(skuPo.getOriginalPrice());
         this.setSkuSn(skuPo.getSkuSn());
@@ -144,6 +162,7 @@ public class Sku implements VoObject {
         skuPo.setOriginalPrice(this.getOriginalPrice());
         skuPo.setSkuSn(this.getSkuSn());
         skuPo.setWeight(this.getWeight());
+        if(this.getInventory()!=null)
         skuPo.setInventory(this.getInventory().intValue());
         return skuPo;
     }

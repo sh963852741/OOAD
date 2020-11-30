@@ -123,6 +123,47 @@ public class GoodsDao {
     }
 
     /**
+     * 功能描述: 根据SPU获取sku
+     * @Param:
+     * @Return:
+     * @Author: Yifei Wang
+     * @Date: 2020/11/30 19:07
+     */
+    public ReturnObject getSkusBySpu(Long spuId){
+        SKUPoExample example =new SKUPoExample();
+        SKUPoExample.Criteria criteria=example.createCriteria();
+        criteria.andGoodsSpuIdEqualTo(spuId);
+        try {
+            List<SKUPo> skuPoList = skuPoMapper.selectByExample(example);
+            List<SkuSimpleRetVo> skuSimpleRetVos = new ArrayList<>();
+            for (SKUPo po : skuPoList) {
+                Sku sku = new Sku(po);
+
+                //查询浮动价格
+                FloatPricePoExample example1 = new FloatPricePoExample();
+                FloatPricePoExample.Criteria criteria1 = example1.createCriteria();
+                criteria1.andBeginTimeLessThanOrEqualTo(LocalDateTime.now());
+                criteria1.andEndTimeGreaterThan(LocalDateTime.now());
+                criteria1.andGoodsSkuIdEqualTo(po.getId());
+                List<FloatPricePo> pricePos = floatPricePoMapper.selectByExample(example1);
+
+                if (pricePos.size() == 0) {
+                    //没查到浮动价格
+                    sku.setPrice(po.getOriginalPrice());
+                } else {
+                    //查询到浮动价格
+                    sku.setPrice(pricePos.get(0).getActivityPrice());
+                }
+                skuSimpleRetVos.add(sku.createSimpleVo());
+            }
+            return new ReturnObject(skuSimpleRetVos);
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
+
+    /**
      * 功能描述: 根据id获取sku
      * @Param: [id]
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
@@ -156,6 +197,7 @@ public class GoodsDao {
         SKUPo skuPo=sku.createPo();
         int ret;
         try{
+            skuPo.setGmtModified(LocalDateTime.now());
             ret=skuPoMapper.updateByPrimaryKeySelective(skuPo);
         }catch (Exception e){
             logger.error("updateSkuImg: DataAccessException:" + e.getMessage());
@@ -241,6 +283,10 @@ public class GoodsDao {
     public ReturnObject newSpu(SPUPo po) {
         try{
             int ret;
+            po.setGmtCreated(LocalDateTime.now());
+            po.setGmtModified(LocalDateTime.now());
+            po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
+            po.setState(Spu.State.OFFSHELF.getCode().byteValue());
             ret=spuPoMapper.insertSelective(po);
             if(ret==0){
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
@@ -263,6 +309,7 @@ public class GoodsDao {
         SPUPo spuPo=updateSpu.createPo();
         int ret;
         try{
+            spuPo.setGmtModified(LocalDateTime.now());
             ret=spuPoMapper.updateByPrimaryKeySelective(spuPo);
         }catch (Exception e){
             logger.error("updateSkuImg: DataAccessException:" + e.getMessage());
