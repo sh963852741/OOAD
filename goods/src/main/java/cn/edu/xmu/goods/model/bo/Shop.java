@@ -78,22 +78,27 @@ public class Shop implements VoObject {
     public Shop(ShopPo shopPo){
         this.setId(shopPo.getId());
         this.setName(shopPo.getName());
+        this.setState(shopPo.getState());
+        this.setGmtCreated(shopPo.getGmtCreate());
+        this.setGmtModified(shopPo.getGmtModified());
     }
 
     public ShopPo createPo(){
         ShopPo shopPo=new ShopPo();
         shopPo.setId(this.getId());
         shopPo.setName(this.getName());
-        shopPo.setState(this.createSimpleVo().getState());
+        shopPo.setState(this.getState());
+        shopPo.setGmtCreate(this.getGmtCreated());
+        shopPo.setGmtModified(this.getGmtModified());
         return shopPo;
     }
 }
 
-@Data
+/*@Data
 @NoArgsConstructor
 @AllArgsConstructor
 class SimpleShop {
     private Long id;
     private String name;
     private byte state;
-}
+}*/

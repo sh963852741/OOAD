@@ -24,10 +24,14 @@ public class ShopControllerTests {
                 .andReturn().getResponse().getContentAsString();
     }
 
+    /**
+     * 新建店铺
+     * @throws Exception
+     */
     @Test
     public void applyShop() throws Exception {
         String requestJson = "{\"name\": \"张三商铺\"}";
-        String responseString = this.mvc.perform(post("/shops").header("authorization", null).content(requestJson))
+        String responseString = this.mvc.perform(post("/shop/shops").contentType("application/json;charset=UTF-8").content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();

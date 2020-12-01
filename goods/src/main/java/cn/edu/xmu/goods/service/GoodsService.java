@@ -243,7 +243,7 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:25
      */
-    public ReturnObject  newSpu(Integer id, SpuVo spuVo) {
+    public ReturnObject  newSpu(Long id, SpuVo spuVo) {
         SPUPo po=new SPUPo();
         po.setShopId(id.longValue());
         po.setName(spuVo.getName());
@@ -593,6 +593,11 @@ public class GoodsService {
         return returnObject;
     }
 
+    /**
+     *
+     */
+    public ReturnObject addSkuToSpu(Long shopId,Long id,SkuVo skuVo)
+    {return null;}
 
     /**
      * 功能描述: 通过spuid获取shopid

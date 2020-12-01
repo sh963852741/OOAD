@@ -191,9 +191,9 @@ public class ActivityService {
         var spu = goodsService.getSpuById(spuId).getData();
         if(spu == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
-        } else if((long)spu.getShop().get("id")!= shopId) {
+        } /*else if((long)spu.getShop().get("id")!= shopId) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
-        }
+        }*/
 
         Long insertId = couponActivityDao.addSpuToActivity(activityId, spuId);
         if(insertId != null){
@@ -207,9 +207,9 @@ public class ActivityService {
         var spu = goodsService.getSpuById(spuId).getData();
         if(spu == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
-        } else if((long)spu.getShop().get("id") != shopId) {
+        } /*else if((long)spu.getShop().get("id") != shopId) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
-        }
+        }*/
 
         boolean success = couponActivityDao.removeSpuFromActivity(activityId, spuId);
         if(success){
