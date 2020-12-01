@@ -148,6 +148,21 @@ public class Spu {
         return vo;
     }
 
+    public Map<String, Object> createSimpleSpu() {
+        Map<String,Object> simple=new HashMap<>();
+        simple.put("id",this.getId());
+        simple.put("name",this.getName());
+        simple.put("goodsSn",this.getGoodsSn());
+        simple.put("imageUrl",this.getImageUrl());
+        simple.put("state",this.getState());
+        simple.put("gmtCreate",this.getGmtCreate());
+        simple.put("gmtModified",this.getGmtModified());
+        simple.put("disable",this.getDisabled());
+        simple.put("shopId",this.getShopId());
+        return  simple;
+    }
+
+
     //获取简单的brand
     private Map<String,Object> getSimpleBrandVo(){
         Map<String,Object> map=new HashMap<>();

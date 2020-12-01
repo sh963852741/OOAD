@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,8 +59,19 @@ public class ActivityService {
 
     public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
+        Map<String,Object> spuVo = goodsService.getSimpleSpuById(spuId).getData();
+
+        if(spuVo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "对应的SPU不存在");
+        }
+        if(((Long)(spuVo.get("shopId"))).equals(shopId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不允许使用其他店铺的SPU");
+        }
+
         if (presaleActivityDao.addActivity(po, spuId, shopId) == 1) {
-            return new ReturnObject(new PresaleActivityVo(po));
+            presaleActivityVo = new PresaleActivityVo(po);
+            presaleActivityVo.subData.put("goodsSpu",spuVo);
+            return new ReturnObject(presaleActivityVo);
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }

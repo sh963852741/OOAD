@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 @ApiModel(value = "Spu视图")
 public class SpuVo {
 
-    @NotBlank
     @ApiModelProperty(value = "spu名称")
     String name;
 

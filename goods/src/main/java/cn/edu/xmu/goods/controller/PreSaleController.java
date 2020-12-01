@@ -1,9 +1,19 @@
 package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
+import cn.edu.xmu.goods.service.ActivityService;
+import cn.edu.xmu.ooad.annotation.Audit;
+import cn.edu.xmu.ooad.annotation.Depart;
+import cn.edu.xmu.ooad.annotation.LoginUser;
+import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -16,6 +26,9 @@ import javax.validation.Valid;
 @RequestMapping(value = "/presale", produces = "application/json;charset=UTF-8")
 public class PreSaleController {
 
+    @Autowired
+    private ActivityService activityService;
+
     /**
      * 获得预售活动的所有状态
      * @param
@@ -26,8 +39,8 @@ public class PreSaleController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/presales/states")
-    public Object getpresaleState(){
-        return null;
+    public Object getPresaleState(){
+        return activityService.getPresaleActivityStatus();
     }
 
 
@@ -70,8 +83,22 @@ public class PreSaleController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/presales")
-    public Object createPresaleofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleActivityVo presaleActivityVo){
-        return null;
+    @Audit
+    public Object addPresaleActivity(@Depart Long shopIdInToken, @LoginUser Long userId,
+                                     @ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
+                                     @ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Long spuId,
+                                     @ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleActivityVo presaleActivityVo,
+                                     BindingResult bindingResult, HttpServletResponse httpServletResponse){
+        var res = Common.processFieldErrors(bindingResult, httpServletResponse);
+        if(res != null){
+            return res;
+        }
+        if(shopIdInToken != shopId){
+            return new ReturnObject<>(ResponseCode.AUTH_INVALID_JWT, "店铺ID不一致，请重新登录或联系管理员");
+        }
+
+        ReturnObject ret = activityService.addPresaleActivity(presaleActivityVo, spuId, shopId);
+        return ret;
     }
 
     /**
