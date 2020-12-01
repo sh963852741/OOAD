@@ -227,13 +227,30 @@ public class GoodsService {
      * @Date: 2020/11/27 17:09
      */
     public ReturnObject getSpuById(Long id) {
-        ReturnObject ret=goodsDao.getSpuById(id);
-        if(ret.getCode()!=ResponseCode.OK){
+        ReturnObject ret = goodsDao.getSpuById(id);
+        if(ret.getCode() != ResponseCode.OK){
             return ret;
         }
-        Spu spu=new Spu((SPUPo) ret.getData());
+        Spu spu=new Spu((SPUPo)ret.getData());
         SpuRetVo vo=spu.createVo();
         return new ReturnObject(vo);
+    }
+
+    /**
+     * 功能描述: 获取简单的spu
+     * @Param: [id]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/1 20:14
+     */
+    public ReturnObject getSimpleSpuById(Long id){
+        ReturnObject ret = goodsDao.getSpuById(id);
+        if(ret.getCode() != ResponseCode.OK){
+            return ret;
+        }
+        Spu spu=new Spu((SPUPo)ret.getData());
+        Map<String,Object> simpleSpu=spu.createSimpleSpu();
+        return new ReturnObject(simpleSpu);
     }
 
     /**
