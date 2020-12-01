@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,12 +51,19 @@ public class Shop implements VoObject {
     }
     private Long id;
     private String name;
-    private String createdBy;
-    private String modifyBy;
+    private Byte state;
+    private LocalDateTime gmtCreated;
+    private LocalDateTime gmtModified;
 
     @Override
-    public Object createVo() {
-        return null;
+    public ShopRetVo createVo(){
+        ShopRetVo vo=new ShopRetVo();
+        vo.setId(this.getId());
+        vo.setName(this.getName());
+        vo.setGmtCreate(this.getGmtCreated());
+        vo.setGmtModified(this.getGmtModified());
+        vo.setState(this.getState());
+        return vo;
     }
 
     @Override
@@ -70,22 +78,27 @@ public class Shop implements VoObject {
     public Shop(ShopPo shopPo){
         this.setId(shopPo.getId());
         this.setName(shopPo.getName());
+        this.setState(shopPo.getState());
+        this.setGmtCreated(shopPo.getGmtCreate());
+        this.setGmtModified(shopPo.getGmtModified());
     }
 
     public ShopPo createPo(){
         ShopPo shopPo=new ShopPo();
         shopPo.setId(this.getId());
         shopPo.setName(this.getName());
-        shopPo.setState(this.createSimpleVo().getState());
+        shopPo.setState(this.getState());
+        shopPo.setGmtCreate(this.getGmtCreated());
+        shopPo.setGmtModified(this.getGmtModified());
         return shopPo;
     }
 }
 
-@Data
+/*@Data
 @NoArgsConstructor
 @AllArgsConstructor
 class SimpleShop {
     private Long id;
     private String name;
     private byte state;
-}
+}*/

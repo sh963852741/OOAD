@@ -1,6 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
-
+import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -45,8 +45,9 @@ public class ShopController {
             @ApiResponse(code = 908, message = "用户已经有店铺"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops")
-    public Object addShop(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization, @ApiParam(value = "" ,required=true )   @RequestBody String name){
-        return null;
+    public Object addShop( @RequestBody ShopVo shopvo){
+        ReturnObject ret=shopService.newShop(shopvo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
