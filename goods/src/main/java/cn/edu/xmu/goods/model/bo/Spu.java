@@ -158,6 +158,7 @@ public class Spu {
         simple.put("gmtCreate",this.getGmtCreate());
         simple.put("gmtModified",this.getGmtModified());
         simple.put("disable",this.getDisabled());
+        simple.put("shopId",this.getShopId());
         return  simple;
     }
 
