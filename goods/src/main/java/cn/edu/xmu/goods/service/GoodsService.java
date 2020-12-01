@@ -15,6 +15,7 @@ import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.SPUPo;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.util.ImgHelper;
+import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import org.slf4j.Logger;
@@ -22,13 +23,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: Yifei Wang
@@ -603,5 +608,39 @@ public class GoodsService {
      */
     public ReturnObject getShopIdBySpuId(Long id){
         return goodsDao.getShopIdBySpuId(id);
+    }
+
+    /**
+     * 功能描述: 将sku添加到spu中
+     * @Param: [shopId, id, skuVo]
+     * @Return: void
+     * @Author: Yifei Wang
+     * @Date: 2020/12/1 10:24
+     */
+    @Transactional
+    public ReturnObject addSkuToSpu(Integer shopId, Integer id, SkuVo skuVo) {
+        if(shopId!=0){
+            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
+            if(check.getCode()!=ResponseCode.OK){
+                return check;
+            }
+            if(shopId.longValue()!=check.getData()){
+                return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
+            }
+        }
+        SKUPo po=new SKUPo();
+        ReturnObject ret=goodsDao.newSku(po);
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        String specs= JacksonUtil.toJson(skuVo.getSpuSpec());
+        Spu spu=new Spu();
+        spu.setId(id.longValue());
+        spu.setSpec(specs);
+        ReturnObject spuRet=goodsDao.updateSpu(spu);
+        if(spuRet.getCode()!=ResponseCode.OK){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
+        return ret;
     }
 }

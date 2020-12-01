@@ -20,6 +20,6 @@ public class FloatPriceRetVo {
     private Long createBy;
     private Long modifiedBy;
     private Byte valid;
-    private LocalDateTime gmtCreated;
+    private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
 }
