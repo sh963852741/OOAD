@@ -1,7 +1,9 @@
 package cn.edu.xmu.goods.service;
 
 import cn.edu.xmu.goods.dao.ShopDao;
+import cn.edu.xmu.goods.model.bo.Comment;
 import cn.edu.xmu.goods.model.bo.Shop;
+import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.ShopPo;
 import cn.edu.xmu.goods.model.vo.ShopRetVo;
 import cn.edu.xmu.goods.model.vo.ShopVo;
@@ -50,5 +52,82 @@ public class ShopService {
         Shop shop=new Shop((ShopPo) ret.getData());
         ShopRetVo vo=shop.createVo();
         return new ReturnObject(vo);
+    }
+
+    /**
+     * 功能描述: 获取店铺所有状态
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Lei Yang
+     * @Date: 2020/12/1 20:36
+     */
+    public ReturnObject getShopStates(){
+        return shopDao.getShopState();
+    }
+
+    /**
+     * 功能描述: 修改商铺信息
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Lei Yang
+     * @Date: 2020/12/1 20:36
+     */
+    public ReturnObject updateShop(Long id,Long shopId, ShopVo shopVo) {
+        Shop shop=new Shop();
+        shop.setId(id.longValue());
+        shop.setName(shopVo.getName());
+        ReturnObject ret=shopDao.UpdateShop(shop);
+        return ret;
+    }
+
+    /**
+     * 功能描述: 关闭商铺
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Lei YangLong
+     * @Date: 2020/12/1 20:36
+     */
+    public ReturnObject deleteShopById(Long id) {
+        ReturnObject ret=shopDao.deleteShopbyID(id.longValue());
+        return ret;
+    }
+
+    /**
+     * 功能描述: 管理员审核商铺
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Lei YangLong
+     * @Date: 2020/12/1 20:36
+     */
+    public ReturnObject passShop(Long id,ShopConclusionVo conclusion) {
+        Shop shop=new Shop();
+        shop.setId(id.longValue());
+        shop.setState(conclusion.getConclusion()==true? Shop.State.NORM.getCode().byteValue() : Shop.State.EXAME.getCode().byteValue());
+        ReturnObject ret=shopDao.updateShopState(shop);
+        return ret;
+    }
+
+    /**
+     * 功能描述: 管理员上线商铺
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Lei YangLong
+     * @Date: 2020/12/1 20:36
+     */
+    public ReturnObject onShelfShop(Long id) {
+        Shop shop=new Shop();
+        shop.setId(id.longValue());
+        shop.setState(Shop.State.ONLINE.getCode().byteValue());
+        ReturnObject ret=shopDao.UpdateShop(shop);
+        return ret;
+    }
+
+    /**
+     * 功能描述: 管理员下线商铺
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Lei YangLong
+     * @Date: 2020/12/1 20:36
+     */
+    public ReturnObject offShelfShop(Long id) {
+        Shop shop=new Shop();
+        shop.setId(id.longValue());
+        shop.setState(Shop.State.OFFLINE.getCode().byteValue());
+        ReturnObject ret=shopDao.UpdateShop(shop);
+        return ret;
     }
 }
