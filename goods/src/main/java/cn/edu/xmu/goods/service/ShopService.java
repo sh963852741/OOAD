@@ -39,7 +39,7 @@ public class ShopService {
      * @Author: Lei Yang
      * @Date: 2020/11/29 22:10
      */
-    public ReturnObject  newShop(Long id, ShopVo shopVo) {
+    public ReturnObject  newShop(ShopVo shopVo) {
         ShopPo po=new ShopPo();
         po.setName(shopVo.getName());
 
