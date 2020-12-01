@@ -121,7 +121,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{id}/skus")
-    public Object addSkutoSpu(@PathVariable Integer shopId,@PathVariable Integer id,@RequestBody SkuVo skuVo){
+    public Object addSkutoSpu(@PathVariable Long shopId,@PathVariable Long id,@RequestBody SkuVo skuVo){
         if(shopId==null||id==null){
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
@@ -263,7 +263,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{id}/spus")
-    public Object addSpu(@PathVariable Integer id, @RequestBody SpuVo spuVo){
+    public Object addSpu(@PathVariable Long id, @RequestBody SpuVo spuVo){
         if(id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
