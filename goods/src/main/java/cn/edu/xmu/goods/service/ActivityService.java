@@ -18,6 +18,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -245,12 +246,61 @@ public class ActivityService {
     //endregion
 
     //region 优惠券部分
+
+    /**
+     * 用户获取自己的优惠券
+     * @param userId
+     * @param state 优惠券状态
+     * @param page
+     * @param pageSize
+     * @return
+     */
     public ReturnObject getCouponList(Long userId, Byte state, Integer page, Integer pageSize) {
-        List Coupons = couponDao.getCouponList(userId, state, page, pageSize);
-        return new ReturnObject(Coupons);
+        PageInfo<CouponPo> couponPoList = couponDao.getCouponList(userId, state, page, pageSize);
+
+        List<HashMap<String,Object>> couponList = new ArrayList<>();
+        for(CouponPo couponPo:couponPoList.getList()){
+            HashMap<String, Object> singleCoupon = new HashMap<>();
+            HashMap<String, Object> singleActivity = new HashMap<>();
+
+            var activityPo = couponActivityDao.getActivityById(couponPo.getActivityId());
+
+            singleCoupon.put("id", couponPo.getId());
+            singleCoupon.put("activity", new ActivityInCouponVo(activityPo));
+            singleCoupon.put("name",couponPo.getName());
+            singleCoupon.put("couponSn",couponPo.getCouponSn());
+
+            couponList.add(singleCoupon);
+        }
+
+        PageInfo ret = new PageInfo(couponList);
+        ret.setPageNum(couponPoList.getPageNum());
+        ret.setPages(couponPoList.getPages());
+        ret.setPageSize(couponPoList.getPageSize());
+        ret.setTotal(couponPoList.getTotal());
+
+        return new ReturnObject(ret);
     }
 
+    /**
+     * 用户使用优惠券
+     * @param couponId 优惠券ID
+     * @param userId 用户ID
+     * @return
+     */
     public ReturnObject useCoupon(Long couponId, Long userId) {
+        CouponPo couponToUse = couponDao.getCoupon(couponId);
+        if(couponToUse == null){
+            new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "您使用的优惠券不存在");
+        }else if(couponToUse.getCustomerId() != userId){
+            new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "不可使用不属于您的优惠券");
+        }else if(couponToUse.getBeginTime().isAfter(LocalDateTime.now())
+                ||couponToUse.getEndTime().isBefore(LocalDateTime.now())){
+            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
+        }else if(couponToUse.getState() != Coupon.CouponStatus.AVAILABLE.getCode()){
+            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
+        }
+
         CouponPo po = new CouponPo();
         po.setState(Coupon.CouponStatus.USED.getCode());
 
@@ -261,6 +311,12 @@ public class ActivityService {
         }
     }
 
+    /**
+     * 用户删除优惠券
+     * @param couponId
+     * @param userId
+     * @return
+     */
     public ReturnObject delCoupon(Long couponId, Long userId) {
         CouponPo po = new CouponPo();
         po.setState(Coupon.CouponStatus.DELETED.getCode());
@@ -272,6 +328,12 @@ public class ActivityService {
         }
     }
 
+    /**
+     * 系统退还优惠券
+     * @param couponId
+     * @param userId
+     * @return
+     */
     public ReturnObject refundCoupon(Long couponId, Long userId) {
         CouponPo po = new CouponPo();
         po.setState(Coupon.CouponStatus.AVAILABLE.getCode());
@@ -283,16 +345,70 @@ public class ActivityService {
         }
     }
 
-    public ReturnObject claimCoupon(Long couponId, Long userId) {
-        CouponPo po = new CouponPo();
-        po.setState(Coupon.CouponStatus.AVAILABLE.getCode());
-
-        if (couponDao.modifyCoupon(po) == 1) {
-            return new ReturnObject();
-        } else {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+    /**
+     * 用户领取优惠券
+     * @param activityId 优惠活动ID
+     * @param userId 用户ID
+     * @return
+     */
+    public ReturnObject claimCoupon(Long activityId, Long userId) {
+        CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
+        if (couponActivityPo == null) {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动不存在");
+        } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
+                || couponActivityPo.getEndTime().isBefore(LocalDateTime.now())) {
+            return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动已结束或者未开始");
+        } else if (couponActivityPo.getState() != CouponActivity.CouponStatus.RUNNING.getCode()) {
+            return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
         }
-    }
 
+        var couponPoList = couponDao.getCouponList(userId, null, 1, 1);
+        if (couponPoList.getList().size() != 0) {
+            return new ReturnObject(ResponseCode.COUPON_FINISH, "你已经领取过本活动的优惠券了");
+        }
+
+        CouponPo po = new CouponPo();
+
+        if (couponActivityPo.getQuantitiyType() == 0) {
+            // 每人限领取一定数量，生成quantity张
+            for (int i = 0; i < couponActivityPo.getQuantity(); ++i) {
+
+                if (couponActivityPo.getValidTerm() == 0) {
+                    po.setBeginTime(couponActivityPo.getCouponTime());
+                    po.setEndTime(couponActivityPo.getEndTime());
+                } else if (couponActivityPo.getValidTerm() > 0) {
+                    po.setBeginTime(LocalDateTime.now());
+                    po.setEndTime(
+                            LocalDateTime.now().plusDays(couponActivityPo.getValidTerm()).isAfter(couponActivityPo.getEndTime()) ?
+                                    couponActivityPo.getEndTime() : LocalDateTime.now().plusDays(couponActivityPo.getValidTerm())
+                    );
+                }
+                couponDao.addCoupon(po, activityId, userId);
+            }
+        } else if (couponActivityPo.getQuantitiyType() == 1) {
+            // 总数控制，每人领取一张
+            if (couponActivityPo.getQuantity() > 0) {
+                couponActivityPo.setQuantity(couponActivityPo.getQuantity() - 1);
+                couponActivityDao.updateActivity(couponActivityPo, couponActivityPo.getId());
+            } else {
+                return new ReturnObject(ResponseCode.COUPON_FINISH, "优惠券已售罄");
+            }
+
+            if (couponActivityPo.getValidTerm() == 0) {
+                po.setBeginTime(couponActivityPo.getCouponTime());
+                po.setEndTime(couponActivityPo.getEndTime());
+            } else if (couponActivityPo.getValidTerm() > 0) {
+                po.setBeginTime(LocalDateTime.now());
+                po.setEndTime(
+                        LocalDateTime.now().plusDays(couponActivityPo.getValidTerm()).isAfter(couponActivityPo.getEndTime()) ?
+                                couponActivityPo.getEndTime() : LocalDateTime.now().plusDays(couponActivityPo.getValidTerm())
+                );
+            }
+            couponDao.addCoupon(po, activityId, userId);
+        }
+        ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
+        CouponVo couponVo = new CouponVo(po,activityInCouponVo);
+        return new ReturnObject(couponVo);
+    }
     //endregion
 }
