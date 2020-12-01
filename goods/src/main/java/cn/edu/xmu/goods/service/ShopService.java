@@ -28,7 +28,7 @@ public class ShopService {
      * @Author: Lei Yang
      * @Date: 2020/11/29 23:21
      */
-    public ReturnObject getShopByShopId(Long ShopId){
+    public ReturnObject<Shop> getShopByShopId(Long ShopId){
         return shopDao.getShopById(ShopId);
     }
 

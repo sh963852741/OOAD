@@ -26,7 +26,7 @@ public class ShopDao {
      * @Author: Lei Yang
      * @Date: 2020/11/29 22:10
      */
-    public ReturnObject getShopById(Long id){
+    public ReturnObject<Shop> getShopById(Long id){
         ShopPo shopPo;
         try {
             shopPo = shopPoMapper.selectByPrimaryKey(id);

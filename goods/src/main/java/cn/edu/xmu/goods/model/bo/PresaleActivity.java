@@ -1,6 +1,8 @@
 package cn.edu.xmu.goods.model.bo;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -26,6 +28,7 @@ public class PresaleActivity {
         }
 
         private byte code;
+        @JsonProperty("name")
         private String description;
 
         PresaleStatus(byte code, String description) {

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import static cn.edu.xmu.ooad.util.Common.decorateReturnObject;
+
 /**
  * 预售控制器
  * @author Yifei Wang
@@ -40,7 +42,7 @@ public class PreSaleController {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/presales/states")
     public Object getPresaleState(){
-        return activityService.getPresaleActivityStatus();
+        return decorateReturnObject(activityService.getPresaleActivityStatus());
     }
 
 
@@ -94,11 +96,14 @@ public class PreSaleController {
             return res;
         }
         if(shopIdInToken != shopId){
-            return new ReturnObject<>(ResponseCode.AUTH_INVALID_JWT, "店铺ID不一致，请重新登录或联系管理员");
+            return decorateReturnObject(new ReturnObject<>(ResponseCode.AUTH_INVALID_JWT, "店铺ID不一致，请重新登录或联系管理员"));
+        }
+        if(presaleActivityVo.getBeginTime().isAfter(presaleActivityVo.getPayTime()) || presaleActivityVo.getPayTime().isAfter(presaleActivityVo.getEndTime())){
+            return decorateReturnObject(new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "预售开始时间必然大于尾款支付时间，必然大于结束时间"));
         }
 
         ReturnObject ret = activityService.addPresaleActivity(presaleActivityVo, spuId, shopId);
-        return ret;
+        return decorateReturnObject(ret);
     }
 
     /**
@@ -112,8 +117,25 @@ public class PreSaleController {
             @ApiResponse(code = 906, message = "预售活动状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/presales/{id}")
-    public Object changePresaleofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "预售活动id",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleActivityVo presaleActivityVo){
-        return null;
+    @Audit
+    public Object changePresaleofSPU(@Depart Long shopIdInToken, @LoginUser Long userId,
+                                     @ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
+                                     @ApiParam(value = "预售活动id",required=true) @PathVariable("id") Long activityId,
+                                     @ApiParam(value = "可修改的预售活动信息" ,required=true )  @Valid @RequestBody PresaleActivityVo presaleActivityVo,
+                                     BindingResult bindingResult, HttpServletResponse httpServletResponse){
+        var res = Common.processFieldErrors(bindingResult, httpServletResponse);
+        if(res != null){
+            return res;
+        }
+        if(shopIdInToken != shopId){
+            return decorateReturnObject(new ReturnObject<>(ResponseCode.AUTH_INVALID_JWT, "店铺ID不一致，请重新登录或联系管理员"));
+        }
+        if(presaleActivityVo.getBeginTime().isAfter(presaleActivityVo.getPayTime()) || presaleActivityVo.getPayTime().isAfter(presaleActivityVo.getEndTime())){
+            return decorateReturnObject(new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "预售开始时间必然大于尾款支付时间，必然大于结束时间"));
+        }
+        ReturnObject ret = activityService.modifyPresaleActivity(activityId,presaleActivityVo,shopId);
+
+        return decorateReturnObject(ret);
     }
 
     /**

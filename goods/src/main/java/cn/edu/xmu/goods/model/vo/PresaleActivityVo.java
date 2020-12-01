@@ -54,7 +54,8 @@ public class PresaleActivityVo {
     private Byte state;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
-    public HashMap<String, Object> subData = new HashMap<>();
+    public HashMap<String, Object> goodsSpu = new HashMap<>();
+    public HashMap<String, Object> shop = new HashMap<>();
 
 
     public PresaleActivityPo createPo(){
@@ -64,7 +65,6 @@ public class PresaleActivityVo {
         po.setAdvancePayPrice(advancePayPrice);
         po.setPayTime(payTime);
         po.setRestPayPrice(restPayPrice);
-        po.setAdvancePayPrice(advancePayPrice);
         po.setName(name);
         po.setQuantity(quantity);
 
@@ -80,7 +80,7 @@ public class PresaleActivityVo {
         endTime = po.getEndTime();
         payTime = po.getPayTime();
         advancePayPrice = po.getAdvancePayPrice();
-        restPayPrice = po.getAdvancePayPrice();
+        restPayPrice = po.getRestPayPrice();
         gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
     }

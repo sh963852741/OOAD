@@ -249,7 +249,7 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/12/1 20:14
      */
-    public ReturnObject<Map<String,Object>> getSimpleSpuById(Long id){
+    public ReturnObject<HashMap<String,Object>> getSimpleSpuById(Long id){
         ReturnObject ret = goodsDao.getSpuById(id);
         if(ret.getCode() != ResponseCode.OK){
             return ret;

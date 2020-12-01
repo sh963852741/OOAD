@@ -4,10 +4,7 @@ import cn.edu.xmu.goods.dao.CouponActivityDao;
 import cn.edu.xmu.goods.dao.CouponDao;
 import cn.edu.xmu.goods.dao.GrouponActivityDao;
 import cn.edu.xmu.goods.dao.PresaleActivityDao;
-import cn.edu.xmu.goods.model.bo.Coupon;
-import cn.edu.xmu.goods.model.bo.CouponActivity;
-import cn.edu.xmu.goods.model.bo.GrouponActivity;
-import cn.edu.xmu.goods.model.bo.PresaleActivity;
+import cn.edu.xmu.goods.model.bo.*;
 import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.model.VoObject;
@@ -38,6 +35,8 @@ public class ActivityService {
 
     @Autowired
     GoodsService goodsService;
+    @Autowired
+    ShopService shopService;
 
     //region 预售活动部分
     public ReturnObject getPresaleActivityStatus() {
@@ -59,18 +58,25 @@ public class ActivityService {
 
     public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
-        Map<String,Object> spuVo = goodsService.getSimpleSpuById(spuId).getData();
-
+        HashMap<String,Object> spuVo = goodsService.getSimpleSpuById(spuId).getData();
+        Shop shop = shopService.getShopByShopId(shopId).getData();
+        if(shop == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在");
+        }
         if(spuVo == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "对应的SPU不存在");
         }
-        if(((Long)(spuVo.get("shopId"))).equals(shopId)){
+        if(!((Long)(spuVo.get("shopId"))).equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不允许使用其他店铺的SPU");
         }
 
         if (presaleActivityDao.addActivity(po, spuId, shopId) == 1) {
             presaleActivityVo = new PresaleActivityVo(po);
-            presaleActivityVo.subData.put("goodsSpu",spuVo);
+            spuVo.remove("shopId");
+            presaleActivityVo.goodsSpu = spuVo;
+            presaleActivityVo.shop.put("id", shop.getId());
+            presaleActivityVo.shop.put("name", shop.getName());
+
             return new ReturnObject(presaleActivityVo);
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
@@ -80,7 +86,7 @@ public class ActivityService {
     public ReturnObject modifyPresaleActivity(Long id, PresaleActivityVo presaleActivityVo, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
         if (presaleActivityDao.updateActivity(po, id)) {
-            return new ReturnObject(new PresaleActivityVo(po));
+            return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
