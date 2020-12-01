@@ -4,9 +4,13 @@ import cn.edu.xmu.goods.model.po.ShopPo;
 import cn.edu.xmu.goods.model.vo.ShopRetVo;
 import cn.edu.xmu.goods.model.vo.ShopSimpleRetVo;
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.ooad.util.ResponseUtil;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -20,7 +24,7 @@ public class Shop implements VoObject {
         FORBID(3, "逻辑删除"),
         ONLINE(4, "上线"),
         OFFLINE(5,"下线"),
-        MODIFIED(6,"待修改"),
+        NORM(6,"正常"),
         EXAME(7,"待审核");
         private static final Map<Integer, Shop.State> stateMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
@@ -92,6 +96,37 @@ public class Shop implements VoObject {
         shopPo.setGmtModified(this.getGmtModified());
         return shopPo;
     }
+
+    /**
+     * 根据 errCode 修饰 API 返回对象的 HTTP Status
+     * @param returnObject 原返回 Object
+     * @return 修饰后的返回 Object
+     */
+    public static Object decorateReturnObject(ReturnObject returnObject) {
+        switch (returnObject.getCode()) {
+            case RESOURCE_ID_NOTEXIST:
+                // 404：资源不存在
+                return new ResponseEntity(
+                        ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg()),
+                        HttpStatus.NOT_FOUND);
+            case INTERNAL_SERVER_ERR:
+                // 500：数据库或其他严重错误
+                return new ResponseEntity(
+                        ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg()),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            case OK:
+                // 200: 无错误
+                Object data = returnObject.getData();
+                if (data != null){
+                    return ResponseUtil.ok(data);
+                }else{
+                    return ResponseUtil.ok();
+                }
+            default:
+                return ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg());
+        }
+    }
+
 }
 
 /*@Data
