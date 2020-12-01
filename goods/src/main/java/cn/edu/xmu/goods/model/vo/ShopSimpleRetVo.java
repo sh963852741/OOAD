@@ -4,22 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class SpuSpecVo {
-
-    Long id;
-    String name;
-    List<SpecItem> specItems;
-}
-
-@Data
 @AllArgsConstructor
-@NoArgsConstructor
-class SpecItem{
+@Data
+public class ShopSimpleRetVo {
     private Long id;
     private String name;
+    private byte state;
 }

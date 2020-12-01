@@ -92,13 +92,20 @@ public class BrandDao {
         ReturnObject<Object> retObj = null;
         int ret = brandPoMapper.deleteByPrimaryKey(id);
         if (ret == 0) {
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("角色id不存在：" + id));
+            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("品牌id不存在：" + id));
         }
         else{
             retObj = new ReturnObject<>();
         }
         return retObj;
     }
-
+    public ReturnObject<Brand> getBrandById(long id) {
+        BrandPo brandPo = brandPoMapper.selectByPrimaryKey(id);
+        if (brandPo == null) {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        Brand brand = new Brand(brandPo);
+        return new ReturnObject<>(brand);
+    }
 
 }

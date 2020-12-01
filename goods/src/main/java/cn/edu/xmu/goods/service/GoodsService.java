@@ -1,19 +1,19 @@
 package cn.edu.xmu.goods.service;
 
 
+import cn.edu.xmu.goods.dao.BrandDao;
 import cn.edu.xmu.goods.dao.CategoryDao;
 import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.dao.ShopDao;
 import cn.edu.xmu.goods.model.bo.Category;
 import cn.edu.xmu.goods.model.bo.FloatPrice;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.CategoryPo;
 import cn.edu.xmu.goods.model.po.FloatPricePo;
+import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.SPUPo;
-import cn.edu.xmu.goods.model.vo.FloatPriceVo;
-import cn.edu.xmu.goods.model.vo.SkuChangeVo;
-import cn.edu.xmu.goods.model.vo.SkuSelectVo;
-import cn.edu.xmu.goods.model.vo.SpuVo;
+import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -27,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: Yifei Wang
@@ -43,6 +45,12 @@ public class GoodsService {
 
     @Autowired
     private CategoryDao categoryDao;
+
+    @Autowired
+    private BrandDao brandDao;
+
+    @Autowired
+    private ShopDao shopDao;
 
     @Value("${goodsservice.webdav.username}")
     private String davUsername;
@@ -75,8 +83,26 @@ public class GoodsService {
         return goodsDao.getAllSkus(vo, page, pageSize);
     }
 
-    public ReturnObject getSkuDetails(Integer SkuId){
-        return null;
+    /**
+     * 功能描述: 获取sku详细信息
+     * @Param: [SkuId]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/28 10:03
+     */
+    public ReturnObject getSkuDetails(Integer skuId){
+        ReturnObject ret=goodsDao.getSkuById(skuId.longValue());
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        Sku sku=(Sku)ret.getData();
+        SkuRetVo vo=sku.createVo();
+        ReturnObject spuRet=getSpuById(sku.getGoodsSpuId());
+        if(spuRet.getCode()!=ResponseCode.OK){
+            vo.setSpu(null);
+        }
+        vo.setSpu((SpuRetVo) spuRet.getData());
+        return new ReturnObject(vo);
     }
 
     /**
@@ -194,68 +220,20 @@ public class GoodsService {
     }
 
     /**
-     * 功能描述: 获取商品分类关系
-     * @Param: [id]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/26 22:13
-     */
-    public ReturnObject getSubCategories(Integer id) {
-        return goodsDao.getSubCategories(id.longValue());
-    }
-
-    /**
-     * 功能描述: 新建商品分类
-     * @Param: [id, name]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 8:51
-     */
-    public ReturnObject newCategory(Integer id, String name) {
-        CategoryPo categoryPo=new CategoryPo();
-        categoryPo.setPid(id.longValue());
-        categoryPo.setName(name);
-        ReturnObject ret=goodsDao.insertCategory(categoryPo);
-        return ret;
-    }
-
-    /**
-     * 功能描述: 修改商品类目
-     * @Param: [id, name]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:40
-     */
-    public ReturnObject changeCategory(Integer id, String name) {
-        CategoryPo po=new CategoryPo();
-        po.setId(id.longValue());
-        po.setName(name);
-        ReturnObject ret=goodsDao.updateCategory(po);
-        return ret;
-    }
-
-    /**
-     * 功能描述: 删除商品类目
-     * @Param: [id]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:52
-     */
-    public ReturnObject deleteCategoryById(Integer id) {
-        ReturnObject ret=goodsDao.deleteCategoryById(id.longValue());
-        return ret;
-    }
-
-    /**
      * 功能描述: 获取spu详细信息
      * @Param: [id]
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:09
      */
-    public ReturnObject getSpuById(Integer id) {
-        ReturnObject ret=goodsDao.getSpuById(id.longValue());
-        return ret;
+    public ReturnObject getSpuById(Long id) {
+        ReturnObject ret=goodsDao.getSpuById(id);
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        Spu spu=new Spu((SPUPo) ret.getData());
+        SpuRetVo vo=spu.createVo();
+        return new ReturnObject(vo);
     }
 
     /**
@@ -273,7 +251,12 @@ public class GoodsService {
         po.setSpec(spuVo.getSpecs());
 
         ReturnObject ret=goodsDao.newSpu(po);
-        return ret;
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        Spu spu=new Spu((SPUPo) ret.getData());
+        SpuRetVo vo=spu.createVo();
+        return new ReturnObject(vo);
     }
 
     /**
@@ -387,6 +370,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.DELETE.getCode().byteValue());
+        spu.setState(Spu.State.DELETE.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -411,10 +395,18 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.NORM.getCode().byteValue());
+        spu.setState(Spu.State.NORM.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
 
+    /**
+     * 功能描述: 下架spu
+     * @Param: [id, shopId]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/11/28 10:01
+     */
     public ReturnObject offShelfSpu(Integer id, Integer shopId) {
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
@@ -428,6 +420,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
+        spu.setState(Spu.State.OFFSHELF.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -461,7 +454,6 @@ public class GoodsService {
         ReturnObject ret=goodsDao.newFloatPrice(po);
         return ret;
     }
-
 
     /**
      * 功能描述: 使浮动价格失效
@@ -506,12 +498,12 @@ public class GoodsService {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        ReturnObject<Category> ret=categoryDao.getCategoryById(id);
+        ReturnObject<Category> ret=categoryDao.getCategoryById(id.longValue());
         if(ret.getCode()!=ResponseCode.OK){
             return ret;
         }
         Category category=ret.getData();
-        if(category.getPid()!=0){
+        if(category.getPid()==0){
             return new ReturnObject(ResponseCode.CATEGORY_SET_ERROR);
         }
         Spu spu=new Spu();
@@ -538,12 +530,12 @@ public class GoodsService {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        ReturnObject<Category> ret=categoryDao.getCategoryById(id);
+        ReturnObject<Category> ret=categoryDao.getCategoryById(id.longValue());
         if(ret.getCode()!=ResponseCode.OK){
             return ret;
         }
         Category category=ret.getData();
-        if(category.getPid()!=0){
+        if(category.getPid()==0){
             return new ReturnObject(ResponseCode.CATEGORY_SET_ERROR);
         }
         Spu spu=new Spu();
@@ -552,7 +544,6 @@ public class GoodsService {
         ReturnObject returnObject=goodsDao.updateSpu(spu);
         return returnObject;
     }
-
 
     /**
      * 功能描述: 将spu添加到品牌中
@@ -600,5 +591,17 @@ public class GoodsService {
         spu.setBrandId(null);
         ReturnObject returnObject=goodsDao.updateSpu(spu);
         return returnObject;
+    }
+
+
+    /**
+     * 功能描述: 通过spuid获取shopid
+     * @Param:
+     * @Return:
+     * @Author: Yifei Wang
+     * @Date: 2020/11/30 20:08
+     */
+    public ReturnObject getShopIdBySpuId(Long id){
+        return goodsDao.getShopIdBySpuId(id);
     }
 }

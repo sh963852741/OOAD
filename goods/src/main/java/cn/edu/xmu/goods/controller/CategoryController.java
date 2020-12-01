@@ -6,6 +6,7 @@ import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -14,47 +15,89 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
-@Controller
+@RestController
+@RequestMapping(value = "/goods", produces = "application/json;charset=UTF-8")
 public class CategoryController {
+
     @Autowired
     CategoryService categoryService;
-    @Autowired
-    private HttpServletResponse httpServletResponse;
-    @Audit
-    @DeleteMapping("/categories/{id}")
-    public Object deleteCategory(@PathVariable("id") Long id){
-        ReturnObject returnObject = categoryService.deleteCategory(id);
-        return Common.decorateReturnObject(returnObject);
+
+    /**
+     * 查询商品分类关系
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "查询商品分类关系")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="id", value = "种类id",required = true, dataType="Integer", paramType="path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
+    @GetMapping("/categories/{id}/subcategories")
+    public Object selectCategories(@PathVariable Integer id){
+        ReturnObject ret=categoryService.getSubCategories(id);
+        return Common.decorateReturnObject(ret);
     }
-    @Audit
+
+    /**
+     * 管理员新增商品类目
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "管理员新增商品类目")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="id", value = "种类id",required = true, dataType="Integer", paramType="path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
+    @PostMapping("/categories/{id}/subcategories")
+    public Object addCategories(@PathVariable Integer id,@RequestBody String name){
+        ReturnObject ret=categoryService.newCategory(id,name);
+        return Common.decorateReturnObject(ret);
+    }
+
+    /**
+     * 管理员修改商品类目
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "管理员修改商品类目")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
+            @ApiImplicitParam(name="id", value = "种类id",required = true, dataType="Integer", paramType="path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
     @PutMapping("/categories/{id}")
-    public Object setCategory(@PathVariable Long id, @RequestBody CategoryVo vo, BindingResult bindingResult){
-        Object returnObject = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if (null != returnObject) {
-            return returnObject;
-        }
-        ReturnObject<Object> retObject = categoryService.setCategory(id, vo);
-        return Common.decorateReturnObject(retObject);
+    public Object changeCategories(@PathVariable Integer id,@RequestBody String name){
+        ReturnObject ret=categoryService.changeCategory(id,name);
+        return Common.decorateReturnObject(ret);
     }
-    @Audit
-    @PostMapping("categories/{id}/subcategories")
-    public Object addCategory(@RequestBody BindingResult bindingResult, CategoryVo vo) {
-        Object returnObject = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if (null != returnObject) {
-            return returnObject;
-        }
-        ReturnObject<VoObject> retObject = categoryService.addCategory(vo);
-        httpServletResponse.setStatus(HttpStatus.CREATED.value());
-        return Common.decorateReturnObject(retObject);
+
+    /**
+     * 管理员删除商品类目
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "管理员删除商品类目")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
+            @ApiImplicitParam(name="id", value = "种类id",required = true, dataType="Integer", paramType="path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
+    @DeleteMapping("/categories/{id}")
+    public Object deleteCategories(@PathVariable Integer id){
+        ReturnObject ret=categoryService.deleteCategoryById(id);
+        return Common.decorateReturnObject(ret);
     }
-    @Audit
-    @GetMapping("categories/{id}/subcategories")
-    public Object getCategory(@PathVariable Long id, @RequestBody  BindingResult bindingResult){
-        Object returnObject = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if (null != returnObject) {
-            return returnObject;
-        }
-        ReturnObject<Object> retObject = categoryService.getCategory(id);
-        return Common.decorateReturnObject(retObject);
-    }
+
 }

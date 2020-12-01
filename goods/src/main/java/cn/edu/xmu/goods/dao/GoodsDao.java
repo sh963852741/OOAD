@@ -66,7 +66,6 @@ public class GoodsDao {
         return new ReturnObject<>(stateList);
     }
 
-
     /**
      * 功能描述: 查询所有Sku
      * @Param: [vo, page, pageSize]
@@ -124,6 +123,47 @@ public class GoodsDao {
     }
 
     /**
+     * 功能描述: 根据SPU获取sku
+     * @Param:
+     * @Return:
+     * @Author: Yifei Wang
+     * @Date: 2020/11/30 19:07
+     */
+    public ReturnObject getSkusBySpu(Long spuId){
+        SKUPoExample example =new SKUPoExample();
+        SKUPoExample.Criteria criteria=example.createCriteria();
+        criteria.andGoodsSpuIdEqualTo(spuId);
+        try {
+            List<SKUPo> skuPoList = skuPoMapper.selectByExample(example);
+            List<SkuSimpleRetVo> skuSimpleRetVos = new ArrayList<>();
+            for (SKUPo po : skuPoList) {
+                Sku sku = new Sku(po);
+
+                //查询浮动价格
+                FloatPricePoExample example1 = new FloatPricePoExample();
+                FloatPricePoExample.Criteria criteria1 = example1.createCriteria();
+                criteria1.andBeginTimeLessThanOrEqualTo(LocalDateTime.now());
+                criteria1.andEndTimeGreaterThan(LocalDateTime.now());
+                criteria1.andGoodsSkuIdEqualTo(po.getId());
+                List<FloatPricePo> pricePos = floatPricePoMapper.selectByExample(example1);
+
+                if (pricePos.size() == 0) {
+                    //没查到浮动价格
+                    sku.setPrice(po.getOriginalPrice());
+                } else {
+                    //查询到浮动价格
+                    sku.setPrice(pricePos.get(0).getActivityPrice());
+                }
+                skuSimpleRetVos.add(sku.createSimpleVo());
+            }
+            return new ReturnObject(skuSimpleRetVos);
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
+
+    /**
      * 功能描述: 根据id获取sku
      * @Param: [id]
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
@@ -146,7 +186,6 @@ public class GoodsDao {
         return new ReturnObject<>(sku);
     }
 
-
     /**
      * 功能描述: 更新sku
      * @Param: [sku]
@@ -158,6 +197,7 @@ public class GoodsDao {
         SKUPo skuPo=sku.createPo();
         int ret;
         try{
+            skuPo.setGmtModified(LocalDateTime.now());
             ret=skuPoMapper.updateByPrimaryKeySelective(skuPo);
         }catch (Exception e){
             logger.error("updateSkuImg: DataAccessException:" + e.getMessage());
@@ -215,99 +255,13 @@ public class GoodsDao {
     }
 
     /**
-     * 功能描述: 获取商品分类列表
-     * @Param: [id]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/26 22:15
-     */
-    public ReturnObject getSubCategories(Long id){
-        CategoryPoExample example=new CategoryPoExample();
-        CategoryPoExample.Criteria criteria=example.createCriteria();
-        criteria.andPidEqualTo(id);
-        try {
-            List<CategoryPo> categoryPos = categoryPoMapper.selectByExample(example);
-            ReturnObject<List> ret=new ReturnObject<>(categoryPos);
-            return ret;
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-    }
-
-    /**
-     * 功能描述: 新建商品分类
-     * @Param: [categoryPo]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 8:53
-     */
-    public ReturnObject insertCategory(CategoryPo categoryPo) {
-        try{
-            categoryPo.setGmtCreated(LocalDateTime.now());
-            categoryPo.setGmtModified(categoryPo.getGmtCreated());
-            int ret=categoryPoMapper.insertSelective(categoryPo);
-            if (ret == 0) {
-                logger.debug("insertSku: insert failed: " + categoryPo.getId());
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-            }
-            return new ReturnObject(categoryPo);
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-    }
-
-    /**
-     * 功能描述: 修改商品类目
-     * @Param: [po]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:46
-     */
-    public ReturnObject updateCategory(CategoryPo po) {
-        try{
-            int ret;
-            ret=categoryPoMapper.updateByPrimaryKeySelective(po);
-            if(ret ==0){
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-            }else{
-                return new ReturnObject(ResponseCode.OK);
-            }
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-
-    }
-
-    /**
-     * 功能描述: 根据id删除Category
-     * @Param: id
-     * @Return: returnobject
-     * @Author: Yifei Wang
-     * @Date: 2020/11/27 16:53
-     */
-
-    public ReturnObject deleteCategoryById(Long id){
-        try{
-            int ret;
-           ret= categoryPoMapper.deleteByPrimaryKey(id);
-           if(ret==0){
-               return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-           }else{
-               return new ReturnObject(ResponseCode.OK);
-           }
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
-    }
-
-    /**
      * 功能描述: 获取spu
      * @Param: [longValue]
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:10
      */
-    public ReturnObject  getSpuById(Long id) {
+    public ReturnObject getSpuById(Long id) {
         try {
             SPUPo spuPo=spuPoMapper.selectByPrimaryKey(id);
             if(spuPo==null){
@@ -329,6 +283,10 @@ public class GoodsDao {
     public ReturnObject newSpu(SPUPo po) {
         try{
             int ret;
+            po.setGmtCreated(LocalDateTime.now());
+            po.setGmtModified(LocalDateTime.now());
+            po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
+            po.setState(Spu.State.OFFSHELF.getCode().byteValue());
             ret=spuPoMapper.insertSelective(po);
             if(ret==0){
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
@@ -351,6 +309,7 @@ public class GoodsDao {
         SPUPo spuPo=updateSpu.createPo();
         int ret;
         try{
+            spuPo.setGmtModified(LocalDateTime.now());
             ret=spuPoMapper.updateByPrimaryKeySelective(spuPo);
         }catch (Exception e){
             logger.error("updateSkuImg: DataAccessException:" + e.getMessage());
@@ -375,7 +334,7 @@ public class GoodsDao {
      */
     public ReturnObject newFloatPrice(FloatPricePo po) {
         try{
-            po.setGmtCreated(LocalDateTime.now());
+            po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             int ret;
             ret=floatPricePoMapper.insertSelective(po);
@@ -393,7 +352,7 @@ public class GoodsDao {
     }
     
     /**
-     * 功能描述: 
+     * 功能描述: 更新floatPrice
      * @Param: 
      * @Return: 
      * @Author: Yifei Wang

@@ -4,16 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-public class SkuSimpleRetVo {
+@AllArgsConstructor
+@NoArgsConstructor
+public class SkuRetVo {
     private Long id;
     private String name;
     private String skuSn;
+    private String detail;
     private String imageUrl;
-    private Integer inventory;
     private Long originalPrice;
     private Long price;
-    private Byte disable;
+    private Integer inventory;
+    private String configuration;
+    private Long weight;
+    private String gmtCreate;
+    private String gmtModified;
+    private SpuRetVo spu;
 }

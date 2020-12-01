@@ -64,7 +64,7 @@ public class FloatPrice implements VoObject {
 
     private LocalDateTime endTime;
 
-    private Long quantity;
+    private Integer quantity;
 
     private Long createdBy;
 
@@ -82,11 +82,11 @@ public class FloatPrice implements VoObject {
         this.setActivityPrice(po.getActivityPrice());
         this.setBeginTime(po.getBeginTime());
         this.setEndTime(po.getEndTime());
-        this.setQuantity(po.getQuantity().longValue());
+        this.setQuantity(po.getQuantity());
         this.setCreatedBy(po.getCreatedBy());
         this.setInvalidBy(po.getInvalidBy());
         this.setValid(po.getValid());
-        this.setGmtCreated(po.getGmtCreated());
+        this.setGmtCreated(po.getGmtCreate());
         this.setGmtModified(po.getGmtModified());
     }
 
@@ -97,11 +97,11 @@ public class FloatPrice implements VoObject {
         po.setActivityPrice(this.getActivityPrice());
         po.setBeginTime(this.getBeginTime());
         po.setEndTime(this.getEndTime());
-        po.setQuantity(this.getQuantity().intValue());
+        po.setQuantity(this.getQuantity());
         po.setCreatedBy(this.getCreatedBy());
         po.setInvalidBy(this.getInvalidBy());
         po.setValid(this.getValid());
-        po.setGmtCreated(this.getGmtCreated());
+        po.setGmtCreate(this.getGmtCreated());
         po.setGmtModified(this.getGmtModified());
         return po;
     }

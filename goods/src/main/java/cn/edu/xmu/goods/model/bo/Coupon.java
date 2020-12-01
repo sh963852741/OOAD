@@ -1,10 +1,14 @@
 package cn.edu.xmu.goods.model.bo;
 
+import cn.edu.xmu.ooad.util.JacksonUtil;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Coupon {
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum CouponStatus {
         PENDING((byte)0,"尚未开始"),
         AVAILABLE((byte)1,"可用"),
@@ -22,11 +26,11 @@ public class Coupon {
         }
 
         private byte code;
-        private String description;
+        private String name;
 
         CouponStatus(byte code, String description) {
             this.code = code;
-            this.description = description;
+            this.name = description;
         }
 
         public static Coupon.CouponStatus getTypeByCode(Integer code) {
@@ -38,7 +42,7 @@ public class Coupon {
         }
 
         public String getDescription() {
-            return description;
+            return name;
         }
     }
 

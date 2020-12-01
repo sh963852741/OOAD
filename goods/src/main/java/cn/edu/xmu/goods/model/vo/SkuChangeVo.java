@@ -10,6 +10,6 @@ public class SkuChangeVo {
     Long originalPrice;
     String configuration;
     Long weight;
-    Long inventory;
+    Integer inventory;
     String detail;
 }

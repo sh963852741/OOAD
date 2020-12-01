@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.model.bo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 @Data
 public class PresaleActivity {
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum PresaleStatus {
         PENDING((byte)0,"尚未开始"),
         DEPOSIT((byte)1,"支付定金"),
