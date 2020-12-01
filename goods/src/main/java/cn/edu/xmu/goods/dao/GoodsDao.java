@@ -63,6 +63,27 @@ public class GoodsDao {
         return new ReturnObject<>(stateList);
     }
 
+    /*
+     * 功能描述:
+     * @Param:
+     * @Return:
+     * @Author: Yifei Wang
+     * @Date: 2020/12/1 15:11
+     */
+    public ReturnObject getSpuIdBySpuSn(String goodsSn){
+        SPUPoExample example=new SPUPoExample();
+        SPUPoExample.Criteria criteria=example.createCriteria();
+        criteria.andGoodsSnEqualTo(goodsSn);
+        try{
+            List<SPUPo>list=spuPoMapper.selectByExample(example);
+            if(list==null||list.size()==0){
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
+            return new ReturnObject(list.get(0).getId());
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
     /**
      * 功能描述: 查询所有Sku
      * @Param: [vo, page, pageSize]
@@ -78,6 +99,15 @@ public class GoodsDao {
         }
         if(null!=vo.getSpuId()){
             criteria.andGoodsSpuIdEqualTo(vo.getSpuId());
+        }
+        if(null!=vo.getSpuSn()){
+            ReturnObject spuIdRet=getSpuIdBySpuSn(vo.getSpuSn());
+            if(spuIdRet.getCode()==ResponseCode.OK){
+                criteria.andGoodsSpuIdEqualTo((long)spuIdRet.getData());
+            }
+        }
+        if(null!=vo.getShopId()){
+
         }
         List<SKUPo> skuPoList =new ArrayList<>();
         List<SkuSimpleRetVo> skuSimpleRetVos = new ArrayList<>();
@@ -185,6 +215,7 @@ public class GoodsDao {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
     }
+
     /**
      * 功能描述: 根据id获取sku
      * @Param: [id]
@@ -309,6 +340,7 @@ public class GoodsDao {
             po.setGmtModified(LocalDateTime.now());
             po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
             po.setState(Spu.State.OFFSHELF.getCode().byteValue());
+            po.setGoodsSn(UUID.randomUUID().toString());
             ret=spuPoMapper.insertSelective(po);
             if(ret==0){
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);

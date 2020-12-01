@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -188,6 +189,10 @@ public class GoodsController {
     })
     @PutMapping("/shops/{shopId}/skus/{id}")
     public Object changeSku(@PathVariable Integer shopId, @PathVariable Integer id, @RequestBody SkuChangeVo skuChangeVo){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.updateSku(shopId,id,skuChangeVo);
         return Common.getNullRetObj(ret,httpServletResponse);
     }
@@ -208,6 +213,10 @@ public class GoodsController {
     })
     @GetMapping("/spus/{id}")
     public Object getSpu(@PathVariable Long id){
+        if(id==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.getSpuById(id);
         return Common.decorateReturnObject(ret);
 
@@ -230,6 +239,10 @@ public class GoodsController {
     })
     @GetMapping("/share/{sid}/spus/{id}")
     public Object getSharedSpu(@PathVariable Long sid,@PathVariable Long id){
+        if(id==null||sid==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.getSpuById(id);
         return Common.decorateReturnObject(ret);
 
@@ -251,6 +264,10 @@ public class GoodsController {
     })
     @PostMapping("/shops/{id}/spus")
     public Object addSpu(@PathVariable Integer id, @RequestBody SpuVo spuVo){
+        if(id==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.newSpu(id,spuVo);
         return Common.decorateReturnObject(ret);
     }
@@ -272,6 +289,10 @@ public class GoodsController {
     })
     @PostMapping("/shops/{shopId}/spus/{id}/uploadImg")
     public Object uploadSpuImg(@RequestParam("img") MultipartFile multipartFile, @PathVariable Integer shopId, @PathVariable Integer id){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         logger.debug("uploadImg: id = "+ id +" img :" + multipartFile.getOriginalFilename());
         ReturnObject returnObject=goodsService.upLoadSpuImg(multipartFile,shopId,id);
         return Common.getNullRetObj(returnObject,httpServletResponse);
@@ -295,6 +316,10 @@ public class GoodsController {
     })
     @PutMapping("/shops/{shopId}/spus/{id}")
     public Object changeSpu(@PathVariable Integer id, @PathVariable Integer shopId,@RequestBody SpuVo spuVo){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.updateSpu(id,shopId,spuVo);
         return Common.decorateReturnObject(ret);
     }
@@ -316,6 +341,10 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/spus/{id}")
     public Object deleteSpu(@PathVariable Integer id, @PathVariable Integer shopId){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.deleteSpuById(id,shopId);
         return Common.decorateReturnObject(ret);
     }
@@ -337,6 +366,10 @@ public class GoodsController {
     })
     @PutMapping("/shops/{shopId}/spus/{id}/onshelves")
     public Object onShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.onShelfSpu(id,shopId);
         return Common.decorateReturnObject(ret);
     }
@@ -358,6 +391,10 @@ public class GoodsController {
     })
     @PutMapping("/shops/{shopId}/spus/{id}/offshelves")
     public Object offShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.offShelfSpu(id,shopId);
         return Common.decorateReturnObject(ret);
     }
@@ -378,7 +415,16 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{id}/floatPrices")
-    public Object addFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId, @RequestBody FloatPriceVo floatPriceVo ,Long userId){
+    public Object addFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId,Long userId,@RequestBody @Validated FloatPriceVo floatPriceVo ,BindingResult bindingResult){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        Object obj=Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(null!=obj){
+            logger.info("validate fail");
+            return obj;
+        }
         ReturnObject ret=goodsService.newFloatPrice(id,shopId,floatPriceVo,userId);
         return Common.decorateReturnObject(ret);
     }
@@ -400,6 +446,10 @@ public class GoodsController {
     })
     @DeleteMapping("/shops/{shopId}/floatPrices/{id}")
     public Object deleteFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId ,Long userId){
+        if(id==null||shopId==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
         ReturnObject ret=goodsService.deleteFloatPrice(id,shopId ,userId);
         return Common.decorateReturnObject(ret);
     }

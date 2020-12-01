@@ -453,8 +453,12 @@ public class GoodsService {
         po.setCreatedBy(userId);
         po.setGoodsSkuId(id.longValue());
         po.setQuantity(floatPriceVo.getQuantity().intValue());
-        po.setBeginTime(LocalDateTime.parse(floatPriceVo.getBeginTime(), df));
-        po.setEndTime(LocalDateTime.parse(floatPriceVo.getEndTime(),df));
+        try{
+            po.setBeginTime(LocalDateTime.parse(floatPriceVo.getBeginTime(), df));
+            po.setEndTime(LocalDateTime.parse(floatPriceVo.getEndTime(),df));
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.TIMEFORMAT_ERROR);
+        }
         po.setValid((FloatPrice.State.NORM.getCode().byteValue()));
         ReturnObject ret=goodsDao.newFloatPrice(po);
         return ret;

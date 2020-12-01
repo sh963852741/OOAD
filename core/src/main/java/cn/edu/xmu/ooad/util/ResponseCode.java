@@ -90,7 +90,8 @@ public enum ResponseCode {
     COUPON_NOTBEGIN(909,"未到优惠卷领取时间"),
     COUPON_FINISH(910,"优惠卷领罄"),
     COUPON_END(911,"优惠卷活动终止"),
-    CATEGORY_SET_ERROR(912,"不能向一级目录中添加商品");
+    CATEGORY_SET_ERROR(912,"不能向一级目录中添加商品"),
+    TIMEFORMAT_ERROR(913,"时间参数不合法");
 
     private int code;
     private String message;
