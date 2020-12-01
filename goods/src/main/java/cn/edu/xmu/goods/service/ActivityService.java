@@ -9,10 +9,7 @@ import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.bo.GrouponActivity;
 import cn.edu.xmu.goods.model.bo.PresaleActivity;
 import cn.edu.xmu.goods.model.po.*;
-import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
-import cn.edu.xmu.goods.model.vo.CouponActivityVo;
-import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
-import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
+import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -191,10 +188,10 @@ public class ActivityService {
     }
 
     public ReturnObject addSPUToCouponActivity(long spuId, long shopId, long activityId){
-        SPUPo spu = goodsService.getSpuById(spuId).getData();
+        var spu = goodsService.getSpuById(spuId).getData();
         if(spu == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
-        } else if(spu.getShopId() != shopId) {
+        } else if((long)spu.getShop().get("id")!= shopId) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
         }
 
@@ -207,10 +204,10 @@ public class ActivityService {
     }
 
     public ReturnObject removeSPUFromCouponActivity(long spuId, long shopId, long activityId){
-        SPUPo spu = goodsService.getSpuById(spuId).getData();
+        var spu = goodsService.getSpuById(spuId).getData();
         if(spu == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
-        } else if(spu.getShopId() != shopId) {
+        } else if((long)spu.getShop().get("id") != shopId) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
         }
 
@@ -226,7 +223,7 @@ public class ActivityService {
         PageInfo<CouponSPUPo> couponSPUPoPageInfo = couponActivityDao.getSPUsInActivity(activityId, page, pageSize);
         List<HashMap<String,Object>> simpleSpuList = new ArrayList();
         for(CouponSPUPo couponSPUPo:couponSPUPoPageInfo.getList()){
-            ReturnObject<SPUPo> ret = goodsService.getSpuById(couponSPUPo.getId());
+            ReturnObject<SpuRetVo> ret = goodsService.getSpuById(couponSPUPo.getId());
             HashMap<String,Object> hm = new HashMap<String,Object>(){
                 {
                     put("id", ret.getData().getId());
