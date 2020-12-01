@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -120,7 +121,11 @@ public class GoodsController {
     })
     @PostMapping("/shops/{shopId}/spus/{id}/skus")
     public Object addSkutoSpu(@PathVariable Integer shopId,@PathVariable Integer id,@RequestBody SkuVo skuVo){
-        return null;
+        if(shopId==null||id==null){
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        ReturnObject ret=goodsService.addSkuToSpu(shopId,id,skuVo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -203,6 +208,28 @@ public class GoodsController {
     })
     @GetMapping("/spus/{id}")
     public Object getSpu(@PathVariable Long id){
+        ReturnObject ret=goodsService.getSpuById(id);
+        return Common.decorateReturnObject(ret);
+
+    }
+
+    /**
+     * 查看一条分享商品SPU的详细信息（需登录）
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "查看一条分享商品SPU的详细信息（需登录）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
+            @ApiImplicitParam(name="id", value = "商品SPUid",required = true, dataType="Integer", paramType="path"),
+            @ApiImplicitParam(name="sid", value = "分享id",required = true, dataType="Integer", paramType="path")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
+    @GetMapping("/share/{sid}/spus/{id}")
+    public Object getSharedSpu(@PathVariable Long sid,@PathVariable Long id){
         ReturnObject ret=goodsService.getSpuById(id);
         return Common.decorateReturnObject(ret);
 

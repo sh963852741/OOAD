@@ -25,10 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: Yifei Wang
@@ -162,7 +159,32 @@ public class GoodsDao {
         }
     }
 
-
+    /**
+     * 功能描述: 新建sku
+     * @Param: [po]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/1 10:32
+     */
+    public ReturnObject newSku(SKUPo po){
+        po.setGmtCreate(LocalDateTime.now());
+        po.setGmtModified(po.getGmtCreate());
+        po.setSkuSn(UUID.randomUUID().toString());
+        po.setDisabled(Sku.State.OFFSHELF.getCode().byteValue());
+        try{
+            int ret;
+            ret=skuPoMapper.insertSelective(po);
+            if(ret==0){
+                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            }
+            Sku sku=new Sku(po);
+            SkuSimpleRetVo vo=sku.createSimpleVo();
+            vo.setPrice(vo.getOriginalPrice());
+            return new ReturnObject(vo);
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
     /**
      * 功能描述: 根据id获取sku
      * @Param: [id]

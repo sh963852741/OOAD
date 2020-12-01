@@ -30,8 +30,8 @@ public class Sku implements VoObject {
      */
     public enum State {
         FORBID(6, "已删除"),
-        NORM(4, "上架");
-
+        NORM(4, "上架"),
+        OFFSHELF(0,"未上架");
         private static final Map<Integer, Sku.State> stateMap;
 
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
