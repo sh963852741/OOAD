@@ -226,7 +226,7 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:09
      */
-    public ReturnObject getSpuById(Long id) {
+    public ReturnObject<SPUPo> getSpuById(Long id) {
         ReturnObject ret=goodsDao.getSpuById(id);
         if(ret.getCode()!=ResponseCode.OK){
             return ret;
@@ -243,7 +243,7 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:25
      */
-    public ReturnObject  newSpu(Integer id, SpuVo spuVo) {
+    public ReturnObject  newSpu(Long id, SpuVo spuVo) {
         SPUPo po=new SPUPo();
         po.setShopId(id.longValue());
         po.setName(spuVo.getName());

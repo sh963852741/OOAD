@@ -283,7 +283,7 @@ public class GoodsDao {
     public ReturnObject newSpu(SPUPo po) {
         try{
             int ret;
-            po.setGmtCreated(LocalDateTime.now());
+            po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
             po.setState(Spu.State.OFFSHELF.getCode().byteValue());

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,12 +51,19 @@ public class Shop implements VoObject {
     }
     private Long id;
     private String name;
-    private String createdBy;
-    private String modifyBy;
+    private Byte state;
+    private LocalDateTime gmtCreated;
+    private LocalDateTime gmtModified;
 
     @Override
-    public Object createVo() {
-        return null;
+    public ShopRetVo createVo(){
+        ShopRetVo vo=new ShopRetVo();
+        vo.setId(this.getId());
+        vo.setName(this.getName());
+        vo.setGmtCreate(this.getGmtCreated());
+        vo.setGmtModified(this.getGmtModified());
+        vo.setState(this.getState());
+        return vo;
     }
 
     @Override

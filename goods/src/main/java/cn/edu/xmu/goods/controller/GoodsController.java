@@ -223,7 +223,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{id}/spus")
-    public Object addSpu(@PathVariable Integer id, @RequestBody SpuVo spuVo){
+    public Object addSpu(@PathVariable Long id, @RequestBody SpuVo spuVo){
         ReturnObject ret=goodsService.newSpu(id,spuVo);
         return Common.decorateReturnObject(ret);
     }
