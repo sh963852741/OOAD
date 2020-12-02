@@ -44,7 +44,7 @@ public class ShopService {
     public ReturnObject  newShop(ShopVo shopVo) {
         ShopPo po=new ShopPo();
         po.setName(shopVo.getName());
-
+        po.setState(Shop.State.EXAME.getCode().byteValue());
         ReturnObject ret=shopDao.newShop(po);
         if(ret.getCode()!= ResponseCode.OK){
             return ret;
@@ -85,7 +85,10 @@ public class ShopService {
      * @Date: 2020/12/1 20:36
      */
     public ReturnObject deleteShopById(Long id) {
-        ReturnObject ret=shopDao.deleteShopbyID(id.longValue());
+        Shop shop=new Shop();
+        shop.setId(id.longValue());
+        shop.setState(Shop.State.FORBID.getCode().byteValue());
+        ReturnObject ret=shopDao.UpdateShop(shop);
         return ret;
     }
 

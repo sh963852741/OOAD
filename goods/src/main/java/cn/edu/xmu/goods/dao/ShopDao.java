@@ -78,7 +78,7 @@ public class ShopDao {
             int ret;
             po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
-            po.setState(Shop.State.OFFLINE.getCode().byteValue());
+            po.setState(Shop.State.EXAME.getCode().byteValue());
             ret=shopPoMapper.insertSelective(po);
             if(ret==0){
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
@@ -113,28 +113,6 @@ public class ShopDao {
         } else {
             logger.debug("updateShop: update shop success : " + shop.toString());
             return new ReturnObject();
-        }
-    }
-
-    /**
-     * 功能描述: 关闭店铺
-     * @Param: [po]
-     * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Lei Yang
-     * @Date: 2020/11/29 22:10
-     */
-    public ReturnObject deleteShopbyID(long ID)
-    {
-        try{
-            int ret;
-            ret= shopPoMapper.deleteByPrimaryKey(ID);
-            if(ret==0){
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-            }else{
-                return new ReturnObject(ResponseCode.OK);
-            }
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
     }
 

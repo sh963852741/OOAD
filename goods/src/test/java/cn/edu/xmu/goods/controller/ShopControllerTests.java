@@ -18,7 +18,7 @@ public class ShopControllerTests {
 
     @Test
     public void getAllState() throws Exception {
-        String responseString = this.mvc.perform(get("/goods/shops/states"))
+        String responseString = this.mvc.perform(get("/shop/shops/states"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
@@ -70,7 +70,7 @@ public class ShopControllerTests {
 
     @Test
     public void deleteShop() throws Exception {
-        String responseString = this.mvc.perform(delete("/shops/1").header("authorization", null))
+        String responseString = this.mvc.perform(delete("/shops/12").header("authorization", null))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();

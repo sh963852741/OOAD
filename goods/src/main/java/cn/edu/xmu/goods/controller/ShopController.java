@@ -68,7 +68,7 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{id}")
-    public Object modifyShop(Long id,Long shopId, ShopVo shopVo){
+    public Object modifyShop(Long id,Long shopId,@RequestBody ShopVo shopVo){
         ReturnObject ret=shopService.updateShop(id,shopId,shopVo);
         return Common.getNullRetObj(ret,httpServletResponse);
     }
@@ -98,7 +98,7 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/newshops/{id}/audit")
-    public Object shopsShopIdNewshopsIdAuditPut(String authorization,@ApiParam(value = "shop ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "新店 ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )   @RequestBody ShopConclusionVo conclusion){
+    public Object shopsShopIdNewshopsIdAuditPut(@PathVariable("shopId") Long shopId,@ApiParam(value = "新店 ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )   @RequestBody ShopConclusionVo conclusion){
         ReturnObject ret=shopService.passShop(id,conclusion);
         return Shop.decorateReturnObject(ret);
     }
@@ -129,14 +129,9 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{id}/offshelves")
-    public Object shopsIdOffshelvesPut(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "店 ID",required=true) @PathVariable("id") Integer id){
-        return null;
+    public Object shopsIdOffshelvesPut(@ApiParam(value = "店 ID",required=true) @PathVariable("id") long id){
+        ReturnObject ret=shopService.offShelfShop(id);
+        return Shop.decorateReturnObject(ret);
     }
-
-
-
-
-
-
 
 }
