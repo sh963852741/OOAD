@@ -51,6 +51,17 @@ public class PresaleActivityDao {
         return presaleActivityPoMapper.selectByExample(example);
     }
 
+    public boolean changeActivityStatus(long id, byte state){
+        PresaleActivityPo po = new PresaleActivityPo();
+        po.setId(id);
+        po.setState(state);
+        po.setGmtModified(LocalDateTime.now());
+        return presaleActivityPoMapper.updateByPrimaryKey(po) == 1;
+    }
+
+    public PresaleActivityPo getActivityById(long activityId){
+        return presaleActivityPoMapper.selectByPrimaryKey(activityId);
+    }
 
     public List<PresaleActivityPo> getEffectiveActivities(int page,int pageSize, Long shopId, Byte timeline, Long spuId, Boolean all){
         PageHelper.startPage(page, pageSize);
@@ -94,7 +105,7 @@ public class PresaleActivityDao {
         po.setGoodsSpuId(skuId);
         po.setShopId(shopId);
         po.setGmtCreate(LocalDateTime.now());
-        po.setState(PresaleActivity.PresaleStatus.PENDING.getCode());
+        po.setState(PresaleActivity.PresaleStatus.NEW.getCode());
         return presaleActivityPoMapper.insert(po);
     }
 

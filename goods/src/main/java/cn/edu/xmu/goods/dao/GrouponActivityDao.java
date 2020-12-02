@@ -87,7 +87,7 @@ public class GrouponActivityDao {
         po.setShopId(shopId);
         po.setGoodsSpuId(spuId);
         po.setGmtCreate(LocalDateTime.now());
-        po.setState(GrouponActivity.GrouponStatus.PENDING.getCode());
+        po.setState(GrouponActivity.GrouponStatus.NEW.getCode());
         return grouponActivityPoMapper.insert(po) == 1;
     }
 

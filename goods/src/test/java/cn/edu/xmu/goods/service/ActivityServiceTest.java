@@ -110,7 +110,7 @@ class ActivityServiceTest {
     void delPresaleActivity() {
         assertTrue(activityIdHash.containsKey("runningPActivity"));
 
-        ReturnObject ret = activityService.delPresaleActivity(activityIdHash.get("runningPActivity"));
+        ReturnObject ret = activityService.delPresaleActivity(activityIdHash.get("runningPActivity"),1L);
         assertEquals(ResponseCode.OK, ret.getCode());
         activityIdHash.remove("runningPActivity");
     }

@@ -92,11 +92,19 @@ public class ActivityService {
         }
     }
 
-    public ReturnObject delPresaleActivity(long id) {
+    public ReturnObject delPresaleActivity(long id, long shopId) {
+        PresaleActivityPo presaleActivityPo = presaleActivityDao.getActivityById(id);
+        if(presaleActivityPo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "预售活动不存在");
+        }
+        if(presaleActivityPo.getShopId() != shopId){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "当前预售活动不属于您的店铺");
+        }
+
         if (presaleActivityDao.delActivity(id)) {
-            return new ReturnObject();
+            return new ReturnObject<>();
         } else {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法删除预售活动");
         }
     }
     //endregion
@@ -337,7 +345,7 @@ public class ActivityService {
      */
     public ReturnObject delCoupon(Long couponId, Long userId) {
         CouponPo po = new CouponPo();
-        po.setState(Coupon.CouponStatus.DELETED.getCode());
+        po.setState(Coupon.CouponStatus.EXPIRED.getCode());
 
         if (couponDao.modifyCoupon(po) == 1) {
             return new ReturnObject();

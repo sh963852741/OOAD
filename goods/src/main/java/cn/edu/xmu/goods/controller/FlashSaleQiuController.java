@@ -27,6 +27,7 @@ public class FlashSaleQiuController {
 
     @GetMapping(path = "/timesegments/{id}/flashsalesqiu")
     public Flux<FlashSaleItemRetVo> getFlashSale(@PathVariable Long id) {
-        return flashSaleService.getFlashSale(id).map(x -> (FlashSaleItemRetVo) x.createVo());
+//        return flashSaleService.getFlashSale(id).map(x -> (FlashSaleItemRetVo) x.createVo());
+        return null;
     }
 }
