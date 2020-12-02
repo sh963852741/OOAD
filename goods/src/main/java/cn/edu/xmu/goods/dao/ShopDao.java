@@ -76,7 +76,7 @@ public class ShopDao {
     {
         try{
             int ret;
-            po.setGmtCreate(LocalDateTime.now());
+            po.setGmtCreated(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             po.setState(Shop.State.EXAME.getCode().byteValue());
             ret=shopPoMapper.insertSelective(po);

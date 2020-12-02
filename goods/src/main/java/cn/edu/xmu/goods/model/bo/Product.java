@@ -45,7 +45,7 @@ public class Product implements VoObject, Serializable{
         this.inventory = skuPo.getInventory();
         this.weight = skuPo.getWeight();
         this.configuration = skuPo.getConfiguration();
-        this.gmtCreate = skuPo.getGmtCreate();
+        this.gmtCreate = skuPo.getGmtCreated();
         this.gmtModified = skuPo.getGmtModified();
         this.disabled = skuPo.getDisabled() == 1;
     }

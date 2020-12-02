@@ -22,7 +22,7 @@ public class CouponDao {
         couponPo.setCustomerId(customerId);
         couponPo.setState(Coupon.CouponStatus.AVAILABLE.getCode());
         couponPo.setCouponSn(Common.genSeqNum());
-        couponPo.setGmtCreate(LocalDateTime.now());
+        couponPo.setGmtCreated(LocalDateTime.now());
         return couponPoMapper.insert(couponPo);
     }
 

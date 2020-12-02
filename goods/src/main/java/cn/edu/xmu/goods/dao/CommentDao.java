@@ -59,7 +59,7 @@ public class CommentDao {
      */
     public ReturnObject insertComment(CommentPo commentPo){
         try{
-            commentPo.setGmtCreate(LocalDateTime.now());
+            commentPo.setGmtCreated(LocalDateTime.now());
             commentPo.setGmtModified(commentPo.getGmtModified());
             int ret=commentPoMapper.insertSelective(commentPo);
             if(ret==0){

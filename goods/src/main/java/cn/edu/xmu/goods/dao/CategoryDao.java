@@ -52,8 +52,8 @@ public class CategoryDao {
      */
     public ReturnObject insertCategory(CategoryPo categoryPo) {
         try{
-            categoryPo.setGmtCreate(LocalDateTime.now());
-            categoryPo.setGmtModified(categoryPo.getGmtCreate());
+            categoryPo.setGmtCreated(LocalDateTime.now());
+            categoryPo.setGmtModified(categoryPo.getGmtCreated());
             int ret=categoryPoMapper.insertSelective(categoryPo);
             if (ret == 0) {
                 logger.debug("insertSku: insert failed: " + categoryPo.getId());

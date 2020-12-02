@@ -83,7 +83,7 @@ public class Shop implements VoObject {
         this.setId(shopPo.getId());
         this.setName(shopPo.getName());
         this.setState(shopPo.getState());
-        this.setGmtCreated(shopPo.getGmtCreate());
+        this.setGmtCreated(shopPo.getGmtCreated());
         this.setGmtModified(shopPo.getGmtModified());
     }
 
@@ -92,7 +92,7 @@ public class Shop implements VoObject {
         shopPo.setId(this.getId());
         shopPo.setName(this.getName());
         shopPo.setState(this.getState());
-        shopPo.setGmtCreate(this.getGmtCreated());
+        shopPo.setGmtCreated(this.getGmtCreated());
         shopPo.setGmtModified(this.getGmtModified());
         return shopPo;
     }

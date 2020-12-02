@@ -47,7 +47,7 @@ public class GrouponActivityVo {
         strategy = po.getStrategy();
         beginTime = po.getBeginTime();
         endTime = po.getEndTime();
-        gmtCreate = po.getGmtCreate();
+        gmtCreate = po.getGmtCreated();
         gmtModified = po.getGmtModified();
     }
 }

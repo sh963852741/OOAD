@@ -133,7 +133,7 @@ public class Sku implements VoObject {
         this.setOriginalPrice(skuPo.getOriginalPrice());
         this.setSkuSn(skuPo.getSkuSn());
         this.setWeight(skuPo.getWeight());
-        this.setGmtCreate(skuPo.getGmtCreate());
+        this.setGmtCreate(skuPo.getGmtCreated());
         this.setGmtModified(skuPo.getGmtModified());
         this.setDetail(skuPo.getDetail());
         this.setGoodsSpuId(skuPo.getGoodsSpuId());
@@ -156,7 +156,7 @@ public class Sku implements VoObject {
         skuPo.setConfiguration(this.getConfiguration());
         skuPo.setDetail(this.getDetail());
         skuPo.setDisabled(this.getDisable());
-        skuPo.setGmtCreate(this.getGmtCreate());
+        skuPo.setGmtCreated(this.getGmtCreate());
         skuPo.setGmtModified(this.getGmtModified());
         skuPo.setGoodsSpuId(this.getGoodsSpuId());
         skuPo.setOriginalPrice(this.getOriginalPrice());

@@ -41,7 +41,7 @@ public  class FlashSaleItem implements VoObject, Serializable  {
         this.price = itemPo.getPrice();
         this.saleId = itemPo.getSaleId();
         this.quantity = itemPo.getQuantity();
-        this.gmtCreate = itemPo.getGmtCreate();
+        this.gmtCreate = itemPo.getGmtCreated();
         this.gmtModified = itemPo.getGmtModified();
     }
 

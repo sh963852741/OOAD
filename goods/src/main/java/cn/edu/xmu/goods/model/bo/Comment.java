@@ -78,7 +78,7 @@ public class Comment implements VoObject {
         this.content=commentPo.getContent();
         this.type=commentPo.getType();
         this.state=commentPo.getState();
-        this.gmtCreated=commentPo.getGmtCreate();
+        this.gmtCreated=commentPo.getGmtCreated();
         this.gmtModified=commentPo.getGmtModified();
     }
 
@@ -114,7 +114,7 @@ public class Comment implements VoObject {
         po.setState(this.getState());
         po.setGoodsSkuId(this.getGoodsSkuId());
         po.setGmtModified(this.getGmtModified());
-        po.setGmtCreate(this.getGmtCreated());
+        po.setGmtCreated(this.getGmtCreated());
         return po;
     }
 
