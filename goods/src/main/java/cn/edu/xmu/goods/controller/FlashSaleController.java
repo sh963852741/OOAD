@@ -28,7 +28,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("timesegments/{id}/flashsales")
+    @GetMapping(value= "/timesegments/{id}/flashsales")
     public Object getFlashsales(@PathVariable long id, @RequestParam(required = false) Integer state, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize){
         return null;
     }
