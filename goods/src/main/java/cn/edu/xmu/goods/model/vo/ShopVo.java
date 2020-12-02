@@ -13,4 +13,5 @@ public class ShopVo {
     @NotBlank(message = "商铺名不能为空")
     @ApiModelProperty(value = "shop名称")
     private String name;
+    private Byte state;
 }
