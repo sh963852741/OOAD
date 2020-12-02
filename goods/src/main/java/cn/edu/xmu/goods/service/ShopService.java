@@ -44,7 +44,6 @@ public class ShopService {
     public ReturnObject  newShop(ShopVo shopVo) {
         ShopPo po=new ShopPo();
         po.setName(shopVo.getName());
-        po.setState(Shop.State.EXAME.getCode().byteValue());
         ReturnObject ret=shopDao.newShop(po);
         if(ret.getCode()!= ResponseCode.OK){
             return ret;
@@ -101,7 +100,8 @@ public class ShopService {
     public ReturnObject passShop(Long id,ShopConclusionVo conclusion) {
         Shop shop=new Shop();
         shop.setId(id.longValue());
-        shop.setState(conclusion.getConclusion()==true? Shop.State.NORM.getCode().byteValue() : Shop.State.EXAME.getCode().byteValue());
+        shop.setState(conclusion.getConclusion()==true? Shop.State.ONLINE.getCode().byteValue() : Shop.State.NOTPASS.getCode().byteValue());
+
         ReturnObject ret=shopDao.updateShopState(shop);
         return ret;
     }
