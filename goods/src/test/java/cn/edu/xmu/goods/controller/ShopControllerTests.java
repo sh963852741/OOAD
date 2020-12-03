@@ -1,6 +1,9 @@
 package cn.edu.xmu.goods.controller;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ShopControllerTests {
     @Autowired
     private MockMvc mvc;
@@ -29,6 +33,7 @@ public class ShopControllerTests {
      * @throws Exception
      */
     @Test
+    @Order(1)
     public void applyShop() throws Exception {
         String requestJson = "{\"name\": \"张三商铺\"}";
         String responseString = this.mvc.perform(post("/shop/shops").contentType("application/json;charset=UTF-8").content(requestJson))
@@ -38,6 +43,7 @@ public class ShopControllerTests {
     }
 
     @Test
+    @Order(3)
     public void modifyShop() throws Exception {
         String requestJson = "{\"name\": \"修改后的店铺名称\"}";
         String responseString = this.mvc.perform(put("/shops/1").header("authorization", null).content(requestJson))
@@ -47,6 +53,7 @@ public class ShopControllerTests {
     }
 
     @Test
+    @Order(2)
     public void auditShop() throws Exception {
         String requestJson = "{\"conclusion\": true}";
         String responseString = this.mvc.perform(put("/shops/0/newshops/1/audit").header("authorization", null).content(requestJson))
@@ -56,6 +63,7 @@ public class ShopControllerTests {
     }
 
     @Test
+    @Order(4)
     public void shelfShop() throws Exception {
         String responseString1 = this.mvc.perform(put("/shops/1/onshelves").header("authorization", null))
                 .andExpect(status().isOk())
@@ -69,6 +77,7 @@ public class ShopControllerTests {
     }
 
     @Test
+    @Order(5)
     public void deleteShop() throws Exception {
         String responseString = this.mvc.perform(delete("/shops/12").header("authorization", null))
                 .andExpect(status().isOk())
