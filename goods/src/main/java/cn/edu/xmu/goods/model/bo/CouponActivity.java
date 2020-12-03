@@ -11,7 +11,7 @@ public class CouponActivity {
     public enum CouponStatus {
         PENDING((byte)0,"尚未开始"),
         RUNNING((byte)1,"活动进行中"),
-        FINISHED((byte)2,"已结束"),
+        FINISHED((byte)2,"已下线"),
         CANCELED((byte)3,"已取消");
 
         private static final Map<Byte, CouponActivity.CouponStatus> typeMap;

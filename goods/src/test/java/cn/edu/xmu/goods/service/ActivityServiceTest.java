@@ -7,6 +7,7 @@ import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
 import cn.edu.xmu.goods.model.vo.CouponActivityVo;
 import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
 import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
+import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
@@ -66,7 +67,7 @@ class ActivityServiceTest {
         vo.setPageSize(10);
         vo.setShopId(1L);
         vo.setTimeline((byte)2);
-        ReturnObject ret = activityService.getPresaleActivities(vo, true);
+        ReturnObject ret = activityService.getPresaleActivities(vo);
         assertEquals(ResponseCode.OK, ret.getCode());
     }
 
@@ -79,9 +80,9 @@ class ActivityServiceTest {
         vo.setShopId(1L);
         vo.setTimeline((byte)2);
         vo.setSpuId(647L);
-        ReturnObject<List<PresaleActivityVo>> ret = activityService.getPresaleActivities(vo, true);
+        ReturnObject<PageInfo<VoObject>> ret = activityService.getPresaleActivities(vo);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertTrue(ret.getData().size()>0);
+        assertTrue(ret.getData().getList().size()>0);
     }
 
     @Test
@@ -110,7 +111,7 @@ class ActivityServiceTest {
     void delPresaleActivity() {
         assertTrue(activityIdHash.containsKey("runningPActivity"));
 
-        ReturnObject ret = activityService.delPresaleActivity(activityIdHash.get("runningPActivity"));
+        ReturnObject ret = activityService.delPresaleActivity(activityIdHash.get("runningPActivity"),1L);
         assertEquals(ResponseCode.OK, ret.getCode());
         activityIdHash.remove("runningPActivity");
     }

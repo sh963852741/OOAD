@@ -44,17 +44,31 @@ public class ActivityService {
         return new ReturnObject(PresaleActivity.PresaleStatus.values());
     }
 
-    public ReturnObject<List<PresaleActivityVo>> getPresaleActivities(ActivityFinderVo activityFinderVo, boolean all) {
+    public ReturnObject<List<PresaleActivityVo>> getAllPresaleActivities(ActivityFinderVo activityFinderVo) {
         List<PresaleActivityPo> presaleList;
-        if (activityFinderVo.getSpuId() != null && !all) {
-            presaleList = presaleActivityDao.getActivitiesBySPUId(
-                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
-        } else {
-            presaleList = presaleActivityDao.getEffectiveActivities(
-                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
-        }
+        presaleList = presaleActivityDao.getAllActivityBySPUId(activityFinderVo.getTimeline(),activityFinderVo.getSpuId());
         List<PresaleActivityVo> retList = presaleList.stream().map(e -> new PresaleActivityVo(e)).collect(Collectors.toList());
         return new ReturnObject(retList);
+    }
+
+    public ReturnObject<PageInfo<VoObject>> getPresaleActivities(ActivityFinderVo activityFinderVo) {
+            PageInfo<PresaleActivityPo> po;
+            if (activityFinderVo.getSpuId() != null) {
+                po = presaleActivityDao.getActivitiesBySPUId(
+                        activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
+            } else {
+                po = presaleActivityDao.getEffectiveActivities(
+                        activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline());
+            }
+            List<PresaleActivityVo> retList = po.getList().stream().map(e -> new PresaleActivityVo(e)).collect(Collectors.toList());
+
+            PageInfo<PresaleActivityVo> ret = new PageInfo(retList);
+            ret.setPageNum(po.getPageNum());
+            ret.setPages(po.getPages());
+            ret.setTotal(po.getTotal());
+            ret.setPageSize(po.getPageSize());
+            return new ReturnObject(ret);
+
     }
 
     public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId, Long shopId) {
@@ -93,11 +107,19 @@ public class ActivityService {
         }
     }
 
-    public ReturnObject delPresaleActivity(long id) {
+    public ReturnObject delPresaleActivity(long id, long shopId) {
+        PresaleActivityPo presaleActivityPo = presaleActivityDao.getActivityById(id);
+        if(presaleActivityPo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "预售活动不存在");
+        }
+        if(presaleActivityPo.getShopId() != shopId){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "当前预售活动不属于您的店铺");
+        }
+
         if (presaleActivityDao.delActivity(id)) {
-            return new ReturnObject();
+            return new ReturnObject<>();
         } else {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法删除预售活动");
         }
     }
     //endregion
@@ -421,7 +443,7 @@ public class ActivityService {
      */
     public ReturnObject delCoupon(Long couponId, Long userId) {
         CouponPo po = new CouponPo();
-        po.setState(Coupon.CouponStatus.DELETED.getCode());
+        po.setState(Coupon.CouponStatus.EXPIRED.getCode());
 
         if (couponDao.modifyCoupon(po) == 1) {
             return new ReturnObject();

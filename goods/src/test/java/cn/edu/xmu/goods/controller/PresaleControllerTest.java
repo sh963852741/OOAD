@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@Rollback(false)
+@Rollback(true)
 public class PresaleControllerTest {
 
     private static String adminToken;
@@ -107,5 +107,10 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.errmsg").value("成功"))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
+    }
+
+    @Test
+    public void delPresaleActivity(){
+
     }
 }
