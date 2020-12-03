@@ -4,6 +4,7 @@ import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
 import cn.edu.xmu.goods.model.vo.CouponActivityVo;
 import cn.edu.xmu.goods.service.ActivityService;
+import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -42,7 +43,7 @@ public class CouponController {
     @GetMapping(value = "/coupons/states")
     public Object getCouponState(){
         ReturnObject ret = activityService.getCouponStatus();
-        return ret;
+        return Common.decorateReturnObject(ret) ;
     }
 
     /**
@@ -144,7 +145,7 @@ public class CouponController {
                                          @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
         ReturnObject ret = activityService.getSPUInCouponActivity(id,page,pageSize);
 
-        return getPageRetObjectWisely(ret);
+        return ret;
     }
 
     /**
@@ -157,8 +158,11 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/{shopId}/couponactivities/{id}")
-    public Object shopsShopIdCouponactivitiesIdGet(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object getCouponActivity(
+            @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        var ret = activityService.getCouponActivity(id, shopId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -217,8 +221,12 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/couponactivities/{id}/spus")
-    public Object shopsShopIdCouponactivitiesIdSpusPost(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityid,@ApiParam(value = "可修改的优惠券活动信息" ,required=true )  @RequestBody Integer id){
-        return null;
+    public Object shopsShopIdCouponactivitiesIdSpusPost(
+            @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityid,
+            @ApiParam(value = "可修改的优惠券活动信息" ,required=true )  @RequestBody Integer id){
+        var ret = activityService.addSPUToCouponActivity(id,shopId,activityid);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -273,8 +281,11 @@ public class CouponController {
             @ApiResponse(code = 905, message = "优惠卷状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/coupons/{id}")
-    public Object useCoupon(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object useCoupon(
+            @LoginUser Long userId,
+            @ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
+        var ret = activityService.useCoupon(id,userId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -305,8 +316,11 @@ public class CouponController {
             @ApiResponse(code = 911, message = "优惠卷活动终止"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/couponactivities/{id}/usercoupons")
-    public Object couponactivitiesIdUsercouponsPost(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object couponactivitiesIdUsercouponsPost(
+            @LoginUser Long userId,
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        var ret = activityService.claimCoupon(id,userId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -337,7 +351,11 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/coupons/{id}")
-    public Object shopsShopIdCouponsIdPut(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "店铺ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object shopsShopIdCouponsIdPut(
+            @LoginUser Long userId,
+            @ApiParam(value = "店铺ID",required=true) @PathVariable("shopId") Long shopId,
+            @ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
+        var x = activityService.refundCoupon(id,userId);
+        return Common.decorateReturnObject(x);
     }
 }

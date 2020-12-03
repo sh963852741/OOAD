@@ -168,6 +168,24 @@ public class ActivityService {
     //endregion
 
     //region 优惠活动部分
+
+    public ReturnObject getCouponActivity(long activityId, long shopId){
+        CouponActivityPo activityPo = couponActivityDao.getActivityById(activityId);
+        Shop shop = shopService.getShopByShopId(shopId).getData();
+        if (activityPo == null || shop == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "活动或对应店铺不存在");
+        }
+        if(activityPo.getShopId() != shop.getId()){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "活动不是自己店铺的活动");
+        }
+
+        CouponActivityVo couponActivityVo = new CouponActivityVo(activityPo);
+        couponActivityVo.shop.put("id", shop.getId());
+        couponActivityVo.shop.put("name", shop.getName());
+
+        return new ReturnObject(couponActivityVo);
+    }
+
     public ReturnObject getCouponActivityStatus() {
         return new ReturnObject(CouponActivity.CouponStatus.values());
     }
