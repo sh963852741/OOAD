@@ -147,16 +147,16 @@ public class ActivityService {
         if(activityFinderVo.getTimeline()!=null) {
             switch (activityFinderVo.getTimeline()) {
                 case 0:
-                    state = GrouponActivity.GrouponStatus.PENDING.getCode().byteValue();
+                    state = GrouponActivity.GrouponStatus.NEW.getCode().byteValue();
                     break;
                 case 1:
-                    state = GrouponActivity.GrouponStatus.PENDING.getCode().byteValue();
+                    state = GrouponActivity.GrouponStatus.NEW.getCode().byteValue();
                     break;
                 case 2:
                     state = GrouponActivity.GrouponStatus.RUNNING.getCode().byteValue();
                     break;
                 case 3:
-                    state = GrouponActivity.GrouponStatus.FINISHED.getCode().byteValue();
+                    state = GrouponActivity.GrouponStatus.CANCELED.getCode().byteValue();
                     break;
                 default:
                     state = null;
