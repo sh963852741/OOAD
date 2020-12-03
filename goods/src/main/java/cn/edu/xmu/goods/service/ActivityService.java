@@ -43,17 +43,31 @@ public class ActivityService {
         return new ReturnObject(PresaleActivity.PresaleStatus.values());
     }
 
-    public ReturnObject<List<PresaleActivityVo>> getPresaleActivities(ActivityFinderVo activityFinderVo, boolean all) {
+    public ReturnObject<List<PresaleActivityVo>> getAllPresaleActivities(ActivityFinderVo activityFinderVo) {
         List<PresaleActivityPo> presaleList;
-        if (activityFinderVo.getSpuId() != null && !all) {
-            presaleList = presaleActivityDao.getActivitiesBySPUId(
-                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
-        } else {
-            presaleList = presaleActivityDao.getEffectiveActivities(
-                    activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
-        }
+        presaleList = presaleActivityDao.getAllActivityBySPUId(activityFinderVo.getTimeline(),activityFinderVo.getSpuId());
         List<PresaleActivityVo> retList = presaleList.stream().map(e -> new PresaleActivityVo(e)).collect(Collectors.toList());
         return new ReturnObject(retList);
+    }
+
+    public ReturnObject<PageInfo<VoObject>> getPresaleActivities(ActivityFinderVo activityFinderVo) {
+            PageInfo<PresaleActivityPo> po;
+            if (activityFinderVo.getSpuId() != null) {
+                po = presaleActivityDao.getActivitiesBySPUId(
+                        activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
+            } else {
+                po = presaleActivityDao.getEffectiveActivities(
+                        activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline());
+            }
+            List<PresaleActivityVo> retList = po.getList().stream().map(e -> new PresaleActivityVo(e)).collect(Collectors.toList());
+
+            PageInfo<PresaleActivityVo> ret = new PageInfo(retList);
+            ret.setPageNum(po.getPageNum());
+            ret.setPages(po.getPages());
+            ret.setTotal(po.getTotal());
+            ret.setPageSize(po.getPageSize());
+            return new ReturnObject(ret);
+
     }
 
     public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId, Long shopId) {

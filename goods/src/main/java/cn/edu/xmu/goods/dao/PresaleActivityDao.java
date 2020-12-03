@@ -5,6 +5,7 @@ import cn.edu.xmu.goods.model.bo.PresaleActivity;
 import cn.edu.xmu.goods.model.po.PresaleActivityPo;
 import cn.edu.xmu.goods.model.po.PresaleActivityPoExample;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +18,15 @@ public class PresaleActivityDao {
     @Autowired
     PresaleActivityPoMapper presaleActivityPoMapper;
 
+    public List<PresaleActivityPo> getAllActivityBySPUId(byte state, long spuId){
+        PresaleActivityPoExample example = new PresaleActivityPoExample();
+        PresaleActivityPoExample.Criteria criteria = example.createCriteria();
+        criteria.andGoodsSpuIdEqualTo(spuId);
+        criteria.andStateEqualTo(state);
+
+        return presaleActivityPoMapper.selectByExample(example);
+    }
+
     /**
      * 顾客获取某SPU的预售活动信息，此函数为高频读
      * @param page
@@ -24,7 +34,7 @@ public class PresaleActivityDao {
      * @param spuId SPU的ID
      * @return
      */
-    public List<PresaleActivityPo> getActivitiesBySPUId(int page, int pageSize, long spuId, Byte timeline){
+    public PageInfo<PresaleActivityPo> getActivitiesBySPUId(int page, int pageSize, long spuId, Byte timeline){
         PageHelper.startPage(page, pageSize);
 
         PresaleActivityPoExample example = new PresaleActivityPoExample();
@@ -48,7 +58,11 @@ public class PresaleActivityDao {
             }
         }
 
-        return presaleActivityPoMapper.selectByExample(example);
+        var list = presaleActivityPoMapper.selectByExample(example);
+
+        PageInfo<PresaleActivityPo> po = PageInfo.of(list);
+
+        return po;
     }
 
     public boolean changeActivityStatus(long id, byte state){
@@ -63,7 +77,7 @@ public class PresaleActivityDao {
         return presaleActivityPoMapper.selectByPrimaryKey(activityId);
     }
 
-    public List<PresaleActivityPo> getEffectiveActivities(int page,int pageSize, Long shopId, Byte timeline, Long spuId, Boolean all){
+    public PageInfo<PresaleActivityPo> getEffectiveActivities(int page,int pageSize, Long shopId, Byte timeline){
         PageHelper.startPage(page, pageSize);
 
         PresaleActivityPoExample example = new PresaleActivityPoExample();
@@ -90,15 +104,11 @@ public class PresaleActivityDao {
             criteria.andShopIdEqualTo(shopId);
         }
 
-        if(spuId != null){
-            criteria.andGoodsSpuIdEqualTo(spuId);
-        }
+        criteria.andStateNotEqualTo(PresaleActivity.PresaleStatus.CANCELED.getCode());
 
-        if(!all){
-            criteria.andStateNotEqualTo(PresaleActivity.PresaleStatus.CANCELED.getCode());
-        }
-
-        return presaleActivityPoMapper.selectByExample(example);
+        var list = presaleActivityPoMapper.selectByExample(example);
+        PageInfo<PresaleActivityPo> po = PageInfo.of(list);
+        return po;
     }
 
     public int addActivity(PresaleActivityPo po, long skuId, long shopId){

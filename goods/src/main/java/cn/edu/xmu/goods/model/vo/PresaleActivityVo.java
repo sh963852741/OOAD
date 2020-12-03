@@ -1,6 +1,7 @@
 package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.po.PresaleActivityPo;
+import cn.edu.xmu.ooad.model.VoObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 @Data
 @NoArgsConstructor
 @ApiModel(value = "新建预售视图")
-public class PresaleActivityVo {
+public class PresaleActivityVo implements VoObject {
 
     @NotBlank
     @ApiModelProperty(value = "预售名称")
@@ -83,5 +84,15 @@ public class PresaleActivityVo {
         restPayPrice = po.getRestPayPrice();
         gmtCreate = po.getGmtCreated();
         gmtModified = po.getGmtModified();
+    }
+
+    @Override
+    public Object createVo() {
+        return this;
+    }
+
+    @Override
+    public Object createSimpleVo() {
+        return this;
     }
 }
