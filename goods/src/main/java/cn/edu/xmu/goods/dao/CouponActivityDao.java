@@ -84,7 +84,7 @@ public class CouponActivityDao {
 
     public boolean addActivity(CouponActivityPo po, long shopId){
         po.setShopId(shopId);
-        po.setGmtCreated(LocalDateTime.now());
+        po.setGmtCreate(LocalDateTime.now());
         return couponActivityPoMapper.insert(po) == 1;
     }
 

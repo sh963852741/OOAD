@@ -197,8 +197,8 @@ public class GoodsDao {
      * @Date: 2020/12/1 10:32
      */
     public ReturnObject newSku(SKUPo po){
-        po.setGmtCreated(LocalDateTime.now());
-        po.setGmtModified(po.getGmtCreated());
+        po.setGmtCreate(LocalDateTime.now());
+        po.setGmtModified(po.getGmtCreate());
         po.setSkuSn(UUID.randomUUID().toString());
         po.setDisabled(Sku.State.OFFSHELF.getCode().byteValue());
         try{
@@ -336,7 +336,7 @@ public class GoodsDao {
     public ReturnObject newSpu(SPUPo po) {
         try{
             int ret;
-            po.setGmtCreated(LocalDateTime.now());
+            po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
             po.setState(Spu.State.OFFSHELF.getCode().byteValue());
@@ -388,7 +388,7 @@ public class GoodsDao {
      */
     public ReturnObject newFloatPrice(FloatPricePo po) {
         try{
-            po.setGmtCreated(LocalDateTime.now());
+            po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             int ret;
             ret=floatPricePoMapper.insertSelective(po);

@@ -114,7 +114,7 @@ public class PresaleActivityDao {
     public int addActivity(PresaleActivityPo po, long skuId, long shopId){
         po.setGoodsSpuId(skuId);
         po.setShopId(shopId);
-        po.setGmtCreated(LocalDateTime.now());
+        po.setGmtCreate(LocalDateTime.now());
         po.setState(PresaleActivity.PresaleStatus.NEW.getCode());
         return presaleActivityPoMapper.insert(po);
     }

@@ -104,7 +104,7 @@ public class Spu {
         this.setImageUrl(po.getImageUrl());
         this.setState(po.getState());
         this.setSpec(po.getSpec());
-        this.setGmtCreate(po.getGmtCreated());
+        this.setGmtCreate(po.getGmtCreate());
         this.setGmtModified(po.getGmtModified());
         this.setDisabled(po.getState());
     }
@@ -122,7 +122,7 @@ public class Spu {
         po.setImageUrl(this.getImageUrl());
         po.setState(this.getState());
         po.setSpec(this.getSpec());
-        po.setGmtCreated(this.getGmtCreate());
+        po.setGmtCreate(this.getGmtCreate());
         po.setGmtModified(this.getGmtModified());
         po.setDisabled(this.getState());
         return po;

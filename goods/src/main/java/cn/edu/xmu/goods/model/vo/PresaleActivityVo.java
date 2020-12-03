@@ -82,7 +82,7 @@ public class PresaleActivityVo implements VoObject {
         payTime = po.getPayTime();
         advancePayPrice = po.getAdvancePayPrice();
         restPayPrice = po.getRestPayPrice();
-        gmtCreate = po.getGmtCreated();
+        gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
     }
 

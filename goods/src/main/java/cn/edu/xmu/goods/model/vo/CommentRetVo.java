@@ -52,7 +52,7 @@ public class CommentRetVo {
         po.setType(this.getType());
         po.setState(this.getState());
         po.setCustomerId(this.getCustomer().getId());
-        po.setGmtCreated(this.getGmtCreated());
+        po.setGmtCreate(this.getGmtCreate());
         po.setGmtModified(this.getGmtModified());
         return po;
     }*/
