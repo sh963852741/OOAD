@@ -85,7 +85,7 @@ public class GoodsController {
             return obj;
         }
         ReturnObject returnObject = goodsService.getAllSkus(vo, page, pageSize);
-        return returnObject;
+        return Common.decorateReturnObject(returnObject);
     }
 
     /**

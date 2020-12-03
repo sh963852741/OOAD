@@ -1,7 +1,7 @@
 package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.po.GrouponActivityPo;
-import cn.edu.xmu.goods.model.po.PresaleActivityPo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -22,21 +23,30 @@ public class GrouponActivityVo {
     String strategy;
 
     @ApiModelProperty(value = "团购开始时间")
-    LocalDateTime beginTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime dbeginTime;
 
     @ApiModelProperty(value = "团购结束时间")
-    LocalDateTime endTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime dendTime;
 
     Long id;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtCreate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtModified;
-    public HashMap<String, Object> subData = new HashMap<>();
+
+    public Map<String, Object> goodsSpu = new HashMap<>();
+
+    public Map<String, Object> shop = new HashMap<>();
 
     public GrouponActivityPo createPo() {
         GrouponActivityPo po = new GrouponActivityPo();
         po.setName(name);
-        po.setBeginTime(beginTime);
-        po.setEndTime(endTime);
+        po.setBeginTime(dbeginTime);
+        po.setEndTime(dendTime);
         po.setStrategy(strategy);
         return po;
     }
@@ -45,8 +55,8 @@ public class GrouponActivityVo {
         id = po.getId();
         name = po.getName();
         strategy = po.getStrategy();
-        beginTime = po.getBeginTime();
-        endTime = po.getEndTime();
+        dbeginTime = po.getBeginTime();
+        dendTime = po.getEndTime();
         gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
     }
