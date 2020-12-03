@@ -62,7 +62,9 @@ public class CouponActivityVo {
     Long id;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
-    public HashMap<String, Object> subData = new HashMap<>();
+    public HashMap<String, Object> shop = new HashMap<>();
+    public HashMap<String, Object> createdBy = new HashMap<>();
+    public HashMap<String, Object> modiBy = new HashMap<>();
 
     public CouponActivityPo createPo() {
         CouponActivityPo po = new CouponActivityPo();
