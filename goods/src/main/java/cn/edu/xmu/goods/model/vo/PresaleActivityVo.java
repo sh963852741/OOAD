@@ -1,39 +1,53 @@
 package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.po.PresaleActivityPo;
+import cn.edu.xmu.ooad.model.VoObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @Data
 @NoArgsConstructor
 @ApiModel(value = "新建预售视图")
-public class PresaleActivityVo {
+public class PresaleActivityVo implements VoObject {
 
+    @NotBlank
     @ApiModelProperty(value = "预售名称")
     String name;
 
+    @NotNull
+    @Min(0)
     @ApiModelProperty(value = "预售款")
     Long advancePayPrice;
 
+    @NotNull
+    @Min(0)
     @ApiModelProperty(value = "尾款")
     Long restPayPrice;
 
+    @NotNull
+    @Min(0)
     @ApiModelProperty(value = "预售数量")
     Integer quantity;
 
+    @DateTimeFormat
+    @Future
     @ApiModelProperty(value = "预售开始时间")
     LocalDateTime beginTime;
 
+    @DateTimeFormat
+    @Future
     @ApiModelProperty(value = "预售结束时间")
     LocalDateTime endTime;
 
+    @DateTimeFormat
+    @Future
     @ApiModelProperty(value = "付款时间")
     LocalDateTime payTime;
 
@@ -41,7 +55,8 @@ public class PresaleActivityVo {
     private Byte state;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
-    public HashMap<String, Object> subData = new HashMap<>();
+    public HashMap<String, Object> goodsSpu = new HashMap<>();
+    public HashMap<String, Object> shop = new HashMap<>();
 
 
     public PresaleActivityPo createPo(){
@@ -51,7 +66,6 @@ public class PresaleActivityVo {
         po.setAdvancePayPrice(advancePayPrice);
         po.setPayTime(payTime);
         po.setRestPayPrice(restPayPrice);
-        po.setAdvancePayPrice(advancePayPrice);
         po.setName(name);
         po.setQuantity(quantity);
 
@@ -67,8 +81,18 @@ public class PresaleActivityVo {
         endTime = po.getEndTime();
         payTime = po.getPayTime();
         advancePayPrice = po.getAdvancePayPrice();
-        restPayPrice = po.getAdvancePayPrice();
+        restPayPrice = po.getRestPayPrice();
         gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
+    }
+
+    @Override
+    public Object createVo() {
+        return this;
+    }
+
+    @Override
+    public Object createSimpleVo() {
+        return this;
     }
 }

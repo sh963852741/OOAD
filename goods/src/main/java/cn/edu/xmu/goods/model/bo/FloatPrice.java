@@ -72,7 +72,7 @@ public class FloatPrice implements VoObject {
 
     private Byte valid;
 
-    private LocalDateTime gmtCreated;
+    private LocalDateTime gmtCreate;
 
     private LocalDateTime gmtModified;
 
@@ -86,7 +86,7 @@ public class FloatPrice implements VoObject {
         this.setCreatedBy(po.getCreatedBy());
         this.setInvalidBy(po.getInvalidBy());
         this.setValid(po.getValid());
-        this.setGmtCreated(po.getGmtCreate());
+        this.setGmtCreate(po.getGmtCreate());
         this.setGmtModified(po.getGmtModified());
     }
 
@@ -101,7 +101,7 @@ public class FloatPrice implements VoObject {
         po.setCreatedBy(this.getCreatedBy());
         po.setInvalidBy(this.getInvalidBy());
         po.setValid(this.getValid());
-        po.setGmtCreate(this.getGmtCreated());
+        po.setGmtCreate(this.getGmtCreate());
         po.setGmtModified(this.getGmtModified());
         return po;
     }
@@ -115,7 +115,7 @@ public class FloatPrice implements VoObject {
         retVo.setEndTime(this.getEndTime());
         retVo.setValid(this.getValid());
         retVo.setId(this.getId());
-        retVo.setGmtCreated(this.getGmtCreated());
+        retVo.setGmtCreate(this.getGmtCreate());
         retVo.setGmtModified(this.getGmtModified());
         retVo.setQuantity(this.getQuantity());
         return retVo;

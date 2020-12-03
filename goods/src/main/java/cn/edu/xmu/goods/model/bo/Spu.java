@@ -7,7 +7,6 @@ import cn.edu.xmu.goods.dao.ShopDao;
 import cn.edu.xmu.goods.model.po.SPUPo;
 import cn.edu.xmu.goods.model.vo.SkuSimpleRetVo;
 import cn.edu.xmu.goods.model.vo.SpuRetVo;
-import cn.edu.xmu.goods.model.vo.SpuVo;
 import cn.edu.xmu.goods.utility.SpringContextHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -89,7 +88,7 @@ public class Spu {
 
     private Byte disabled;
 
-    private LocalDateTime gmtCreated;
+    private LocalDateTime gmtCreate;
 
     private LocalDateTime gmtModified;
 
@@ -105,7 +104,7 @@ public class Spu {
         this.setImageUrl(po.getImageUrl());
         this.setState(po.getState());
         this.setSpec(po.getSpec());
-        this.setGmtCreated(po.getGmtCreate());
+        this.setGmtCreate(po.getGmtCreate());
         this.setGmtModified(po.getGmtModified());
         this.setDisabled(po.getState());
     }
@@ -123,7 +122,7 @@ public class Spu {
         po.setImageUrl(this.getImageUrl());
         po.setState(this.getState());
         po.setSpec(this.getSpec());
-        po.setGmtCreate(this.getGmtCreated());
+        po.setGmtCreate(this.getGmtCreate());
         po.setGmtModified(this.getGmtModified());
         po.setDisabled(this.getState());
         return po;
@@ -137,7 +136,7 @@ public class Spu {
         vo.setDisable(this.getDisabled());
         vo.setImageUrl(this.getImageUrl());
         vo.setName(this.getName());
-        vo.setGmtCreate(this.getGmtCreated());
+        vo.setGmtCreate(this.getGmtCreate());
         vo.setGmtModified(this.getGmtModified());
         vo.setState(this.getState());
         vo.setSpec(this.getSpec());
@@ -148,6 +147,21 @@ public class Spu {
         vo.setSkuList(this.getSimpleSkus());
         return vo;
     }
+
+    public Map<String, Object> createSimpleSpu() {
+        Map<String,Object> simple=new HashMap<>();
+        simple.put("id",this.getId());
+        simple.put("name",this.getName());
+        simple.put("goodsSn",this.getGoodsSn());
+        simple.put("imageUrl",this.getImageUrl());
+        simple.put("state",this.getState());
+        simple.put("gmtCreate",this.getGmtCreate());
+        simple.put("gmtModified",this.getGmtModified());
+        simple.put("disable",this.getDisabled());
+        simple.put("shopId",this.getShopId());
+        return  simple;
+    }
+
 
     //获取简单的brand
     private Map<String,Object> getSimpleBrandVo(){
