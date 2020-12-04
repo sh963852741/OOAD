@@ -7,6 +7,7 @@ import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.ShopPo;
 import cn.edu.xmu.goods.model.vo.ShopRetVo;
 import cn.edu.xmu.goods.model.vo.ShopVo;
+import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.model.vo.*;
@@ -69,11 +70,11 @@ public class ShopService {
      * @Author: Lei Yang
      * @Date: 2020/12/1 20:36
      */
-    public ReturnObject updateShop(Long id,Long shopId, ShopVo shopVo) {
+    public ReturnObject updateShop(Long id,ShopVo shopVo) {
         Shop shop=new Shop();
-        shop.setId(id.longValue());
-        shop.setName(shopVo.getName());
-        ReturnObject ret=shopDao.UpdateShop(shop);
+        shop.setId(id);
+        shop.setName(shopVo.getName()) ;
+        ReturnObject ret=shopDao.UpdateShop(shop.getId(),shop);
         return ret;
     }
 
@@ -87,7 +88,7 @@ public class ShopService {
         Shop shop=new Shop();
         shop.setId(id.longValue());
         shop.setState(Shop.State.FORBID.getCode().byteValue());
-        ReturnObject ret=shopDao.UpdateShop(shop);
+        ReturnObject ret=shopDao.updateShopState(shop);
         return ret;
     }
 
@@ -100,7 +101,7 @@ public class ShopService {
     public ReturnObject passShop(Long id,ShopConclusionVo conclusion) {
         Shop shop=new Shop();
         shop.setId(id.longValue());
-        shop.setState(conclusion.getConclusion()==true? Shop.State.ONLINE.getCode().byteValue() : Shop.State.NOTPASS.getCode().byteValue());
+        shop.setState(conclusion.getConclusion()==true? Shop.State.OFFLINE.getCode().byteValue() : Shop.State.NOTPASS.getCode().byteValue());
 
         ReturnObject ret=shopDao.updateShopState(shop);
         return ret;
@@ -114,10 +115,13 @@ public class ShopService {
      */
     public ReturnObject onShelfShop(Long id) {
         Shop shop=new Shop();
-        shop.setId(id.longValue());
+        shop.setId(id);
         shop.setState(Shop.State.ONLINE.getCode().byteValue());
-        ReturnObject ret=shopDao.UpdateShop(shop);
-        return ret;
+        if(getShopByShopId(id).getData().getState()==5) {
+            ReturnObject ret = shopDao.updateShopState(shop);
+            return ret;
+        }
+        else return new ReturnObject(ResponseCode.PASSSHOP_ERROR);
     }
 
     /**
@@ -127,10 +131,12 @@ public class ShopService {
      * @Date: 2020/12/1 20:36
      */
     public ReturnObject offShelfShop(Long id) {
-        Shop shop=new Shop();
+        Shop shop = new Shop();
         shop.setId(id.longValue());
         shop.setState(Shop.State.OFFLINE.getCode().byteValue());
-        ReturnObject ret=shopDao.UpdateShop(shop);
-        return ret;
+        if (getShopByShopId(id).getData().getState() == 4) {
+            ReturnObject ret = shopDao.updateShopState(shop);
+            return ret;
+        } else return new ReturnObject(ResponseCode.PASSSHOP_ERROR);
     }
 }
