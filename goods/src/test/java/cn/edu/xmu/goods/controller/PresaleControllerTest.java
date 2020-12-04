@@ -22,8 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
-@Rollback(true)
 public class PresaleControllerTest {
 
     private static String adminToken;
@@ -48,7 +46,7 @@ public class PresaleControllerTest {
         String request="{ \"name\": \"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/690/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isOk()))
@@ -68,7 +66,7 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.gmtCreate").isString())
                 .andExpect(jsonPath("$.data.state").isNumber())
                 .andExpect(jsonPath("$.data.goodsSpu.shopId").doesNotExist())
-                .andExpect(jsonPath("$.data.goodsSpu.id").value(690))
+                .andExpect(jsonPath("$.data.goodsSpu.id").value(290))
                 .andExpect(jsonPath("$.data.shop.id").value(1))
                 .andExpect(jsonPath("$.data.shop.name").isString())
                 .andReturn().getResponse().getContentAsString();
