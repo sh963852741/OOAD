@@ -62,6 +62,7 @@ public class CouponActivityVo {
     Long id;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
+    private Byte state;
     public HashMap<String, Object> shop = new HashMap<>();
     public HashMap<String, Object> createdBy = new HashMap<>();
     public HashMap<String, Object> modiBy = new HashMap<>();
@@ -76,6 +77,7 @@ public class CouponActivityVo {
         po.setBeginTime(beginTime);
         po.setEndTime(endTime);
         po.setStrategy(strategy);
+        po.setState(state);
         return po;
     }
 

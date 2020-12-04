@@ -12,7 +12,6 @@ import cn.edu.xmu.goods.service.dubbo.IActivityService;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -253,11 +252,13 @@ public class ActivityService implements IActivityService {
     //region 优惠活动部分
 
     public Map<Long, Long> validateActivity(List<OrderItem> orderItems, Long couponId){
+        // 考虑增加HashMap以进行优惠券和活动的对应
         CouponPo couponPo = couponDao.getCoupon(couponId);
         if(couponPo == null){
             return new HashMap<>();
         }
         Map<Long, Long> map = new HashMap<>();
+        // 考虑增加缓存，缓存活动适用的SPU
         Long activityId = couponPo.getActivityId();
         List<CouponSPUPo> couponSPUPoList = couponActivityDao.getSPUsInActivity(activityId);
         Set<Long> spuSet = new HashSet<>();
@@ -277,34 +278,49 @@ public class ActivityService implements IActivityService {
         return map;
     }
 
-    public ReturnObject getCouponActivity(long activityId, long shopId){
+    /**
+     * 获取优惠活动的的详细信息
+     * @param activityId
+     * @param shopId
+     * @return 返回优惠活动，店铺，创建者，修改者
+     */
+    public ReturnObject<CouponActivityVo> getCouponActivity(long activityId, long shopId){
         CouponActivityPo activityPo = couponActivityDao.getActivityById(activityId);
         Shop shop = shopService.getShopByShopId(shopId).getData();
         if (activityPo == null || shop == null){
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "活动或对应店铺不存在");
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "活动或对应店铺不存在");
         }
-        if(activityPo.getShopId() != shop.getId()){
-            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "活动不是自己店铺的活动");
+        if(!activityPo.getShopId().equals(shop.getId())){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "活动不是自己店铺的活动");
         }
 
         CouponActivityVo couponActivityVo = new CouponActivityVo(activityPo);
         couponActivityVo.shop.put("id", shop.getId());
         couponActivityVo.shop.put("name", shop.getName());
 
-        return new ReturnObject(couponActivityVo);
+        return new ReturnObject<CouponActivityVo>(couponActivityVo);
     }
 
-    public ReturnObject getCouponActivityStatus() {
-        return new ReturnObject(CouponActivity.CouponStatus.values());
+    /**
+     *
+     * @return 优惠活动的所有状态（对前台而言）
+     */
+    public ReturnObject<CouponActivity.CouponStatus[]> getCouponActivityStatus() {
+        return new ReturnObject<>(CouponActivity.CouponStatus.values());
     }
 
-    public ReturnObject getCouponStatus() {
-        return new ReturnObject(Coupon.CouponStatus.values());
+    public ReturnObject<Coupon.CouponStatus[]> getCouponStatus() {
+        return new ReturnObject<>(Coupon.CouponStatus.values());
     }
 
+    /**
+     *查看优惠活动列表，可以查看上线的也可以查看下线的
+     * @param activityFinderVo
+     * @return 带分页的优惠活动列表
+     */
     public ReturnObject<PageInfo<CouponActivityVo>> getCouponActivities(ActivityFinderVo activityFinderVo) {
         PageInfo<CouponActivityPo> couponList;
-        if (activityFinderVo.getTimeline() == CouponActivity.CouponStatus.CANCELED.getCode()) {
+        if (activityFinderVo.getTimeline().equals(CouponActivity.CouponStatus.CANCELED.getCode())) {
             couponList = couponActivityDao.getInvalidActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId());
         } else {
@@ -321,6 +337,12 @@ public class ActivityService implements IActivityService {
         return new ReturnObject(ret);
     }
 
+    /**
+     * 新增优惠活动
+     * @param couponActivityVo
+     * @param shopId
+     * @return
+     */
     public ReturnObject addCouponActivity(CouponActivityVo couponActivityVo, Long shopId) {
         CouponActivityPo po = couponActivityVo.createPo();
         if (couponActivityDao.addActivity(po, shopId)) {
@@ -330,14 +352,30 @@ public class ActivityService implements IActivityService {
         }
     }
 
+    /**
+     * 修改优惠活动
+     * @param id
+     * @param couponActivityVo
+     * @param shopId
+     * @return
+     */
     public ReturnObject modifyCouponActivity(Long id, CouponActivityVo couponActivityVo, long shopId) {
+        var activity = couponActivityDao.getActivityById(id);
+        if(activity == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(!activity.getShopId().equals(shopId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
+
         if (couponActivityDao.updateActivity(couponActivityVo.createPo(), id)) {
-            return new ReturnObject(couponActivityVo);
+            return new ReturnObject<>();
         } else {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "未知错误，请联系管理员");
         }
     }
 
+    @Deprecated
     public ReturnObject modifyCouponActivityStatus(Long id, CouponActivity.CouponStatus status){
         if (couponActivityDao.changeActivityStatus(id, status.getCode())) {
             return new ReturnObject();
@@ -346,6 +384,7 @@ public class ActivityService implements IActivityService {
         }
     }
 
+    @Deprecated
     public ReturnObject delCouponActivity(long id) {
         if (couponActivityDao.delActivity(id)) {
             return new ReturnObject();
@@ -354,29 +393,46 @@ public class ActivityService implements IActivityService {
         }
     }
 
-    public ReturnObject addSPUToCouponActivity(long spuId, long shopId, long activityId){
-        var spu = goodsService.getSpuById(spuId).getData();
-        if(spu == null){
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
-        } /*else if((long)spu.getShop().get("id")!= shopId) {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
-        }*/
+    /**
+     * 将SPU加入到优惠活动之中
+     * @param spuIds
+     * @param shopId
+     * @param activityId
+     * @return
+     */
+    public ReturnObject addSPUToCouponActivity(List<Long> spuIds, long shopId, long activityId){
+        for(Long spuId:spuIds){
+            var spu = goodsService.getSpuById(spuId).getData();
+            if(spu == null){
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
+            }
+            if((long)spu.getShop().get("id")!= shopId) {
+                return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
+            }
 
-        Long insertId = couponActivityDao.addSpuToActivity(activityId, spuId);
-        if(insertId != null){
-            return new ReturnObject();
-        } else {
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
+            Long insertId = couponActivityDao.addSpuToActivity(activityId, spuId);
+            if(insertId == null){
+                return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
+            }
         }
+        return new ReturnObject<>();
     }
 
+    /**
+     * 将SPU从优惠活动中移除
+     * @param spuId
+     * @param shopId
+     * @param activityId
+     * @return
+     */
     public ReturnObject removeSPUFromCouponActivity(long spuId, long shopId, long activityId){
         var spu = goodsService.getSpuById(spuId).getData();
         if(spu == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
-        } /*else if((long)spu.getShop().get("id") != shopId) {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
-        }*/
+        }
+        if((long)spu.getShop().get("id") != shopId) {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU不属于你的店铺");
+        }
 
         boolean success = couponActivityDao.removeSpuFromActivity(activityId, spuId);
         if(success){
@@ -386,6 +442,13 @@ public class ActivityService implements IActivityService {
         }
     }
 
+    /**
+     * 获取优惠活动中的SPU
+     * @param activityId
+     * @param page
+     * @param pageSize
+     * @return
+     */
     public ReturnObject getSPUInCouponActivity(long activityId,int page,int pageSize){
         PageInfo<CouponSPUPo> couponSPUPoPageInfo = couponActivityDao.getSPUsInActivity(activityId, page, pageSize);
         List<HashMap<String,Object>> simpleSpuList = new ArrayList();
@@ -425,6 +488,7 @@ public class ActivityService implements IActivityService {
         PageInfo<CouponPo> couponPoList = couponDao.getCouponList(userId, state, page, pageSize);
 
         List<HashMap<String,Object>> couponList = new ArrayList<>();
+        /* 获取每个优惠券所参加的活动 */
         for(CouponPo couponPo:couponPoList.getList()){
             HashMap<String, Object> singleCoupon = new HashMap<>();
             HashMap<String, Object> singleActivity = new HashMap<>();
@@ -481,6 +545,11 @@ public class ActivityService implements IActivityService {
         }
     }
 
+    /**
+     * 使用指定ID的优惠券，订单模块调用
+     * @param couponId
+     * @return
+     */
     public Boolean useCoupon(Long couponId){
         CouponPo couponToUse = couponDao.getCoupon(couponId);
         if(couponToUse.getBeginTime().isAfter(LocalDateTime.now())
@@ -511,6 +580,7 @@ public class ActivityService implements IActivityService {
      * @param userId
      * @return
      */
+    @Deprecated
     public ReturnObject delCoupon(Long couponId, Long userId) {
         CouponPo po = new CouponPo();
         po.setState(Coupon.CouponStatus.EXPIRED.getCode());
@@ -546,6 +616,7 @@ public class ActivityService implements IActivityService {
      * @return
      */
     public ReturnObject claimCoupon(Long activityId, Long userId) {
+        /* 验证优惠活动的有效性 */
         CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
         if (couponActivityPo == null) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动不存在");
@@ -556,6 +627,7 @@ public class ActivityService implements IActivityService {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
         }
 
+        /* 保证用户没有重复领取优惠券 */
         var couponPoList = couponDao.getCouponList(userId, null, 1, 1);
         if (couponPoList.getList().size() != 0) {
             return new ReturnObject(ResponseCode.COUPON_FINISH, "你已经领取过本活动的优惠券了");

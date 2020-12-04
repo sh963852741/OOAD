@@ -232,14 +232,14 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 17:09
      */
-    public ReturnObject getSpuById(Long id) {
+    public ReturnObject<SpuRetVo> getSpuById(Long id) {
         ReturnObject ret = goodsDao.getSpuById(id);
         if(ret.getCode() != ResponseCode.OK){
             return ret;
         }
         Spu spu=new Spu((SPUPo)ret.getData());
         SpuRetVo vo=spu.createVo();
-        return new ReturnObject(vo);
+        return new ReturnObject<>(vo);
     }
 
     /**

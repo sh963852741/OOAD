@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static cn.edu.xmu.goods.utility.Common.getPageRetObjectWisely;
 
 @RestController
@@ -206,8 +208,11 @@ public class CouponController {
     @DeleteMapping(value = "/shops/{shopId}/couponactivities/{id}")
     public Object cancelCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
                                        @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
-        ReturnObject ret = activityService.modifyCouponActivityStatus(id, CouponActivity.CouponStatus.CANCELED);
-        return ret;
+        CouponActivityVo vo =  new CouponActivityVo();
+        vo.setState(CouponActivity.CouponStatus.CANCELED.getCode());
+        ReturnObject ret = activityService.modifyCouponActivity(id, vo, shopId);
+//        ReturnObject ret = activityService.modifyCouponActivityStatus(id, CouponActivity.CouponStatus.CANCELED);
+        return Common.decorateReturnObject(ret);
     }
 
 
@@ -223,9 +228,9 @@ public class CouponController {
     @PostMapping(value = "/shops/{shopId}/couponactivities/{id}/spus")
     public Object shopsShopIdCouponactivitiesIdSpusPost(
             @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
-            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityid,
-            @ApiParam(value = "可修改的优惠券活动信息" ,required=true )  @RequestBody Integer id){
-        var ret = activityService.addSPUToCouponActivity(id,shopId,activityid);
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityId,
+            @ApiParam(value = "SPU的ID列表" ,required=true )  @RequestBody List<Long> ids){
+        var ret = activityService.addSPUToCouponActivity(ids, shopId, activityId);
         return Common.decorateReturnObject(ret);
     }
 
