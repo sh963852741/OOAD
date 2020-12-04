@@ -167,6 +167,16 @@ public class CouponController {
         return Common.decorateReturnObject(ret);
     }
 
+    @DeleteMapping(value = "/shops/{shopId}/presales/{id}")
+    public Object delCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+                                    @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        CouponActivityVo vo = new CouponActivityVo();
+        vo.setState(CouponActivity.CouponStatus.CANCELED.getCode());
+
+        var ret = activityService.modifyCouponActivity(id,vo,shopId);
+        return Common.decorateReturnObject(ret);
+    }
+
     /**
      * 管理员修改己方某优惠活动
      * @param

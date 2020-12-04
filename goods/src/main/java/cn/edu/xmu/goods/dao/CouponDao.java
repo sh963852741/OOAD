@@ -26,6 +26,17 @@ public class CouponDao {
         return couponPoMapper.insert(couponPo);
     }
 
+    public int cancelCoupon(long activityId){
+        CouponPoExample example = new CouponPoExample();
+        CouponPoExample.Criteria criteria = example.createCriteria();
+        criteria.andActivityIdEqualTo(activityId);
+
+        CouponPo couponPo =new CouponPo();
+        couponPo.setState(Coupon.CouponStatus.EXPIRED.getCode());
+        // 按理说不能把已使用的优惠券设置为已作废，记得改
+        return couponPoMapper.updateByExampleSelective(couponPo, example);
+    }
+
     public int modifyCoupon(CouponPo couponPo){
         return couponPoMapper.updateByPrimaryKeySelective(couponPo);
     }

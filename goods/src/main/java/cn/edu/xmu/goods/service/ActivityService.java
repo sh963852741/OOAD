@@ -10,6 +10,7 @@ import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.service.dubbo.IActivityService;
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
@@ -38,17 +39,27 @@ public class ActivityService implements IActivityService {
     ShopService shopService;
 
     //region 预售活动部分
-    public ReturnObject getPresaleActivityStatus() {
-        return new ReturnObject(PresaleActivity.PresaleStatus.values());
+    public ReturnObject<PresaleActivity.PresaleStatus[]> getPresaleActivityStatus() {
+        return new ReturnObject<>(PresaleActivity.PresaleStatus.values());
     }
 
+    /**
+     * 管理员查看SPU的预售活动
+     * @param activityFinderVo
+     * @return 预售活动的列表
+     */
     public ReturnObject<List<PresaleActivityVo>> getAllPresaleActivities(ActivityFinderVo activityFinderVo) {
         List<PresaleActivityPo> presaleList;
         presaleList = presaleActivityDao.getAllActivityBySPUId(activityFinderVo.getTimeline(),activityFinderVo.getSpuId());
-        List<PresaleActivityVo> retList = presaleList.stream().map(e -> new PresaleActivityVo(e)).collect(Collectors.toList());
-        return new ReturnObject(retList);
+        List<PresaleActivityVo> retList = presaleList.stream().map(PresaleActivityVo::new).collect(Collectors.toList());
+        return new ReturnObject<List<PresaleActivityVo>>(retList);
     }
 
+    /**
+     * 用户查看预售活动
+     * @param activityFinderVo
+     * @return
+     */
     public ReturnObject<PageInfo<VoObject>> getPresaleActivities(ActivityFinderVo activityFinderVo) {
             PageInfo<PresaleActivityPo> po;
             if (activityFinderVo.getSpuId() != null) {
@@ -367,6 +378,12 @@ public class ActivityService implements IActivityService {
         if(!activity.getShopId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }
+        if(activity.getBeginTime().isAfter(LocalDateTime.now())){
+            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经开始的优惠活动");
+        }
+        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.CANCELED.getCode())){
+            couponDao.cancelCoupon(id);
+        }
 
         if (couponActivityDao.updateActivity(couponActivityVo.createPo(), id)) {
             return new ReturnObject<>();
@@ -374,6 +391,7 @@ public class ActivityService implements IActivityService {
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "未知错误，请联系管理员");
         }
     }
+
 
     @Deprecated
     public ReturnObject modifyCouponActivityStatus(Long id, CouponActivity.CouponStatus status){
@@ -635,6 +653,7 @@ public class ActivityService implements IActivityService {
 
         CouponPo po = new CouponPo();
 
+        po.setCouponSn(Common.genSeqNum());
         if (couponActivityPo.getQuantitiyType() == 0) {
             // 每人限领取一定数量，生成quantity张
             for (int i = 0; i < couponActivityPo.getQuantity(); ++i) {
