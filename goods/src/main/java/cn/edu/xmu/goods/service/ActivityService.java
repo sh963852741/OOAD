@@ -14,6 +14,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -128,29 +129,105 @@ public class ActivityService {
         return new ReturnObject(GrouponActivity.GrouponStatus.values());
     }
 
+    @Transactional
     public ReturnObject getGrouponActivities(ActivityFinderVo activityFinderVo, boolean all) {
         List<GrouponActivityPo> grouponList;
+        PageInfo info;
         if (activityFinderVo.getSpuId() != null && !all) {
-            grouponList = grouponActivityDao.getActivitiesBySPUId(
+            info = grouponActivityDao.getActivitiesBySPUId(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getSpuId(), activityFinderVo.getTimeline());
         } else {
-            grouponList = grouponActivityDao.getEffectiveActivities(
+            info = grouponActivityDao.getEffectiveActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline(), activityFinderVo.getSpuId(), all);
         }
-        List<GrouponActivityVo> retList = grouponList.stream().map(e -> new GrouponActivityVo(e)).collect(Collectors.toList());
-        return new ReturnObject(retList);
+        grouponList=info.getList();
+        List<GrouponActivity> retList = grouponList.stream().map(e -> new GrouponActivity(e)).collect(Collectors.toList());
+        info.setList(retList);
+        Byte state=null;
+        if(activityFinderVo.getTimeline()!=null) {
+            switch (activityFinderVo.getTimeline()) {
+                case 0:
+                    state = GrouponActivity.GrouponStatus.NEW.getCode().byteValue();
+                    break;
+                case 1:
+                    state = GrouponActivity.GrouponStatus.NEW.getCode().byteValue();
+                    break;
+                case 2:
+                    state = GrouponActivity.GrouponStatus.RUNNING.getCode().byteValue();
+                    break;
+                case 3:
+                    state = GrouponActivity.GrouponStatus.CANCELED.getCode().byteValue();
+                    break;
+                default:
+                    state = null;
+                    break;
+            }
+        }
+        List<Long> changList=new ArrayList<>();
+        for(GrouponActivityPo po : grouponList){
+            if(!po.getState().equals(state)){
+                changList.add(po.getId());
+            }
+        }
+        if(state!=null)
+        grouponActivityDao.setGroupsState(state,changList);
+        return new ReturnObject(info);
+    }
+
+    public ReturnObject getGrouponActivitiesByAdmin(ActivityFinderVo vo){
+        List<GrouponActivityPo> grouponList;
+        PageInfo info;
+        info=grouponActivityDao.getGrouponsByAdmin(vo.getShopId(),vo.getState(),vo.getSpuId(),vo.getBeginTime(),vo.getEndTime(),vo.getPage(),vo.getPageSize());
+        grouponList=info.getList();
+        List<GrouponActivity> retList = grouponList.stream().map(e -> new GrouponActivity(e)).collect(Collectors.toList());
+        info.setList(retList);
+        return new ReturnObject(info);
+    }
+
+    public ReturnObject getGrouponBySpuIdAdmin(ActivityFinderVo vo){
+        List<GrouponActivity> grouponActivities;
+        grouponActivities=grouponActivityDao.getAllGrouponsBySpuAmdin(vo.getSpuId(),vo.getShopId(),vo.getState());
+        return new ReturnObject(grouponActivities);
     }
 
     public ReturnObject<GrouponActivityVo> addGrouponActivity(GrouponActivityVo grouponActivityVo, long spuId, long shopId) {
+        if(shopId!=0){
+            ReturnObject shopIdret=goodsService.getShopIdBySpuId(spuId);
+            if(shopIdret.getCode()!=ResponseCode.OK){
+                return shopIdret;
+            }
+            if(((Long)shopIdret.getData()).equals(shopId)){
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+            }
+        }
         GrouponActivityPo po = grouponActivityVo.createPo();
         if (grouponActivityDao.addActivity(po, spuId, shopId)) {
-            return new ReturnObject(new GrouponActivityVo(po));
+            ReturnObject spuRet=goodsService.getSimpleSpuById(spuId);
+            Map<String,Object> spu = (Map<String, Object>)spuRet.getData();
+            ReturnObject shopRet = shopService.getShopByShopId(shopId);
+            Map<String,Object> shopMap=new HashMap<>();
+            if(shopRet.getCode()==ResponseCode.OK){
+                Shop shop=(Shop) shopRet.getData();
+                shopMap.put("id",shop.getId());
+                shopMap.put("name",shop.getName());
+            }
+            var vo=new GrouponActivityVo(po);
+            vo.setGoodsSpu(spu);
+            vo.setShop(shopMap);
+            return new ReturnObject(vo);
         } else {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
     public ReturnObject<GrouponActivityVo> modifyGrouponActivity(Long id, GrouponActivityVo grouponActivityVo, long shopId) {
+        ReturnObject ret=goodsService.getShopIdBySpuId(id);
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        if(!((Long)ret.getData()).equals(shopId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
         if (grouponActivityDao.updateActivity(grouponActivityVo.createPo(), id)) {
             return new ReturnObject(grouponActivityVo);
         } else {
@@ -158,7 +235,14 @@ public class ActivityService {
         }
     }
 
-    public ReturnObject<?> delGrouponActivity(long id) {
+    public ReturnObject<?> delGrouponActivity(long id,long shopId) {
+        ReturnObject<Long> ret=goodsService.getShopIdBySpuId(id);
+        if(ret.getCode()!=ResponseCode.OK){
+            return ret;
+        }
+        if(!ret.getData().equals(shopId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
         if (grouponActivityDao.delActivity(id)) {
             return new ReturnObject();
         } else {
@@ -168,6 +252,24 @@ public class ActivityService {
     //endregion
 
     //region 优惠活动部分
+
+    public ReturnObject getCouponActivity(long activityId, long shopId){
+        CouponActivityPo activityPo = couponActivityDao.getActivityById(activityId);
+        Shop shop = shopService.getShopByShopId(shopId).getData();
+        if (activityPo == null || shop == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "活动或对应店铺不存在");
+        }
+        if(activityPo.getShopId() != shop.getId()){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "活动不是自己店铺的活动");
+        }
+
+        CouponActivityVo couponActivityVo = new CouponActivityVo(activityPo);
+        couponActivityVo.shop.put("id", shop.getId());
+        couponActivityVo.shop.put("name", shop.getName());
+
+        return new ReturnObject(couponActivityVo);
+    }
+
     public ReturnObject getCouponActivityStatus() {
         return new ReturnObject(CouponActivity.CouponStatus.values());
     }

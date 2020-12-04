@@ -1,12 +1,17 @@
 package cn.edu.xmu.goods.model.bo;
 
+import cn.edu.xmu.goods.model.po.GrouponActivityPo;
+import cn.edu.xmu.ooad.model.VoObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GrouponActivity {
+@Data
+public class GrouponActivity implements VoObject {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum GrouponStatus {
         NEW((byte)0,"发布"),
@@ -24,6 +29,8 @@ public class GrouponActivity {
         }
 
         private byte code;
+
+        @JsonProperty("name")
         private String description;
 
         GrouponStatus(byte code, String description) {
@@ -52,4 +59,29 @@ public class GrouponActivity {
     private Long spuId;
     private Long quantity;
     private String strategy;
+
+    @Override
+    public Map<String, Object> createVo() {
+        Map<String,Object> data=new HashMap<>();
+        data.put("id",this.getId());
+        data.put("name",this.getName());
+        data.put("beginTime",this.getBeginTime().toString());
+        data.put("endTime",this.getEndTime().toString());
+        return data;
+    }
+
+    public GrouponActivity(GrouponActivityPo po){
+        this.setId(po.getId());
+        this.setName(po.getName());
+        this.setBeginTime(po.getBeginTime());
+        this.setEndTime(po.getEndTime());
+        this.setStatus(GrouponStatus.getTypeByCode(po.getState().intValue()));
+        this.setSpuId(po.getGoodsSpuId());
+        this.setStrategy(po.getStrategy());
+    }
+
+    @Override
+    public Object createSimpleVo() {
+        return null;
+    }
 }
