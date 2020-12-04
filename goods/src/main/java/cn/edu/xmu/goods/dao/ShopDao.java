@@ -5,6 +5,8 @@ import cn.edu.xmu.goods.model.bo.*;
 import cn.edu.xmu.goods.model.po.CommentPo;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.ShopPo;
+import cn.edu.xmu.goods.model.vo.ShopVo;
+import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import org.slf4j.Logger;
@@ -96,23 +98,31 @@ public class ShopDao {
      * @Author: Lei Yang
      * @Date: 2020/11/29 22:10
      */
-    public ReturnObject UpdateShop(Shop shop)
+    public ReturnObject UpdateShop(Long id, Shop shop)
     {
-        ShopPo shopPo=shop.createPo();
         int ret;
-        try{
-            shopPo.setGmtModified(LocalDateTime.now());
-            ret=shopPoMapper.updateByPrimaryKeySelective(shopPo);
-        }catch (Exception e){
-            logger.error("updateSkuImg: DataAccessException:" + e.getMessage());
-            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+        ShopPo shopPo=shopPoMapper.selectByPrimaryKey(id);
+        shopPo.setName(shop.getName());
+        if(shopPo.getState()==6||shopPo.getState()==3)
+        {
+            return new ReturnObject(ResponseCode.MODIFYSHOP_ERROR);
         }
-        if (ret == 0) {
-            logger.debug("updateShop: update fail. shop id: " + shop.getId());
-            return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-        } else {
-            logger.debug("updateShop: update shop success : " + shop.toString());
-            return new ReturnObject();
+        else
+        {
+            try{
+                shopPo.setGmtModified(LocalDateTime.now());
+                ret=shopPoMapper.updateByPrimaryKeySelective(shopPo);
+            }catch (Exception e){
+                logger.error("updateShop: DataAccessException:" + e.getMessage());
+                return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+            }
+            if (ret == 0) {
+                logger.debug("updateShop: update fail. shop id: " + shopPo.getId());
+                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            } else {
+                logger.debug("updateShop: update shop success : " + shopPo.toString());
+                return new ReturnObject();
+            }
         }
     }
 
@@ -125,7 +135,7 @@ public class ShopDao {
      */
     public ReturnObject updateShopState(Shop shop)
     {
-        ShopPo shopPo = shop.createPo();
+        ShopPo shopPo=shop.createPo();
         int ret;
         try {
             ret = shopPoMapper.updateByPrimaryKeySelective(shopPo);
