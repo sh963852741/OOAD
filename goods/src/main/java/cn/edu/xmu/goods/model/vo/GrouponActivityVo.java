@@ -24,11 +24,11 @@ public class GrouponActivityVo {
 
     @ApiModelProperty(value = "团购开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime dbeginTime;
+    LocalDateTime beginTime;
 
     @ApiModelProperty(value = "团购结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime dendTime;
+    LocalDateTime endTime;
 
     Long id;
 
@@ -45,8 +45,8 @@ public class GrouponActivityVo {
     public GrouponActivityPo createPo() {
         GrouponActivityPo po = new GrouponActivityPo();
         po.setName(name);
-        po.setBeginTime(dbeginTime);
-        po.setEndTime(dendTime);
+        po.setBeginTime(beginTime);
+        po.setEndTime(endTime);
         po.setStrategy(strategy);
         return po;
     }
@@ -55,8 +55,8 @@ public class GrouponActivityVo {
         id = po.getId();
         name = po.getName();
         strategy = po.getStrategy();
-        dbeginTime = po.getBeginTime();
-        dendTime = po.getEndTime();
+        beginTime = po.getBeginTime();
+        endTime = po.getEndTime();
         gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
     }

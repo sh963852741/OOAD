@@ -34,6 +34,14 @@ public class CouponActivityDao {
         return activities;
     }
 
+    public List<CouponSPUPo> getSPUsInActivity(long activityId){
+        CouponSPUPoExample couponSPUPoExample = new CouponSPUPoExample();
+        var criteria = couponSPUPoExample.createCriteria();
+        criteria.andActivityIdEqualTo(activityId);
+        List<CouponSPUPo> list = couponSPUPoMapper.selectByExample(couponSPUPoExample);
+        return list;
+    }
+
     public PageInfo<CouponActivityPo> getInvalidActivities(int page, int pageSize, long shopId) {
         PageHelper.startPage(page, pageSize);
 

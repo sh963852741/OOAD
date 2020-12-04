@@ -5,8 +5,10 @@ import cn.edu.xmu.goods.dao.CouponDao;
 import cn.edu.xmu.goods.dao.GrouponActivityDao;
 import cn.edu.xmu.goods.dao.PresaleActivityDao;
 import cn.edu.xmu.goods.model.bo.*;
+import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
 import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
+import cn.edu.xmu.goods.service.dubbo.IActivityService;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -17,14 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class ActivityService {
+public class ActivityService implements IActivityService {
     @Autowired
     PresaleActivityDao presaleActivityDao;
     @Autowired
@@ -253,6 +252,31 @@ public class ActivityService {
 
     //region 优惠活动部分
 
+    public Map<Long, Long> validateActivity(List<OrderItem> orderItems, Long couponId){
+        CouponPo couponPo = couponDao.getCoupon(couponId);
+        if(couponPo == null){
+            return new HashMap<>();
+        }
+        Map<Long, Long> map = new HashMap<>();
+        Long activityId = couponPo.getActivityId();
+        List<CouponSPUPo> couponSPUPoList = couponActivityDao.getSPUsInActivity(activityId);
+        Set<Long> spuSet = new HashSet<>();
+        for(CouponSPUPo couponSPUPo:couponSPUPoList){
+            spuSet.add(couponSPUPo.getSpuId());
+        }
+
+        for(OrderItem o:orderItems){
+            if(spuSet.contains(o.getSkuId())){
+                map.put(o.getSkuId(), activityId);
+            }else{
+                map.put(o.getSkuId(), null);
+            }
+
+        }
+
+        return map;
+    }
+
     public ReturnObject getCouponActivity(long activityId, long shopId){
         CouponActivityPo activityPo = couponActivityDao.getActivityById(activityId);
         Shop shop = shopService.getShopByShopId(shopId).getData();
@@ -434,22 +458,50 @@ public class ActivityService {
         CouponPo couponToUse = couponDao.getCoupon(couponId);
         if(couponToUse == null){
             new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "您使用的优惠券不存在");
-        }else if(couponToUse.getCustomerId() != userId){
+        }
+        if(couponToUse.getCustomerId() != userId){
             new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "不可使用不属于您的优惠券");
-        }else if(couponToUse.getBeginTime().isAfter(LocalDateTime.now())
+        }
+        if(couponToUse.getBeginTime().isAfter(LocalDateTime.now())
                 ||couponToUse.getEndTime().isBefore(LocalDateTime.now())){
             new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
-        }else if(couponToUse.getState() != Coupon.CouponStatus.AVAILABLE.getCode()){
+        }
+        if(couponToUse.getState() != Coupon.CouponStatus.AVAILABLE.getCode()){
             new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
         }
 
         CouponPo po = new CouponPo();
+        po.setId(couponToUse.getId());
         po.setState(Coupon.CouponStatus.USED.getCode());
 
         if (couponDao.modifyCoupon(po) == 1) {
             return new ReturnObject();
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+    }
+
+    public Boolean useCoupon(Long couponId){
+        CouponPo couponToUse = couponDao.getCoupon(couponId);
+        if(couponToUse.getBeginTime().isAfter(LocalDateTime.now())
+                ||couponToUse.getEndTime().isBefore(LocalDateTime.now())){
+            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
+        }
+        if(couponToUse.getState() != Coupon.CouponStatus.AVAILABLE.getCode()){
+            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
+        }
+        if(couponToUse == null){
+            new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "您使用的优惠券不存在");
+        }
+
+        CouponPo po = new CouponPo();
+        po.setId(couponToUse.getId());
+        po.setState(Coupon.CouponStatus.USED.getCode());
+
+        if (couponDao.modifyCoupon(po) == 1) {
+            return true;
+        } else {
+            return false;
         }
     }
 
