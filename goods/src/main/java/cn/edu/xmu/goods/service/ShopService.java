@@ -88,7 +88,7 @@ public class ShopService {
         Shop shop=new Shop();
         shop.setId(id.longValue());
         shop.setState(Shop.State.FORBID.getCode().byteValue());
-        ReturnObject ret=shopDao.UpdateShop(shop.getId(),shop);
+        ReturnObject ret=shopDao.updateShopState(shop);
         return ret;
     }
 
@@ -115,10 +115,10 @@ public class ShopService {
      */
     public ReturnObject onShelfShop(Long id) {
         Shop shop=new Shop();
-        shop.setId(id.longValue());
+        shop.setId(id);
         shop.setState(Shop.State.ONLINE.getCode().byteValue());
         if(getShopByShopId(id).getData().getState()==5) {
-            ReturnObject ret = shopDao.UpdateShop(shop.getId(), shop);
+            ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
         }
         else return new ReturnObject(ResponseCode.PASSSHOP_ERROR);
@@ -135,7 +135,7 @@ public class ShopService {
         shop.setId(id.longValue());
         shop.setState(Shop.State.OFFLINE.getCode().byteValue());
         if (getShopByShopId(id).getData().getState() == 4) {
-            ReturnObject ret = shopDao.UpdateShop(shop.getId(), shop);
+            ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
         } else return new ReturnObject(ResponseCode.PASSSHOP_ERROR);
     }

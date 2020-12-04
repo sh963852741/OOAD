@@ -156,7 +156,7 @@ public class ShopController {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 170, message = "该店铺无法下线")})
     @PutMapping(value = "/shops/{id}/offshelves")
-    public Object shopsIdOffshelvesPut(@ApiParam(value = "店 ID",required=true) @PathVariable("id") long id){
+    public Object shopsIdOffshelvesPut(@PathVariable("id") long id){
         if(shopService.getShopByShopId(id).getData().getState()==4)
         {
             ReturnObject ret=shopService.offShelfShop(id);

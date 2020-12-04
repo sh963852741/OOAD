@@ -45,7 +45,6 @@ public class ShopDao {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         Shop shop=new Shop(shopPo);
-
         return new ReturnObject<>(shop);
     }
     /**
