@@ -26,4 +26,11 @@ public interface IGoodsService {
 	 * @return
 	 */
 	Map<Shop, List<OrderItem>> classifySku(List<OrderItem> orderItems);
+
+	/**
+	 * 获取商铺消息
+	 * @param skuId
+	 * @return
+	 */
+	Shop getShop(Long skuId);
 }

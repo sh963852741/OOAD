@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8088
 
 spring:
   application:
@@ -48,6 +48,10 @@ spring:
         max-wait: -1
     # 连接超时时间（毫秒）
     timeout: 5000
+  cloud:
+    nacos:
+      server-addr: 47.115.162.144:8848
+
 
 goodsservice:
   webdav:
@@ -67,3 +71,14 @@ mybatis:
 #pagehelper分页插件配置
 pagehelper:
   helper-dialect: mysql
+
+dubbo:
+  application:
+    name: dubbo-goods
+  scan:
+    base-packages: cn.edu.xmu.goods.service
+  registry:
+    address: nacos://47.115.162.144:8848
+  protocol:
+    name: dubbo
+    port: 28088

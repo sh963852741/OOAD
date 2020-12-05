@@ -4,6 +4,7 @@ import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
 import cn.edu.xmu.goods.model.bo.dubbo.Shop;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
+import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.goods.service.dubbo.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -18,8 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 
-@DubboService
+@DubboService(version = "0.0.1-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
+
+    @Autowired
+    private ShopService shopService;
 
     @Autowired
     private GoodsService goodsService;
@@ -29,7 +33,7 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
-        ReturnObject<SkuRetVo> ret=goodsService.getSkuDetails(skuId);
+        ReturnObject<SkuRetVo> ret = goodsService.getSkuDetails(skuId);
         if(ret.getCode()!= ResponseCode.OK){
             return null;
         }
@@ -59,5 +63,24 @@ public class GoodsServiceImpl implements IGoodsService {
             ret.put(shop,entry.getValue());
         }
         return ret;
+    }
+
+    @Override
+    public Shop getShop(Long skuId) {
+        if(skuId == null){
+            return new Shop();
+        }
+        ReturnObject shopIdRet=goodsService.getShopIdBySkuId(skuId);
+        if(shopIdRet.getCode() != ResponseCode.OK){
+            return new Shop();
+        }
+        Long shopId=(Long)shopIdRet.getData();
+        ReturnObject shopRet=shopService.getShopByShopId(shopId);
+        if(shopRet.getCode() != ResponseCode.OK){
+            return new Shop();
+        }
+        cn.edu.xmu.goods.model.bo.Shop shop=(cn.edu.xmu.goods.model.bo.Shop) shopRet.getData();
+        Shop shopData=new Shop(shop.getId(),shop.getName(),shop.getGmtCreated().toString(),shop.getGmtModified().toString());
+        return shopData;
     }
 }

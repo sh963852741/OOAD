@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-@DubboService
 public class ShopService {
     private  static  final Logger logger = LoggerFactory.getLogger(ShopService.class);
     @Autowired

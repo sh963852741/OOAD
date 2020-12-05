@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
-@DubboService
+@DubboService(version = "0.0.1-SNAPSHOT")
 public class InventoryServiceImpl implements IInventoryService {
 
     @Autowired
