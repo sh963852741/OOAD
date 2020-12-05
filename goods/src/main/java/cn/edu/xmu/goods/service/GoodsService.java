@@ -93,8 +93,8 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/28 10:03
      */
-    public ReturnObject getSkuDetails(Integer skuId){
-        ReturnObject ret=goodsDao.getSkuById(skuId.longValue());
+    public ReturnObject getSkuDetails(Long skuId){
+        ReturnObject ret=goodsDao.getSkuById(skuId);
         if(ret.getCode()!=ResponseCode.OK){
             return ret;
         }
@@ -675,4 +675,20 @@ public class GoodsService {
     public ReturnObject getShopIdBySpuId(Long id){
         return goodsDao.getShopIdBySpuId(id);
     }
+
+    /**
+     * 功能描述: 通过skuId获取shopid
+     * @Param: [id]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/5 17:19
+     */
+    public ReturnObject getShopIdBySkuId(Long id){
+        return goodsDao.getShopIdBySkuId(id);
+    }
+
+    public ReturnObject changSkuInventory(Long skuId, Integer quantity){
+        return goodsDao.changSkuInventory(skuId,quantity);
+    }
+
 }
