@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.model.bo;
 
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public class Coupon {
         }
 
         private byte code;
+        @JsonProperty("name")
         private String name;
 
         CouponStatus(byte code, String description) {

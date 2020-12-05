@@ -108,11 +108,22 @@ public class ActivityService implements IActivityService {
     }
 
     public ReturnObject modifyPresaleActivity(Long id, PresaleActivityVo presaleActivityVo, Long shopId) {
+        var activity = presaleActivityDao.getActivityById(id);
+        if(activity == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(!activity.getShopId().equals(shopId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
+        if(activity.getBeginTime().isAfter(LocalDateTime.now())){
+            return new ReturnObject(ResponseCode.PRESALE_STATENOTALLOW,"仅可修改未开始的预售活动");
+        }
+
         PresaleActivityPo po = presaleActivityVo.createPo();
         if (presaleActivityDao.updateActivity(po, id)) {
             return new ReturnObject();
         } else {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
     }
 

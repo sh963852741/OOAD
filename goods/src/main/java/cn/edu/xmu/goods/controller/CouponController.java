@@ -27,7 +27,7 @@ import java.util.List;
 import static cn.edu.xmu.goods.utility.Common.getPageRetObjectWisely;
 
 @RestController
-@RequestMapping(value = "coupon", produces = "application/json;charset=UTF-8")
+@RequestMapping(value = "coupon", produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
 public class CouponController {
 
     @Autowired
@@ -58,7 +58,9 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/couponactivities")
-    public Object addCouponActivity(@PathVariable("shopId") long shopId, @Valid @RequestBody CouponActivityVo couponActivityVo,
+    public Object addCouponActivity(@PathVariable("shopId") Long shopId,
+                                    @PathVariable("id") Long noUse,
+                                    @Valid @RequestBody CouponActivityVo couponActivityVo,
                                     BindingResult bindingResult, HttpServletResponse httpServletResponse){
         var res = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(res != null){

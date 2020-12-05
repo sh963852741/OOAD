@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CategoryTests {
+public class CategoryTest {
     @Autowired
     private MockMvc mvc;
 
