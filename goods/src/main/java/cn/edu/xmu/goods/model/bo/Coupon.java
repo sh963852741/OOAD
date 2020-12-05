@@ -11,10 +11,10 @@ import java.util.Map;
 public class Coupon {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum CouponStatus {
-        NEW((byte)0,"不可用"),
-        AVAILABLE((byte)1,"可用"),
+        UNCLAIMED((byte)0,"未领取"),
+        NORMAL((byte)1,"已领取"),
         USED((byte)2,"已使用"),
-        EXPIRED((byte)3,"失效");
+        EXPIRED((byte)3,"已失效");
 
         private static final Map<Byte, Coupon.CouponStatus> typeMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值

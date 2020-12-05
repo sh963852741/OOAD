@@ -20,7 +20,7 @@ public class CouponDao {
     public int addCoupon(CouponPo couponPo, long activityId, long customerId){
         couponPo.setActivityId(activityId);
         couponPo.setCustomerId(customerId);
-        couponPo.setState(Coupon.CouponStatus.AVAILABLE.getCode());
+        couponPo.setState(Coupon.CouponStatus.NORMAL.getCode());
         couponPo.setCouponSn(Common.genSeqNum());
         couponPo.setGmtCreate(LocalDateTime.now());
         return couponPoMapper.insert(couponPo);

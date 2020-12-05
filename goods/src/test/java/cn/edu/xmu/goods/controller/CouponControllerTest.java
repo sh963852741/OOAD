@@ -81,7 +81,7 @@ class CouponControllerTest {
                 .andExpect(jsonPath("$.errmsg").value("成功"))
                 .andExpect(jsonPath("$.data").isMap())
                 .andExpect(jsonPath("$.data.id").isNumber())
-                .andExpect(jsonPath("$.data.state").value(CouponActivity.CouponStatus.PENDING))
+                .andExpect(jsonPath("$.data.state").value(CouponActivity.CouponStatus.NORMAL))
                 .andExpect(jsonPath("$.data.quantity").value(20))
                 .andExpect(jsonPath("$.data.quantityType").value(0))
                 .andExpect(jsonPath("$.data.validTerm").value(6))

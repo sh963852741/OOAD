@@ -14,6 +14,7 @@ import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@DubboService
 public class ActivityService implements IActivityService {
     @Autowired
     PresaleActivityDao presaleActivityDao;
@@ -167,13 +169,13 @@ public class ActivityService implements IActivityService {
         if(activityFinderVo.getTimeline()!=null) {
             switch (activityFinderVo.getTimeline()) {
                 case 0:
-                    state = GrouponActivity.GrouponStatus.NEW.getCode().byteValue();
+                    state = GrouponActivity.GrouponStatus.NORMAL.getCode().byteValue();
                     break;
                 case 1:
-                    state = GrouponActivity.GrouponStatus.NEW.getCode().byteValue();
+                    state = GrouponActivity.GrouponStatus.NORMAL.getCode().byteValue();
                     break;
                 case 2:
-                    state = GrouponActivity.GrouponStatus.RUNNING.getCode().byteValue();
+                    state = GrouponActivity.GrouponStatus.NORMAL.getCode().byteValue();
                     break;
                 case 3:
                     state = GrouponActivity.GrouponStatus.CANCELED.getCode().byteValue();
@@ -559,7 +561,7 @@ public class ActivityService implements IActivityService {
                 ||couponToUse.getEndTime().isBefore(LocalDateTime.now())){
             new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
         }
-        if(couponToUse.getState() != Coupon.CouponStatus.AVAILABLE.getCode()){
+        if(couponToUse.getState() != Coupon.CouponStatus.NORMAL.getCode()){
             new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
         }
 
@@ -585,7 +587,7 @@ public class ActivityService implements IActivityService {
                 ||couponToUse.getEndTime().isBefore(LocalDateTime.now())){
             new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
         }
-        if(couponToUse.getState() != Coupon.CouponStatus.AVAILABLE.getCode()){
+        if(couponToUse.getState() != Coupon.CouponStatus.NORMAL.getCode()){
             new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
         }
         if(couponToUse == null){
@@ -629,7 +631,7 @@ public class ActivityService implements IActivityService {
      */
     public ReturnObject refundCoupon(Long couponId, Long userId) {
         CouponPo po = new CouponPo();
-        po.setState(Coupon.CouponStatus.AVAILABLE.getCode());
+        po.setState(Coupon.CouponStatus.NORMAL.getCode());
 
         if (couponDao.modifyCoupon(po) == 1) {
             return new ReturnObject();
@@ -652,7 +654,7 @@ public class ActivityService implements IActivityService {
         } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
                 || couponActivityPo.getEndTime().isBefore(LocalDateTime.now())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动已结束或者未开始");
-        } else if (couponActivityPo.getState() != CouponActivity.CouponStatus.RUNNING.getCode()) {
+        } else if (couponActivityPo.getState() != CouponActivity.CouponStatus.NORMAL.getCode()) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
         }
 

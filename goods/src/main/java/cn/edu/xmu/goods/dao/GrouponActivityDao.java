@@ -133,7 +133,7 @@ public class GrouponActivityDao {
         po.setGoodsSpuId(spuId);
         po.setGmtCreate(LocalDateTime.now());
         po.setGmtModified(po.getGmtCreate());
-        po.setState(GrouponActivity.GrouponStatus.NEW.getCode());
+        po.setState(GrouponActivity.GrouponStatus.NORMAL.getCode());
         return grouponActivityPoMapper.insert(po) == 1;
     }
 

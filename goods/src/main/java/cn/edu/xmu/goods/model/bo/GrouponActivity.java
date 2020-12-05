@@ -14,11 +14,10 @@ import java.util.Map;
 public class GrouponActivity implements VoObject {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum GrouponStatus {
-        NEW((byte)0,"发布"),
-        RUNNING((byte)1,"上线"),
-        CANCELED((byte)2,"已下线"),
-        SUCCESS((byte)3,"已成团"),
-        FAILURE((byte)4,"未成团");
+        NORMAL((byte)0,"正常运行"),
+        CANCELED((byte)1,"已取消"),
+        SUCCESS((byte)2,"已成团"),
+        FAILURE((byte)3,"未成团");
 
         private static final Map<Byte, GrouponActivity.GrouponStatus> typeMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
