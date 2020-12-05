@@ -40,6 +40,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `coupon` WRITE;
 /*!40000 ALTER TABLE `coupon` DISABLE KEYS */;
+INSERT INTO `coupon` VALUES ('1', 'sn_283927', '宋**', '1', '3', addDate(now(), interval 3 hour), addDate(now(), interval 5 hour), '1', subDate(now(), interval 1 hour), null),('2', 'sn_283927', '宋**', '1', '3', addDate(now(), interval 3 hour), addDate(now(), interval 5 hour), '2', subDate(now(), interval 1 hour), null);
 /*!40000 ALTER TABLE `coupon` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -49,6 +50,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `coupon_activity` WRITE;
 /*!40000 ALTER TABLE `coupon_activity` DISABLE KEYS */;
+INSERT INTO `coupon_activity` VALUES ('1', '邱*', addDate(now(), interval 3 hour), addDate(now(), interval 5 hour), addDate(now(), interval 1 hour), '0', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1'),('2', '邱*', addDate(now(), interval 3 hour), addDate(now(), interval 5 hour), addDate(now(), interval 1 hour), '1', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1'),('3', '邱*', addDate(now(), interval 3 hour), addDate(now(), interval 5 hour), subDate(now(), interval 1 hour), '0', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1'),('4', '盐*', addDate(now(), interval 3 hour), addDate(now(), interval 5 hour), subDate(now(), interval 1 hour), '1', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1'),('5', '朱*', subDate(now(), interval 1 hour), addDate(now(), interval 5 hour), subDate(now(), interval 2 hour), '0', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1'),('6', '张*', subDate(now(), interval 1 hour), addDate(now(), interval 5 hour), subDate(now(), interval 2 hour), '1', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1'),('7', '邱*', subDate(now(), interval 2 hour), subDate(now(), interval 1 hour), subDate(now(), interval 3 hour), '0', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1'),('8', '邱*', subDate(now(), interval 2 hour), subDate(now(), interval 1 hour), subDate(now(), interval 3 hour), '1', '0', '200', '0', 'oj.ppyo.uij', '{}', '23', '50', subDate(now(), interval 10 hour), null, '1');
 /*!40000 ALTER TABLE `coupon_activity` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,21 +130,12 @@ LOCK TABLES `groupon_activity` WRITE;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `presale_activity`
---
-
-LOCK TABLES `presale_activity` WRITE;
-/*!40000 ALTER TABLE `presale_activity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `presale_activity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `shop`
 --
 
 LOCK TABLES `shop` WRITE;
 /*!40000 ALTER TABLE `shop` DISABLE KEYS */;
-INSERT INTO `shop` VALUES ('0', '王五商铺', '7', '2020-12-03 11:02:50', '2020-12-03 11:02:50');
+INSERT INTO `shop` VALUES ('1', '张三商铺', '7', '2020-12-03 11:02:50', '2020-12-03 11:02:50'),('0', '王五商铺', '7', '2020-12-03 11:02:50', '2020-12-03 11:02:50');
 /*!40000 ALTER TABLE `shop` ENABLE KEYS */;
 UNLOCK TABLES;
 
