@@ -145,15 +145,6 @@ LOCK TABLES `shop` WRITE;
 INSERT INTO `shop` VALUES ('0', '王五商铺', '7', '2020-12-03 11:02:50', '2020-12-03 11:02:50');
 /*!40000 ALTER TABLE `shop` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 --
 -- Dumping data for table `presale_activity`
@@ -161,7 +152,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `presale_activity` WRITE;
 /*!40000 ALTER TABLE `presale_activity` DISABLE KEYS */;
-INSERT INTO `presale_activity` VALUES (1,'宋**的预售','2020-12-03 10:22:27','2020-12-03 11:22:27','2020-12-03 12:22:27',0,0,676,30,12,234,'2020-12-03 09:22:27',NULL),(2,'**的预售','2020-12-03 08:22:27','2020-12-03 11:22:27','2020-12-03 12:22:27',0,0,675,300,112,2324,'2020-12-02 23:22:27',NULL),(3,'王**的预售','2020-12-03 08:22:27','2020-12-03 11:22:27','2020-12-03 12:22:27',1,0,675,300,112,2324,'2020-12-02 23:22:27',NULL),(4,'王**的预售','2020-12-03 07:22:27','2020-12-03 08:22:27','2020-12-03 12:22:27',1,0,675,300,112,2324,'2020-12-02 23:22:27',NULL),(5,'邵**的预售','2020-12-03 06:22:27','2020-12-03 07:22:27','2020-12-03 10:22:27',2,0,675,300,112,2324,'2020-12-02 23:22:27',NULL),(6,'邵**的预售','2020-12-03 06:22:27','2020-12-03 07:22:27','2020-12-03 10:22:27',3,0,675,300,112,2324,'2020-12-02 23:22:27',NULL),(7,'邵**的预售','2020-12-03 06:22:27','2020-12-03 07:22:27','2020-12-03 08:22:27',4,0,675,300,112,2324,'2020-12-02 23:22:27',NULL),(8,'宋**的预售','2020-12-03 10:22:27','2020-12-03 11:22:27','2020-12-03 12:22:27',0,0,676,30,12,234,'2020-12-03 09:22:27',NULL);
+INSERT INTO `presale_activity` VALUES ('1', '宋**的预售', addDate(now(), interval 1 hour), addDate(now(), interval 2 hour), addDate(now(), interval 3 hour), '0', '0', '676', '30', '12', '234', now(), null),('2', '**的预售', subDate(now(), interval 1 hour), addDate(now(), interval 2 hour), addDate(now(), interval 3 hour), '0', '0', '675', '300', '112', '2324', subDate(now(), interval 10 hour), null),('3', '王**的预售', subDate(now(), interval 1 hour), addDate(now(), interval 2 hour), addDate(now(), interval 3 hour), '0', '0', '675', '300', '112', '2324', subDate(now(), interval 10 hour), null),('4', '王**的预售', subDate(now(), interval 2 hour), subDate(now(), interval 1 hour), addDate(now(), interval 3 hour), '0', '0', '675', '300', '112', '2324', subDate(now(), interval 10 hour), null),('5', '邵**的预售', subDate(now(), interval 3 hour), subDate(now(), interval 2 hour), addDate(now(), interval 1 hour), '0', '0', '675', '300', '112', '2324', subDate(now(), interval 10 hour), null),('6', '邵**的预售', subDate(now(), interval 3 hour), subDate(now(), interval 2 hour), addDate(now(), interval 1 hour), '1', '0', '675', '300', '112', '2324', subDate(now(), interval 10 hour), null),('7', '邵**的预售', subDate(now(), interval 3 hour), subDate(now(), interval 2 hour), subDate(now(), interval 1 hour), '0', '0', '675', '300', '112', '2324', subDate(now(), interval 10 hour), null),('8', '宋**的预售', addDate(now(), interval 1 hour), addDate(now(), interval 2 hour), addDate(now(), interval 3 hour), '1', '0', '676', '30', '12', '234', now(), null);
 /*!40000 ALTER TABLE `presale_activity` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

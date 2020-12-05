@@ -117,7 +117,7 @@ public class ActivityService implements IActivityService {
         if(!activity.getShopId().equals(shopId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }
-        if(activity.getBeginTime().isAfter(LocalDateTime.now())){
+        if(activity.getBeginTime().isBefore(LocalDateTime.now())){
             return new ReturnObject(ResponseCode.PRESALE_STATENOTALLOW,"仅可修改未开始的预售活动");
         }
 
