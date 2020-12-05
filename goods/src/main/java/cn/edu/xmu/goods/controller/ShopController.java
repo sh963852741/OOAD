@@ -50,6 +50,7 @@ public class ShopController {
      * createdBy Yifei Wang 2020/11/17 21:37
      */
     @ApiOperation(value = "店家申请店铺", nickname = "addShop", notes = "", tags={ "shop", })
+    @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header")
     @ApiResponses(value = {
             @ApiResponse(code = 908, message = "用户已经有店铺"),
             @ApiResponse(code = 200, message = "成功") })
@@ -66,20 +67,17 @@ public class ShopController {
      * createdBy Yifei Wang 2020/11/17 21:37
      */
     @ApiOperation(value = "店家修改店铺信息", nickname = "modifyShop", notes = "", tags={ "shop", })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "id", value = "商店id", required = true, dataType = "Long", paramType = "path")
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 140, message = "该店铺无法修改")})
     @PutMapping(value = "/shops/{id}")
-    public Object modifyShop(Long id,Long shopId,@RequestBody ShopVo shopVo){
-        if(shopVo.getState()==6||shopVo.getState()==3)
-        {
-            return Common.decorateReturnObject(new ReturnObject(ResponseCode.MODIFYSHOP_ERROR));
-        }
-        else
-        {
-            ReturnObject ret=shopService.updateShop(id,shopId,shopVo);
-            return Common.getNullRetObj(ret,httpServletResponse);
-        }
+    public Object modifyShop(@PathVariable Long id,@RequestBody ShopVo shopVo){
+        ReturnObject ret=shopService.updateShop(id,shopVo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -119,7 +117,7 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{shopId}/newshops/{id}/audit")
     public Object shopsShopIdNewshopsIdAuditPut(@PathVariable("shopId") Long shopId,@ApiParam(value = "新店 ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )   @RequestBody ShopConclusionVo conclusion){
-        if(shopService.getShopByShopId(id).getData().getState()==5)
+        if(shopService.getShopByShopId(id).getData().getState()==7)
         {
             ReturnObject ret=shopService.passShop(id,conclusion);
             return Shop.decorateReturnObject(ret);
@@ -129,7 +127,6 @@ public class ShopController {
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.PASSSHOP_ERROR));
         }
     }
-
 
     /**
      * 管理员上线店铺
@@ -144,12 +141,8 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{id}/onshelves")
     public Object shopsIdOnshelvesPut(@PathVariable("id") long id){
-        if(shopService.getShopByShopId(id).getData().getState()==5)
-        {
-            ReturnObject ret=shopService.onShelfShop(id);
-            return Shop.decorateReturnObject(ret);
-        }
-        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.ONLINESHOP_ERROR));
+        ReturnObject ret=shopService.onShelfShop(id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -163,7 +156,7 @@ public class ShopController {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 170, message = "该店铺无法下线")})
     @PutMapping(value = "/shops/{id}/offshelves")
-    public Object shopsIdOffshelvesPut(@ApiParam(value = "店 ID",required=true) @PathVariable("id") long id){
+    public Object shopsIdOffshelvesPut(@PathVariable("id") long id){
         if(shopService.getShopByShopId(id).getData().getState()==4)
         {
             ReturnObject ret=shopService.offShelfShop(id);
@@ -171,5 +164,4 @@ public class ShopController {
         }
         else return Common.decorateReturnObject(new ReturnObject(ResponseCode.OFFLINESHOP_ERROR));
     }
-
 }

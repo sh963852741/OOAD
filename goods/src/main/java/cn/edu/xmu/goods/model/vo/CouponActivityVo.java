@@ -1,14 +1,27 @@
 package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.po.CouponActivityPo;
+import cn.edu.xmu.goods.utility.Common;
+import cn.edu.xmu.goods.utility.MyDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import io.micrometer.core.instrument.util.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -37,32 +50,33 @@ public class CouponActivityVo {
     @ApiModelProperty(value = "优惠券时长，0表示与活动相同，否则表示自领取后几日内有效")
     Byte validTerm;
 
-    @NotNull
-    @Future
     @DateTimeFormat
+    @Future
     @ApiModelProperty(value = "开始领优惠券时间")
     LocalDateTime couponTime;
 
-    @NotNull
-    @Future
     @DateTimeFormat
+    @Future
     @ApiModelProperty(value = "活动开始时间")
     LocalDateTime beginTime;
 
-    @NotNull
-    @Future
     @DateTimeFormat
+    @Future
     @ApiModelProperty(value = "活动结束时间")
     LocalDateTime endTime;
 
     @NotBlank
+    @JsonDeserialize(using = MyDeserializer.class)
     @ApiModelProperty(value = "优惠规则")
     String strategy;
 
     Long id;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
-    public HashMap<String, Object> subData = new HashMap<>();
+    private Byte state;
+    public HashMap<String, Object> shop = new HashMap<>();
+    public HashMap<String, Object> createdBy = new HashMap<>();
+    public HashMap<String, Object> modiBy = new HashMap<>();
 
     public CouponActivityPo createPo() {
         CouponActivityPo po = new CouponActivityPo();
@@ -74,6 +88,7 @@ public class CouponActivityVo {
         po.setBeginTime(beginTime);
         po.setEndTime(endTime);
         po.setStrategy(strategy);
+        po.setState(state);
         return po;
     }
 

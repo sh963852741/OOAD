@@ -190,7 +190,7 @@ class ActivityServiceTest {
     void delGrouponActivity() {
         assertTrue(activityIdHash.containsKey("runningGActivity"));
 
-        ReturnObject<?> ret = activityService.delGrouponActivity(activityIdHash.get("runningGActivity"));
+        ReturnObject<?> ret = activityService.delGrouponActivity(activityIdHash.get("runningGActivity"),1);
         assertEquals(ResponseCode.OK, ret.getCode());
         activityIdHash.remove("runningGActivity");
     }

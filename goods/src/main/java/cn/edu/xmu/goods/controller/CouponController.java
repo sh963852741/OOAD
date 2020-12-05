@@ -4,6 +4,7 @@ import cn.edu.xmu.goods.model.bo.CouponActivity;
 import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
 import cn.edu.xmu.goods.model.vo.CouponActivityVo;
 import cn.edu.xmu.goods.service.ActivityService;
+import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -21,10 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static cn.edu.xmu.goods.utility.Common.getPageRetObjectWisely;
 
 @RestController
-@RequestMapping(value = "coupon", produces = "application/json;charset=UTF-8")
+@RequestMapping(value = "coupon", produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
 public class CouponController {
 
     @Autowired
@@ -42,7 +45,7 @@ public class CouponController {
     @GetMapping(value = "/coupons/states")
     public Object getCouponState(){
         ReturnObject ret = activityService.getCouponStatus();
-        return ret;
+        return Common.decorateReturnObject(ret) ;
     }
 
     /**
@@ -55,7 +58,9 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/couponactivities")
-    public Object addCouponActivity(@PathVariable("shopId") long shopId, @Valid @RequestBody CouponActivityVo couponActivityVo,
+    public Object addCouponActivity(@PathVariable("shopId") Long shopId,
+                                    @PathVariable("id") Long noUse,
+                                    @Valid @RequestBody CouponActivityVo couponActivityVo,
                                     BindingResult bindingResult, HttpServletResponse httpServletResponse){
         var res = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(res != null){
@@ -144,7 +149,7 @@ public class CouponController {
                                          @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
         ReturnObject ret = activityService.getSPUInCouponActivity(id,page,pageSize);
 
-        return getPageRetObjectWisely(ret);
+        return ret;
     }
 
     /**
@@ -157,8 +162,21 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/{shopId}/couponactivities/{id}")
-    public Object shopsShopIdCouponactivitiesIdGet(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object getCouponActivity(
+            @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        var ret = activityService.getCouponActivity(id, shopId);
+        return Common.decorateReturnObject(ret);
+    }
+
+    @DeleteMapping(value = "/shops/{shopId}/presales/{id}")
+    public Object delCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+                                    @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        CouponActivityVo vo = new CouponActivityVo();
+        vo.setState(CouponActivity.CouponStatus.CANCELED.getCode());
+
+        var ret = activityService.modifyCouponActivity(id,vo,shopId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -202,8 +220,11 @@ public class CouponController {
     @DeleteMapping(value = "/shops/{shopId}/couponactivities/{id}")
     public Object cancelCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
                                        @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
-        ReturnObject ret = activityService.modifyCouponActivityStatus(id, CouponActivity.CouponStatus.CANCELED);
-        return ret;
+        CouponActivityVo vo =  new CouponActivityVo();
+        vo.setState(CouponActivity.CouponStatus.CANCELED.getCode());
+        ReturnObject ret = activityService.modifyCouponActivity(id, vo, shopId);
+//        ReturnObject ret = activityService.modifyCouponActivityStatus(id, CouponActivity.CouponStatus.CANCELED);
+        return Common.decorateReturnObject(ret);
     }
 
 
@@ -217,8 +238,12 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/couponactivities/{id}/spus")
-    public Object shopsShopIdCouponactivitiesIdSpusPost(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityid,@ApiParam(value = "可修改的优惠券活动信息" ,required=true )  @RequestBody Integer id){
-        return null;
+    public Object shopsShopIdCouponactivitiesIdSpusPost(
+            @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityId,
+            @ApiParam(value = "SPU的ID列表" ,required=true )  @RequestBody List<Long> ids){
+        var ret = activityService.addSPUToCouponActivity(ids, shopId, activityId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -273,8 +298,11 @@ public class CouponController {
             @ApiResponse(code = 905, message = "优惠卷状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/coupons/{id}")
-    public Object useCoupon(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object useCoupon(
+            @LoginUser Long userId,
+            @ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
+        var ret = activityService.useCoupon(id,userId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -305,8 +333,11 @@ public class CouponController {
             @ApiResponse(code = 911, message = "优惠卷活动终止"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/couponactivities/{id}/usercoupons")
-    public Object couponactivitiesIdUsercouponsPost(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object couponactivitiesIdUsercouponsPost(
+            @LoginUser Long userId,
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        var ret = activityService.claimCoupon(id,userId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -337,7 +368,11 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/coupons/{id}")
-    public Object shopsShopIdCouponsIdPut(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "店铺ID",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
-        return null;
+    public Object shopsShopIdCouponsIdPut(
+            @LoginUser Long userId,
+            @ApiParam(value = "店铺ID",required=true) @PathVariable("shopId") Long shopId,
+            @ApiParam(value = "优惠卷ID",required=true) @PathVariable("id") Long id){
+        var x = activityService.refundCoupon(id,userId);
+        return Common.decorateReturnObject(x);
     }
 }

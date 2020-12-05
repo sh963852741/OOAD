@@ -1,10 +1,23 @@
 package cn.edu.xmu.goods.controller;
 
+import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
 import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
+import cn.edu.xmu.goods.service.ActivityService;
+import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.ooad.util.ReturnObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 
 /**
  * 团购控制器
@@ -14,7 +27,14 @@ import javax.validation.Valid;
 @Api(value = "团购服务", tags = "groupon")
 @RestController /*Restful的Controller对象*/
 @RequestMapping(value = "/groupon", produces = "application/json;charset=UTF-8")
+@Slf4j
 public class GrouponController {
+
+    @Autowired
+    private ActivityService activityService;
+
+    @Autowired
+    private HttpServletResponse httpServletResponse;
 
     /**
      * 获得团购活动的所有状态
@@ -27,7 +47,7 @@ public class GrouponController {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/groupons/states")
     public Object getgrouponState(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization){
-        return null;
+        return Common.decorateReturnObject(activityService.grouponActivityStatus());
     }
 
     /**
@@ -40,8 +60,15 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "") })
     @GetMapping(value = "/groupons")
-    public Object queryGroupons(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "时间：0 还未开始的， 1 明天开始的，2 正在进行中的，3 已经结束的") @Valid @RequestParam(value = "timeline", required = false) Integer timeline,@ApiParam(value = "根据spu_id查询") @Valid @RequestParam(value = "spu_id", required = false) Integer spuId,@ApiParam(value = "根据shop id查询") @Valid @RequestParam(value = "shopId", required = false) Integer shopId,@ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,@ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
-        return null;
+    public Object queryGroupons(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization, @ApiParam(value = "时间：0 还未开始的， 1 明天开始的，2 正在进行中的，3 已经结束的") @Valid @RequestParam(value = "timeline", required = false) Byte timeline,@ApiParam(value = "根据spu_id查询") @Valid @RequestParam(value = "spu_id", required = false) Long spuId,@ApiParam(value = "根据shop id查询") @Valid @RequestParam(value = "shopId", required = false) Long shopId,@ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false,defaultValue = "1") Integer page,@ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false,defaultValue = "10") Integer pageSize){
+        ActivityFinderVo vo=new ActivityFinderVo();
+        vo.setPage(page);
+        vo.setPageSize(pageSize);
+        vo.setShopId(shopId);
+        vo.setTimeline(timeline);
+        vo.setSpuId(spuId);
+        ReturnObject ret=activityService.getGrouponActivities(vo,false);
+        return Common.getPageRetObject(ret);
     }
 
     /**
@@ -54,12 +81,21 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "") })
     @GetMapping(value = "/shops/{id}/groupons")
-    public Object queryGroupon(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "根据商铺id查询",required=true) @PathVariable("id") Integer id,@ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Integer state,@ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuid", required = false) Integer spuid,@ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,@ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
-        return null;
+    public Object queryGrouponByAdmin(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization, @ApiParam(value = "根据商铺id查询",required=true) @PathVariable("id") Long id, @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state, @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuid", required = false) Long spuid, @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false,defaultValue = "1") Integer page, @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false,defaultValue = "10") Integer pageSize, @RequestParam(value = "state", required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime beginTime, @RequestParam(value = "state", required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime){
+        ActivityFinderVo vo=new ActivityFinderVo();
+        vo.setSpuId(spuid);
+        vo.setState(state);
+        vo.setShopId(id);
+        vo.setBeginTime(beginTime);
+        vo.setEndTime(endTime);
+        vo.setPage(page);
+        vo.setPageSize(pageSize);
+        ReturnObject ret=activityService.getGrouponActivitiesByAdmin(vo);
+        return Common.getPageRetObject(ret);
     }
 
     /**
-     * 管理员查询所有团购(包括下线的)
+     * 管理员查询某SPU所有团购活动
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
@@ -68,8 +104,12 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "") })
     @GetMapping(value = "/shops/{shopId}/spus/{id}/groupons")
-    public Object queryGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,@ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Integer state){
-        return null;
+    public Object queryGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Long id,@ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state){
+        ActivityFinderVo vo=new ActivityFinderVo();
+        vo.setSpuId(id);
+        vo.setShopId(shopId);
+        vo.setState(state);
+        return Common.getListRetObject(activityService.getGrouponBySpuIdAdmin(vo));
     }
 
 
@@ -83,8 +123,18 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/groupons")
-    public Object createGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的团购活动信息" ,required=true )  @Valid @RequestBody GrouponActivityVo grouponActivityVO){
-        return null;
+    public Object createGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization, @ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId, @ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id, @RequestBody @Validated GrouponActivityVo grouponActivityVO,BindingResult bindingResult){
+        if(shopId==null || id==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
+        if (null != obj) {
+            log.info("validate fail");
+            return obj;
+        }
+        ReturnObject ret=activityService.addGrouponActivity(grouponActivityVO,id,shopId);
+        return Common.decorateReturnObject(ret);
     }
 
 
@@ -99,8 +149,17 @@ public class GrouponController {
             @ApiResponse(code = 907, message = "团购活动状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/groupons/{id}")
-    public Object changeGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "团购活动id",required=true) @PathVariable("id") Integer id,@ApiParam(value = "可修改的团购活动信息" ,required=true )  @Valid @RequestBody GrouponActivityVo grouponActivityVO){
-        return null;
+    public Object changeGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,@ApiParam(value = "团购活动id",required=true) @PathVariable("id") Long id,@ApiParam(value = "可修改的团购活动信息" ,required=true )  @Valid @RequestBody GrouponActivityVo grouponActivityVO,BindingResult bindingResult){
+        if(shopId==null || id==null){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
+        if (null != obj) {
+            log.info("validate fail");
+            return obj;
+        }
+        return Common.decorateReturnObject(activityService.modifyGrouponActivity(id,grouponActivityVO,shopId));
     }
 
     /**
@@ -115,7 +174,13 @@ public class GrouponController {
             @ApiResponse(code = 200, message = "成功") })
     @DeleteMapping(value = "/shops/{shopId}/groupons/{id}")
     public Object cancelGrouponofSPU(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "根据商铺id查询",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "团购活动id",required=true) @PathVariable("id") Integer id){
-        return null;
+        if(shopId==null || id==null){
+            if(shopId==null || id==null){
+                httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+                return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+            }
+        }
+        return Common.decorateReturnObject(activityService.delGrouponActivity(id,shopId));
     }
 
 

@@ -239,6 +239,28 @@ public class GoodsDao {
         return new ReturnObject<>(sku);
     }
 
+    public ReturnObject changSkuInventory(Long skuId, Integer quantity){
+        try{
+            SKUPo skuPo = skuPoMapper.selectByPrimaryKey(skuId);
+            if(skuPo == null){
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
+            if(skuPo.getInventory() < quantity){
+                return new ReturnObject(ResponseCode.SKU_NOTENOUGH);
+            }
+            skuPo.setInventory(skuPo.getInventory() - quantity);
+            skuPo.setGmtModified(LocalDateTime.now());
+            int ret;
+            ret=skuPoMapper.updateByPrimaryKeySelective(skuPo);
+            if(ret == 0){
+                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            }
+            return new ReturnObject(ResponseCode.OK);
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
     /**
      * 功能描述: 更新sku
      * @Param: [sku]
