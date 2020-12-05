@@ -103,7 +103,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/skus/{id}")
-    public Object getSkuDetails(@PathVariable Integer id) {
+    public Object getSkuDetails(@PathVariable Long id) {
         ReturnObject ret = goodsService.getSkuDetails(id);
         return Common.decorateReturnObject(ret);
     }
