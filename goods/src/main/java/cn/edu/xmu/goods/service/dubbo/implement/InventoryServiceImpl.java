@@ -1,4 +1,4 @@
-package cn.edu.xmu.goods.service.dubbo.imp;
+package cn.edu.xmu.goods.service.dubbo.implement;
 
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
-@DubboService
+@DubboService(version = "0.0.1-SNAPSHOT")
 public class InventoryServiceImpl implements IInventoryService {
 
     @Autowired

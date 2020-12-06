@@ -22,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
+@Rollback(value = false)
 public class PresaleControllerTest {
 
     private static String adminToken;
@@ -96,9 +98,9 @@ public class PresaleControllerTest {
         String request="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(put("/presale/shops/1/presales/1")
+        ResultActions response = mvc.perform(put("/presale/shops/0/presales/1")
                 .contentType("application/json;charset=UTF-8").content(request)
-                .header("authorization", shopToken));
+                .header("authorization", adminToken));
         String responseString = response.andExpect((status().isOk()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))

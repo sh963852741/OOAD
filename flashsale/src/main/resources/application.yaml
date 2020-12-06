@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8188
 
 spring:
   application:
@@ -14,8 +14,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     initialization-mode: always
-    schema: classpath:schema.sql
-    data: classpath:data.sql
+#    schema: classpath:schema.sql
+#    data: classpath:data.sql
     druid:
       #初始化时建立物理连接的个数
       initial-size: 3
@@ -74,11 +74,11 @@ pagehelper:
 
 dubbo:
   application:
-    name: dubbo-goods
+    name: dubbo-flashsale
   scan:
-    base-packages: cn.edu.xmu.goods.service
+    base-packages: cn.edu.xmu.flashsale.service
   registry:
     address: nacos://47.115.162.144:8848
   protocol:
     name: dubbo
-    port: 28088
+    port: 28188

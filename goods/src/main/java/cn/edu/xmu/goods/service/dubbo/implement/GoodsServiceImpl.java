@@ -5,6 +5,7 @@ import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
+import cn.edu.xmu.goods.service.dubbo.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.xmu.edu.goodscilent.IGoodsService;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@DubboService
+@DubboService(version = "0.0.1-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
 
     @Autowired
@@ -34,7 +35,7 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
-        ReturnObject<SkuRetVo> ret=goodsService.getSkuDetails(skuId);
+        ReturnObject<SkuRetVo> ret = goodsService.getSkuDetails(skuId);
         if(ret.getCode()!= ResponseCode.OK){
             return null;
         }
