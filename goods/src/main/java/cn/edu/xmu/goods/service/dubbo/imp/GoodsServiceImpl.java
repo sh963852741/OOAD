@@ -1,16 +1,18 @@
 package cn.edu.xmu.goods.service.dubbo.imp;
 
-import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
-import cn.edu.xmu.goods.model.bo.dubbo.Shop;
+
+import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
-import cn.edu.xmu.goods.service.dubbo.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goodscilent.IGoodsService;
+import cn.xmu.edu.goodscilent.dubbo.OrderItem;
+import cn.xmu.edu.goodscilent.dubbo.Shop;
+import cn.xmu.edu.goodscilent.dubbo.Sku;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +25,9 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Autowired
     private GoodsService goodsService;
+
+    @Autowired
+    private GoodsDao goodsDao;
 
     @Override
     public Long getPrice(Long skuId) {
@@ -60,4 +65,30 @@ public class GoodsServiceImpl implements IGoodsService {
         }
         return ret;
     }
+
+    @Override
+    public Sku getSku(Long skuId) {
+        ReturnObject<SKUPo> skuRet=goodsDao.getSkuById(skuId);
+        if(skuRet.getCode()!=ResponseCode.OK){
+            return new Sku();
+        }
+        Sku sku=new Sku();
+        SKUPo skuPo=skuRet.getData();
+        sku.setConfiguration(skuPo.getConfiguration());
+        sku.setDisable(skuPo.getDisabled());
+        sku.setId(skuPo.getId());
+        sku.setImageUrl(skuPo.getImageUrl());
+        sku.setInventory(skuPo.getInventory());
+        sku.setName(skuPo.getName());
+        sku.setOriginalPrice(skuPo.getOriginalPrice());
+        sku.setSkuSn(skuPo.getSkuSn());
+        sku.setWeight(skuPo.getWeight());
+        sku.setGmtCreate(skuPo.getGmtCreate());
+        sku.setGmtModified(skuPo.getGmtModified());
+        sku.setDetail(skuPo.getDetail());
+        sku.setGoodsSpuId(skuPo.getGoodsSpuId());
+        return sku;
+    }
+
+
 }

@@ -8,11 +8,11 @@ import cn.edu.xmu.goods.model.bo.*;
 import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
 import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
-import cn.edu.xmu.goods.service.dubbo.IActivityService;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goodscilent.IActivityService;
 import com.github.pagehelper.PageInfo;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@DubboService
-public class ActivityService implements IActivityService {
+public class ActivityService {
     @Autowired
     PresaleActivityDao presaleActivityDao;
     @Autowired

@@ -1,11 +1,11 @@
 package cn.edu.xmu.goods.service.dubbo.imp;
 
-import cn.edu.xmu.goods.model.bo.dubbo.Shop;
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
-import cn.edu.xmu.goods.service.dubbo.IShopService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goodscilent.IShopService;
+import cn.xmu.edu.goodscilent.dubbo.Shop;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
