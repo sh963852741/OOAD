@@ -1,8 +1,6 @@
 package cn.edu.xmu.flashsale.service;
 
 import cn.edu.xmu.flashsale.dao.FlashSaleDao;
-import cn.edu.xmu.flashsale.mapper.FlashSaleItemPoMapper;
-import cn.edu.xmu.flashsale.mapper.FlashSalePoMapper;
 import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
 import cn.edu.xmu.flashsale.model.bo.TimeSegment;
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -19,7 +18,9 @@ import javax.annotation.Resource;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -35,16 +36,17 @@ public class FlashSaleService implements InitializingBean {
 
     @Resource
     private ReactiveRedisTemplate<String, Serializable> reactiveRedisTemplate;
+    @Autowired
+    private RedisTemplate<String, Serializable> redisTemplate;
 
     @Autowired
     ITimeSegmentService timeSegmentService;
     @Autowired
     FlashSaleDao flashSaleDao;
 
-    public Flux<FlashSaleItem> getFlashSale(Long segId)
-   {
-        return reactiveRedisTemplate.opsForSet().members("1").map(x-> (FlashSaleItem) x);
-   }
+    public Flux<FlashSaleItem> getFlashSale(Long segId) {
+        return reactiveRedisTemplate.opsForSet().members("1").map(x -> (FlashSaleItem) x);
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -52,8 +54,8 @@ public class FlashSaleService implements InitializingBean {
 
         List<TimeSegment> timeSegmentsForToday = new ArrayList<>();
         List<TimeSegment> timeSegmentsForTomorrow = new ArrayList<>();
-        for(TimeSegment timeSegment:timeSegments){
-            if (timeSegment.getStartTime().getHour() < loadTime){
+        for (TimeSegment timeSegment : timeSegments) {
+            if (timeSegment.getStartTime().getHour() < loadTime) {
                 /* 这一部分的应该是明天的秒杀 */
                 timeSegmentsForTomorrow.add(timeSegment);
             } else {
@@ -62,21 +64,22 @@ public class FlashSaleService implements InitializingBean {
             }
         }
 
-        /* 获取了所有的秒杀段 */
-        List<FlashSalePo> effectFlashSaleForToday = new ArrayList<>();
-        effectFlashSaleForToday.addAll(flashSaleDao.selectFlashSaleByTimeAndDate(
+        /* 获取了所有的秒杀活动 */
+        List<FlashSalePo> effectFlashSaleToLoad = new ArrayList<>();
+        effectFlashSaleToLoad.addAll(flashSaleDao.selectFlashSaleByTimeAndDate(
                 LocalDate.now(),
-                timeSegmentsForToday.stream().map(e -> e.getId()).collect(Collectors.toList())
+                timeSegmentsForToday.stream().map(TimeSegment::getId).collect(Collectors.toList())
         ));
-        effectFlashSaleForToday.addAll(flashSaleDao.selectFlashSaleByTimeAndDate(
+        effectFlashSaleToLoad.addAll(flashSaleDao.selectFlashSaleByTimeAndDate(
                 LocalDate.now().plusDays(1),
-                timeSegmentsForTomorrow.stream().map(e -> e.getId()).collect(Collectors.toList())
+                timeSegmentsForTomorrow.stream().map(TimeSegment::getId).collect(Collectors.toList())
         ));
 
-        for(FlashSalePo flashSalePo:effectFlashSaleForToday){
+        for (FlashSalePo flashSalePo : effectFlashSaleToLoad) {
             List<FlashSaleItemPo> flashSaleItemPos = flashSaleDao.getFlashSaleItemByFlashSaleId(flashSalePo.getId());
+            String key ="FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString();
+            redisTemplate.boundHashOps(key).put(flashSalePo.getTimeSegId(), flashSaleItemPos);
         }
-
     }
 }
 
