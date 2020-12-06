@@ -256,10 +256,11 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @DeleteMapping(value = "/shops/{shopId}/couponspus/{id}")
-    public Object removeSPUFromCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
-                                              @ApiParam(value = "CouponSpu的id",required=true) @PathVariable("id") Long spuId){
-
-        return null;
+    public Object removeSPUFromCouponActivity(
+            @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+            @ApiParam(value = "CouponSpu的id",required=true) @PathVariable("id") Long id){
+        var ret = activityService.removeSPUFromCouponActivity(id,shopId);
+        return Common.decorateReturnObject(ret);
     }
 
 
