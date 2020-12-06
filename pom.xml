@@ -19,6 +19,7 @@
         <module>core</module>
         <module>goods-client</module>
         <module>flashsale</module>
+        <module>oomall-freight-common</module>
     </modules>
     <name>oomall</name>
     <description>object oriented mall system</description>

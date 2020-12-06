@@ -1,4 +1,4 @@
-package cn.edu.xmu.goods.service.dubbo.imp;
+package cn.edu.xmu.goods.service.dubbo.implement;
 
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
