@@ -196,7 +196,7 @@ public class PresaleControllerTest {
         ResultActions response = mvc.perform(post("/presale/shops/2/spus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
-        String responseString = response.andExpect((status().isBadRequest()))
+        String responseString = response.andExpect((status().isForbidden()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode()))
                 .andReturn().getResponse().getContentAsString();
