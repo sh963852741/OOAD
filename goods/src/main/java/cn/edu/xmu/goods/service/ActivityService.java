@@ -423,26 +423,31 @@ public class ActivityService {
 
     /**
      * 将SPU从优惠活动中移除
-     * @param spuId
-     * @param shopId
-     * @param activityId
+     * @param id 活动-商品对应表的ID
+     * @param shopId 店铺ID
      * @return
      */
-    public ReturnObject removeSPUFromCouponActivity(long spuId, long shopId, long activityId){
-        var spu = goodsService.getSpuById(spuId).getData();
-        if(spu == null){
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
-        }
-        if((long)spu.getShop().get("id") != shopId) {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU不属于你的店铺");
+    public ReturnObject removeSPUFromCouponActivity(long id, long shopId){
+        CouponSPUPo couponSPUPo = couponActivityDao.getCouponSPUPoById(id);
+        if(couponSPUPo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "该商品不在该活动中");
         }
 
-        boolean success = couponActivityDao.removeSpuFromActivity(activityId, spuId);
-        if(success){
-            return new ReturnObject();
-        } else {
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行删除程序");
+        var activityPo = couponActivityDao.getActivityById(couponSPUPo.getActivityId());
+        if(activityPo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "活动不存在");
         }
+        if(activityPo.getShopId() != shopId) {
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "活动不属于你的店铺");
+        }
+
+        boolean success = couponActivityDao.removeSpuFromActivity(id);
+        if(!success){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }else{
+            return new ReturnObject<>();
+        }
+
     }
 
     /**
