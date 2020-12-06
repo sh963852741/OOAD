@@ -73,6 +73,134 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.shop.name").isString())
                 .andReturn().getResponse().getContentAsString();
     }
+    @Test
+    public void addPresaleActivity2() throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(1);
+        LocalDateTime payTime = time.plusHours(2);
+        LocalDateTime endTime = time.plusHours(3);
+
+        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", shopToken));
+        String responseString = response.andExpect((status().isBadRequest()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andReturn().getResponse().getContentAsString();
+    }
+    @Test
+    public void addPresaleActivity3() throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.minusHours(1);
+        LocalDateTime payTime = time.plusHours(2);
+        LocalDateTime endTime = time.plusHours(3);
+
+        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", shopToken));
+        String responseString = response.andExpect((status().isBadRequest()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andReturn().getResponse().getContentAsString();
+    }
+    @Test
+    public void addPresaleActivity4() throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(1);
+        LocalDateTime payTime = time.plusHours(2);
+        LocalDateTime endTime = time.minusHours(3);
+
+        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", shopToken));
+        String responseString = response.andExpect((status().isBadRequest()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andReturn().getResponse().getContentAsString();
+    }
+    @Test
+    public void addPresaleActivity5() throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(1);
+        LocalDateTime payTime = time.minusHours(2);
+        LocalDateTime endTime = time.plusHours(3);
+
+        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", shopToken));
+        String responseString = response.andExpect((status().isBadRequest()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andReturn().getResponse().getContentAsString();
+    }
+    @Test
+    public void addPresaleActivity6() throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(1);
+        LocalDateTime payTime = time.plusHours(2);
+        LocalDateTime endTime = time.plusHours(3);
+
+        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": -3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", shopToken));
+        String responseString = response.andExpect((status().isBadRequest()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andReturn().getResponse().getContentAsString();
+    }
+    @Test
+    //测试错误
+    public void addPresaleActivity7() throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(1);
+        LocalDateTime payTime = time.plusHours(2);
+        LocalDateTime endTime = time.plusHours(3);
+
+        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(post("/presale/shops/1/spus/3000/presales")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", shopToken));
+        String responseString = response.andExpect((status().isBadRequest()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_NOTEXIST.getCode()))
+                .andReturn().getResponse().getContentAsString();
+    }
+    @Test
+    //测试错误
+    public void addPresaleActivity8() throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(1);
+        LocalDateTime payTime = time.plusHours(2);
+        LocalDateTime endTime = time.plusHours(3);
+
+        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(post("/presale/shops/2/spus/290/presales")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", shopToken));
+        String responseString = response.andExpect((status().isForbidden()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode()))
+                .andReturn().getResponse().getContentAsString();
+    }
 
     @Test
     public void getPresaleState()throws Exception{

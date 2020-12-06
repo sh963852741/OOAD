@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class BrandDao {
             } else {
                 //插入成功
                 brand.setId(brandPo.getId());
+                brand.setGmtCreate(LocalDateTime.now());
+                brand.setGmtModified(brandPo.getGmtModified());
                 retObj = new ReturnObject<>(brand);
             }
         }
@@ -54,6 +57,7 @@ public class BrandDao {
             if (ret == 0) {
                 retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("品牌id不存在：" + brandPo.getId()));
             } else {
+                brand.setGmtModified(brandPo.getGmtModified());
                 retObj = new ReturnObject<>();
             }
         }
