@@ -21,7 +21,7 @@
 
 		<dependency>
 			<groupId>cn.edu.xmu</groupId>
-			<artifactId>goods-client</artifactId>
+			<artifactId>goods-provider</artifactId>
 		</dependency>
 
 		<dependency>
@@ -155,7 +155,7 @@
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.xmu</groupId>
-			<artifactId>goods-client</artifactId>
+			<artifactId>goods-provider</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
