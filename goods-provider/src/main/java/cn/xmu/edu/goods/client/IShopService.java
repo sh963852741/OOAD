@@ -1,7 +1,7 @@
-package cn.xmu.edu.goodscilent;
+package cn.xmu.edu.goods.client;
 
 
-import cn.xmu.edu.goodscilent.dubbo.Shop;
+import cn.xmu.edu.goods.client.dubbo.Shop;
 
 /**
  * @Author: Yifei Wang

@@ -7,8 +7,8 @@ import cn.edu.xmu.goods.model.po.CouponPo;
 import cn.edu.xmu.goods.model.po.CouponSPUPo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goodscilent.IActivityService;
-import cn.xmu.edu.goodscilent.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.IActivityService;
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 

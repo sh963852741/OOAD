@@ -1,8 +1,8 @@
-package cn.xmu.edu.goodscilent;
+package cn.xmu.edu.goods.client;
 
 
 
-import cn.xmu.edu.goodscilent.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
 
 import java.util.List;
 import java.util.Map;

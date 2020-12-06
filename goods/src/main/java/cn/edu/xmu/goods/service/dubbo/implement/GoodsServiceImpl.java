@@ -1,17 +1,16 @@
-package cn.edu.xmu.goods.service.dubbo.imp;
+package cn.edu.xmu.goods.service.dubbo.implement;
 
 
 import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
-import cn.edu.xmu.goods.service.dubbo.IGoodsService;
+import cn.xmu.edu.goods.client.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goodscilent.IGoodsService;
-import cn.xmu.edu.goodscilent.dubbo.OrderItem;
-import cn.xmu.edu.goodscilent.dubbo.Shop;
-import cn.xmu.edu.goodscilent.dubbo.Sku;
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.dubbo.Shop;
+import cn.xmu.edu.goods.client.dubbo.Sku;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 

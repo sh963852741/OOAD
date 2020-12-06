@@ -4,8 +4,8 @@ import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goodscilent.IShopService;
-import cn.xmu.edu.goodscilent.dubbo.Shop;
+import cn.xmu.edu.goods.client.IShopService;
+import cn.xmu.edu.goods.client.dubbo.Shop;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 

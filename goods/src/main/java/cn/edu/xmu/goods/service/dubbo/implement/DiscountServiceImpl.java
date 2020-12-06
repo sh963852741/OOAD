@@ -5,8 +5,8 @@ import cn.edu.xmu.goods.service.ActivityService;
 import cn.edu.xmu.ooad.order.discount.BaseCouponDiscount;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goodscilent.IDiscountService;
-import cn.xmu.edu.goodscilent.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.IDiscountService;
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
