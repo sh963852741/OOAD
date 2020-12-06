@@ -1,10 +1,10 @@
 package cn.edu.xmu.goods.service.dubbo.implement;
 
-import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
 import cn.edu.xmu.goods.service.GoodsService;
-import cn.edu.xmu.goods.service.dubbo.IInventoryService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goodscilent.IInventoryService;
+import cn.xmu.edu.goodscilent.dubbo.OrderItem;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
