@@ -1,7 +1,11 @@
 package cn.edu.xmu.flashsale.controller;
 
+import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleItemRetVo;
 import cn.edu.xmu.flashsale.model.vo.FlashsaleVo;
+import cn.edu.xmu.flashsale.service.FlashSaleService;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -13,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController /*Restful的Controller对象*/
 @RequestMapping(value = "/flashsale", produces = "application/json;charset=UTF-8")
 public class FlashSaleController {
+
+    @Autowired
+    FlashSaleService flashSaleService;
 
     /**
      * 查询某一时段秒杀活动详情
@@ -29,8 +36,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping(value= "/timesegments/{id}/flashsales")
-    public Object getFlashsales(@PathVariable long id, @RequestParam(required = false) Integer state, @RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize){
-        return null;
+    public Object getFlashSales(@PathVariable long id){
+
+            return flashSaleService.getFlashSale(id).map(FlashSaleItem::createVo);
     }
 
     /**
