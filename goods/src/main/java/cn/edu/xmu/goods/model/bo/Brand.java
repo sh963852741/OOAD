@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 public  class Brand implements VoObject, Serializable {
@@ -16,7 +17,8 @@ public  class Brand implements VoObject, Serializable {
     private String name;
     private String imageUrl;
     private String detail;
-
+    private LocalDateTime gmtCreate;
+    private LocalDateTime gmtModified;
     public Brand() {
     }
     public Brand(BrandPo po){
@@ -24,6 +26,8 @@ public  class Brand implements VoObject, Serializable {
         this.name = po.getName();
         this.imageUrl = po.getImageUrl();
         this.detail = po.getDetail();
+        this.gmtModified=po.getGmtModified();
+        this.gmtCreate=po.getGmtCreate();
     }
 
     @Override
@@ -48,6 +52,8 @@ public  class Brand implements VoObject, Serializable {
         po.setName(this.getName());
         po.setImageUrl(this.getImageUrl());
         po.setDetail(this.getDetail());
+        po.setGmtCreate(null);
+        po.setGmtModified(LocalDateTime.now());
         return po;
     }
     public SimpleBrand createSimpleBrand(){
