@@ -1,4 +1,4 @@
-package cn.edu.xmu.goods.service.dubbo.imp;
+package cn.edu.xmu.goods.service.dubbo.implement;
 
 import cn.edu.xmu.goods.dao.CouponActivityDao;
 import cn.edu.xmu.goods.dao.CouponDao;

@@ -1,4 +1,4 @@
-package cn.edu.xmu.goods.service.dubbo.imp;
+package cn.edu.xmu.goods.service.dubbo.implement;
 
 import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
 import cn.edu.xmu.goods.model.bo.dubbo.Shop;
@@ -9,9 +9,7 @@ import cn.edu.xmu.goods.service.dubbo.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;

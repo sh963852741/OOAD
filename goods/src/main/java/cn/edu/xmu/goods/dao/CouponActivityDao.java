@@ -117,15 +117,12 @@ public class CouponActivityDao {
         return po.getId();
     }
 
-    public boolean removeSpuFromActivity(long activityId,long spuId){
-        CouponSPUPoExample example = new CouponSPUPoExample();
-        var criteria = example.createCriteria();
-        criteria.andActivityIdEqualTo(activityId);
-        criteria.andSpuIdEqualTo(spuId);
+    public CouponSPUPo getCouponSPUPoById(long id){
+        return couponSPUPoMapper.selectByPrimaryKey(id);
+    }
 
-        var x = couponSPUPoMapper.selectByExample(example);
-
-        return couponSPUPoMapper.deleteByPrimaryKey(x.get(0).getId())==1;
+    public boolean removeSpuFromActivity(long id){
+        return couponSPUPoMapper.deleteByPrimaryKey(id)==1;
     }
 
     public PageInfo<CouponSPUPo> getSPUsInActivity(long activityID, int page, int pageSize){
