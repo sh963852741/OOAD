@@ -3,11 +3,15 @@ package cn.edu.xmu.flashsale.dao;
 import cn.edu.xmu.flashsale.mapper.FlashSaleItemPoMapper;
 import cn.edu.xmu.flashsale.mapper.FlashSalePoMapper;
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
+import cn.edu.xmu.flashsale.model.po.FlashSaleItemPoExample;
 import cn.edu.xmu.flashsale.model.po.FlashSalePo;
+import cn.edu.xmu.flashsale.model.po.FlashSalePoExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public class FlashSaleDao {
@@ -43,5 +47,23 @@ public class FlashSaleDao {
 
     public int deleteFlashSaleItem(long id){
         return flashSaleItemPoMapper.deleteByPrimaryKey(id);
+    }
+
+    public List<FlashSalePo> selectFlashSaleByTimeAndDate(LocalDate date, List<Long> segmentIds){
+        FlashSalePoExample example = new FlashSalePoExample();
+        FlashSalePoExample.Criteria criteria = example.createCriteria();
+        criteria.andFlashDateGreaterThan(date.atStartOfDay());
+        criteria.andFlashDateLessThan(date.atStartOfDay().plusDays(1));
+        criteria.andTimeSegIdIn(segmentIds);
+
+        return flashSalePoMapper.selectByExample(example);
+    }
+
+    public List<FlashSaleItemPo> getFlashSaleItemByFlashSaleId(long id){
+        FlashSaleItemPoExample example = new FlashSaleItemPoExample();
+        FlashSaleItemPoExample.Criteria criteria = example.createCriteria();
+        criteria.andSaleIdEqualTo(id);
+
+        return flashSaleItemPoMapper.selectByExample(example);
     }
 }

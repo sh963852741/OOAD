@@ -53,11 +53,9 @@ spring:
       server-addr: 47.115.162.144:8848
 
 
-goodsservice:
-  webdav:
-    username: oomall
-    password: 123465
-    baseUrl: http://localhost:8088/web/
+flashsale:
+  # 当加载数据时从何时开始，24小时制
+  loadtime: 3
 
 mybatis:
   # 将包中的类添加为类型别名
