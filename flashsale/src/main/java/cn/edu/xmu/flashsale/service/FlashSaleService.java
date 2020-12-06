@@ -6,6 +6,9 @@ import cn.edu.xmu.flashsale.model.bo.TimeSegment;
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
 import cn.edu.xmu.flashsale.model.po.FlashSalePo;
 import cn.edu.xmu.flashsale.service.dubbo.ITimeSegmentService;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
  * @date Created in 2020/11/21 15:00
  **/
 @Service
+@Slf4j
 public class FlashSaleService implements InitializingBean {
 
     @Value("${flashsale.loadtime}")
@@ -36,7 +40,7 @@ public class FlashSaleService implements InitializingBean {
 
     @Resource
     private ReactiveRedisTemplate<String, Serializable> reactiveRedisTemplate;
-    @Autowired
+    @Resource
     private RedisTemplate<String, Serializable> redisTemplate;
 
     @Autowired
@@ -63,7 +67,7 @@ public class FlashSaleService implements InitializingBean {
                 timeSegmentsForToday.add(timeSegment);
             }
         }
-
+        log.debug(timeSegments.toString());
         /* 获取了所有的秒杀活动 */
         List<FlashSalePo> effectFlashSaleToLoad = new ArrayList<>();
         effectFlashSaleToLoad.addAll(flashSaleDao.selectFlashSaleByTimeAndDate(

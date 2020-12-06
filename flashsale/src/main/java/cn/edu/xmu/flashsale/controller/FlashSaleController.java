@@ -37,7 +37,6 @@ public class FlashSaleController {
     })
     @GetMapping(value= "/timesegments/{id}/flashsales")
     public Object getFlashSales(@PathVariable long id){
-
             return flashSaleService.getFlashSale(id).map(FlashSaleItem::createVo);
     }
 

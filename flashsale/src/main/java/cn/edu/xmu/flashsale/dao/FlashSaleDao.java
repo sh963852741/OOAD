@@ -6,6 +6,7 @@ import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPoExample;
 import cn.edu.xmu.flashsale.model.po.FlashSalePo;
 import cn.edu.xmu.flashsale.model.po.FlashSalePoExample;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
+@Slf4j
 public class FlashSaleDao {
     @Autowired
     FlashSaleItemPoMapper flashSaleItemPoMapper;
@@ -50,6 +52,7 @@ public class FlashSaleDao {
     }
 
     public List<FlashSalePo> selectFlashSaleByTimeAndDate(LocalDate date, List<Long> segmentIds){
+        log.debug(segmentIds.toString());
         FlashSalePoExample example = new FlashSalePoExample();
         FlashSalePoExample.Criteria criteria = example.createCriteria();
         criteria.andFlashDateGreaterThan(date.atStartOfDay());

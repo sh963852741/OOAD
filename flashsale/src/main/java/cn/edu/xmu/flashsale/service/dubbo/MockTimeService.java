@@ -15,15 +15,16 @@ public class MockTimeService implements ITimeSegmentService {
     public List<TimeSegment> getFlashSaleSegments(){
         /* 假数据 */
         List<TimeSegment> list = new ArrayList<>();
-        TimeSegment timeSegment = new TimeSegment();
-        timeSegment.setId(1L);
-        timeSegment.setStartTime(LocalTime.MIDNIGHT);
-        timeSegment.setEndTime(LocalTime.NOON);
-        list.add(timeSegment);
-        timeSegment.setId(2L);
-        timeSegment.setStartTime(LocalTime.NOON);
-        timeSegment.setEndTime(LocalTime.MIDNIGHT);
-        list.add(timeSegment);
+        TimeSegment timeSegment1 = new TimeSegment();
+        timeSegment1.setId(1L);
+        timeSegment1.setStartTime(LocalTime.MIDNIGHT);
+        timeSegment1.setEndTime(LocalTime.NOON);
+        TimeSegment timeSegment2 = new TimeSegment();
+        list.add(timeSegment1);
+        timeSegment2.setId(2L);
+        timeSegment2.setStartTime(LocalTime.NOON);
+        timeSegment2.setEndTime(LocalTime.MIDNIGHT);
+        list.add(timeSegment2);
 
         return list;
     }
