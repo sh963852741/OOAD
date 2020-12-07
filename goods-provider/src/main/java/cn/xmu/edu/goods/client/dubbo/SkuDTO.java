@@ -24,7 +24,7 @@ public class SkuDTO {
         private static final Map<Integer, State> stateMap;
 
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
-            stateMap = new HashMap();
+            stateMap = new HashMap<>();
             for (State enum1 : values()) {
                 stateMap.put(enum1.code, enum1);
             }
