@@ -75,7 +75,7 @@ public class ShopDao {
      */
     public ReturnObject newShop(ShopPo po)
     {
-        try{
+//        try{
             int ret;
             po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
@@ -86,9 +86,9 @@ public class ShopDao {
             }else{
                 return new ReturnObject(po);
             }
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
+//        }catch (Exception e){
+//            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+//        }
     }
     /**
      * 功能描述: 商家修改店铺信息
@@ -150,6 +150,4 @@ public class ShopDao {
             return new ReturnObject();
         }
     }
-    }
-
-
+}
