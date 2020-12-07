@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Customer {
+public class CustomerDTO {
 	private Long id;
 	private String userName;
 	private String realName;
 
-	public Customer(Long id) {
+	public CustomerDTO(Long id) {
 		this.id = id;
 	}
 }

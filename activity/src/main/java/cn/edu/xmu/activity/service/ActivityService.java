@@ -501,11 +501,11 @@ public class ActivityService {
         PageInfo<CouponSPUPo> couponSPUPoPageInfo = couponActivityDao.getSPUsInActivity(activityId, page, pageSize);
         List<HashMap<String,Object>> simpleSkuList = new ArrayList();
         for(CouponSPUPo couponSPUPo:couponSPUPoPageInfo.getList()){
-            Sku sku = goodsService.getSku(couponSPUPo.getId());
+            SkuDTO skuDTO = goodsService.getSku(couponSPUPo.getId());
             HashMap<String,Object> hm = new HashMap<>(){
                 {
-                    put("id", sku.getId());
-                    put("name", sku.getName());
+                    put("id", skuDTO.getId());
+                    put("name", skuDTO.getName());
                 }
             };
             simpleSkuList.add(hm);

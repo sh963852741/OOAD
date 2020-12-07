@@ -15,13 +15,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
+public class OrderDTO {
 
 	private Long id;
-	private Customer customer;
+	private CustomerDTO customerDTO;
 	private ShopDTO shopDTO;
 	private String orderSn;
-	private List<Order> subOrders;
+	private List<OrderDTO> subOrderDTOS;
 	private Long pid;
 	private String consignee;
 	private Long regionId;
@@ -48,42 +48,42 @@ public class Order {
 	private LocalDateTime gmtModified;
 
 
-	public Order createAndAddSubOrder(ShopDTO shopDTO, List<OrderItemDTO> orderItemDTOS) {
-		Order subOrder = new Order();
+	public OrderDTO createAndAddSubOrder(ShopDTO shopDTO, List<OrderItemDTO> orderItemDTOS) {
+		OrderDTO subOrderDTO = new OrderDTO();
 
-		subOrder.customer = this.customer;
+		subOrderDTO.customerDTO = this.customerDTO;
 
-		subOrder.shopDTO = shopDTO;
+		subOrderDTO.shopDTO = shopDTO;
 
-		subOrder.orderItemDTOS = new ArrayList<>();
-		subOrder.orderItemDTOS.addAll(orderItemDTOS);
+		subOrderDTO.orderItemDTOS = new ArrayList<>();
+		subOrderDTO.orderItemDTOS.addAll(orderItemDTOS);
 
-		subOrder.consignee = this.consignee;
-		subOrder.regionId = this.regionId;
-		subOrder.address = this.address;
-		subOrder.mobile = this.mobile;
-		subOrder.message = this.message;
+		subOrderDTO.consignee = this.consignee;
+		subOrderDTO.regionId = this.regionId;
+		subOrderDTO.address = this.address;
+		subOrderDTO.mobile = this.mobile;
+		subOrderDTO.message = this.message;
 
-		this.subOrders.add(subOrder);
+		this.subOrderDTOS.add(subOrderDTO);
 
-		return subOrder;
+		return subOrderDTO;
 	}
 
 	public void calcAndSetParentOrderOriginPrice() {
 		Long price = 0L;
-		for (Order o : getSubOrders()) {
+		for (OrderDTO o : getSubOrderDTOS()) {
 			price += o.getOriginPrice();
 		}
 		originPrice = price;
 	}
 
 	public void calcAndSetSubOrdersOriginPrice() {
-		for (Order subOrder : getSubOrders()) {
+		for (OrderDTO subOrderDTO : getSubOrderDTOS()) {
 			long price = 0L;
-			for (OrderItemDTO oi : subOrder.getOrderItemDTOS()) {
+			for (OrderItemDTO oi : subOrderDTO.getOrderItemDTOS()) {
 				price += oi.getQuantity() * oi.getPrice();
 			}
-			subOrder.setOriginPrice(price);
+			subOrderDTO.setOriginPrice(price);
 		}
 	}
 
