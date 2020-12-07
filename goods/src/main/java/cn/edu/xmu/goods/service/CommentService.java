@@ -63,7 +63,10 @@ public class CommentService {
      * @param conclusion
      * @return
      */
-    public ReturnObject confirmCommnets(Long id, CommentConclusionVo conclusion){
+    public ReturnObject confirmCommnets(Long did,Long id, CommentConclusionVo conclusion){
+        if(did!=0){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
         Comment comment=new Comment();
         comment.setId(id);
         comment.setState(conclusion.getConclusion()==true?Comment.State.PASS.getCode() : Comment.State.FORBID.getCode());
@@ -88,11 +91,11 @@ public class CommentService {
      * @param pageSize
      * @return
      */
-    public ReturnObject selelctCommentsOfState(Long shopId,Integer state,Integer pageNum, Integer pageSize){
-        if(shopId==0){
-            return commentDao.selelctCommentsOfState(state.byteValue(),pageNum,pageSize);
+    public ReturnObject selelctCommentsOfState(Long did,Integer state,Integer pageNum, Integer pageSize){
+        if(did!=0){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }
-        return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        return commentDao.selelctCommentsOfState(state.byteValue(),pageNum,pageSize);
     }
 
 

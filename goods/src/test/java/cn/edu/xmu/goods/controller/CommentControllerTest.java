@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
+import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import net.minidev.json.JSONUtil;
@@ -41,7 +42,7 @@ public class CommentControllerTest {
         commentVo.setContent("这个真不错");
         String requestJSON= JacksonUtil.toJson(commentVo);*/
         String requestJSON="{\"type\":0 ,\"content\":\"这个真不错\"}";
-        String responseString=this.mvc.perform(post("/comment/orderitems/2/comments").contentType("application/json;charset=UTF-8").content(requestJSON))
+        String responseString=this.mvc.perform(post("/comment/orderitems/1/comments").contentType("application/json;charset=UTF-8").content(requestJSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
@@ -52,8 +53,10 @@ public class CommentControllerTest {
      */
     @Test
     public void allowComment() throws Exception{
-        String requestJSON="{\"conclusion\":true }";
-        String responseString=this.mvc.perform(put("/comment/comments/2/confirm").contentType("application/json;charset=UTF-8").content(requestJSON))
+        CommentConclusionVo conclusion=new CommentConclusionVo();
+        conclusion.setConclusion(true);
+        String requestJSON=JacksonUtil.toJson(conclusion);
+        String responseString=this.mvc.perform(put("/comment/shops/1/comments/2/confirm").contentType("application/json;charset=UTF-8").content(requestJSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
@@ -66,7 +69,7 @@ public class CommentControllerTest {
     @Test
     public void passComment() throws Exception{
         String requestJSON="{\"conclusion\":false}";
-        String responseString=this.mvc.perform(put("/comment/comments/1/confirm").contentType("application/json;charset=UTF-8").content(requestJSON))
+        String responseString=this.mvc.perform(put("/comment/shops/1/comments/1/confirm").contentType("application/json;charset=UTF-8").content(requestJSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();

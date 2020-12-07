@@ -3,6 +3,9 @@ package cn.edu.xmu.goods.controller;
 import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.goods.service.CommentService;
+import cn.edu.xmu.ooad.annotation.Audit;
+import cn.edu.xmu.ooad.annotation.Depart;
+import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
@@ -62,7 +65,13 @@ public class CommentController {
             @ApiResponse(code = 903, message = "用户没有购买此商品")
     })
     @PostMapping("orderitems/{id}/comments")
-    public Object addCommentOnSku(@PathVariable long id,@Validated @RequestBody CommentVo commentVo,BindingResult bindingResult){
+    @Audit
+    public Object addCommentOnSku(
+            @Depart long shopId,
+            @LoginUser long uid,
+            @PathVariable long id,
+            @Validated @RequestBody CommentVo commentVo,
+            BindingResult bindingResult){
         logger.debug("add comment by skuId:" + id);
         //校验前端数据
         Object returnObject = Common.processFieldErrors(bindingResult, httpServletResponse);
@@ -105,15 +114,16 @@ public class CommentController {
     @ApiOperation(value = "管理员核审评论")
     @ApiImplicitParams({
             @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
+            @ApiImplicitParam(name="did", required = true, dataType="Integer", paramType="path"),
             @ApiImplicitParam(name="id", required = true, dataType="Integer", paramType="path")
     })      @ApiImplicitParam(paramType = "body", dataType = "CommentConclusionVo", name = "commentConclusionVo", value = "新增评论", required = true)
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PutMapping("comments/{id}/confirm")
-    public Object confirmComment(@PathVariable long id,@RequestBody CommentConclusionVo commentConclusionVo){
+    @PutMapping("shops/{did}/comments/{id}/confirm")
+    public Object confirmComment(@PathVariable long did,@PathVariable long id,@RequestBody CommentConclusionVo commentConclusionVo){
         logger.debug("confirm Comment:" + id);
-        ReturnObject ret=commentService.confirmCommnets(id,commentConclusionVo);
+        ReturnObject ret=commentService.confirmCommnets(did,id,commentConclusionVo);
         return Common.decorateReturnObject(ret);
     }
 
@@ -130,7 +140,10 @@ public class CommentController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("comments")
-    public Object getOwnComments(@RequestParam(required = false,defaultValue = "1") Integer page,@RequestParam(required = false,defaultValue = "10") Integer pageSize){
+    @Audit
+    public Object getOwnComments(@LoginUser long uid,
+            @RequestParam(required = false,defaultValue = "1") Integer page,
+            @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         logger.debug("getOwnComments: page = "+ page +"  pageSize ="+pageSize);
         ReturnObject ret=commentService.selectAllCommentsOfUser(page,pageSize);
         return ret;
@@ -149,9 +162,13 @@ public class CommentController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("shops/{id}/comments/all")
-    public Object getAllComments(@PathVariable long id,@RequestParam(required = false) Integer state,@RequestParam(required = false,defaultValue = "1") Integer page,@RequestParam(required = false,defaultValue = "10") Integer pageSize){
+    public Object getAllComments(
+            @PathVariable long did,
+            @RequestParam(required = false) Integer state,
+            @RequestParam(required = false,defaultValue = "1") Integer page,
+            @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         logger.debug("getAllComments: page = "+ page +"  pageSize ="+pageSize);
-        ReturnObject ret=commentService.selelctCommentsOfState(id,state,page,pageSize);
+        ReturnObject ret=commentService.selelctCommentsOfState(did,state,page,pageSize);
         return ret;
     }
 
