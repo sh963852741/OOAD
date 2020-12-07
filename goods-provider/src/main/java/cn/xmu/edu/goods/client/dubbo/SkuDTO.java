@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Sku {
+public class SkuDTO {
 
     /**
      * 后台Sku状态

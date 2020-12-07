@@ -2,7 +2,6 @@ package cn.edu.xmu.goods.service.dubbo.implement;
 
 
 import cn.edu.xmu.goods.dao.GoodsDao;
-import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
@@ -11,7 +10,7 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
 import cn.xmu.edu.goods.client.dubbo.ShopDTO;
-import cn.xmu.edu.goods.client.dubbo.Sku;
+import cn.xmu.edu.goods.client.dubbo.SkuDTO;
 import cn.xmu.edu.goods.client.dubbo.SpuDTO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,32 +67,42 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public Sku getSku(Long skuId) {
+    public SkuDTO getSku(Long skuId) {
         ReturnObject<SKUPo> skuRet=goodsDao.getSkuById(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
-            return new Sku();
+            return new SkuDTO();
         }
-        Sku sku=new Sku();
+        SkuDTO skuDTO =new SkuDTO();
         SKUPo skuPo=skuRet.getData();
-        sku.setConfiguration(skuPo.getConfiguration());
-        sku.setDisable(skuPo.getDisabled());
-        sku.setId(skuPo.getId());
-        sku.setImageUrl(skuPo.getImageUrl());
-        sku.setInventory(skuPo.getInventory());
-        sku.setName(skuPo.getName());
-        sku.setOriginalPrice(skuPo.getOriginalPrice());
-        sku.setSkuSn(skuPo.getSkuSn());
-        sku.setWeight(skuPo.getWeight());
-        sku.setGmtCreate(skuPo.getGmtCreate());
-        sku.setGmtModified(skuPo.getGmtModified());
-        sku.setDetail(skuPo.getDetail());
-        sku.setGoodsSpuId(skuPo.getGoodsSpuId());
-        return sku;
+        skuDTO.setConfiguration(skuPo.getConfiguration());
+        skuDTO.setDisable(skuPo.getDisabled());
+        skuDTO.setId(skuPo.getId());
+        skuDTO.setImageUrl(skuPo.getImageUrl());
+        skuDTO.setInventory(skuPo.getInventory());
+        skuDTO.setName(skuPo.getName());
+        skuDTO.setOriginalPrice(skuPo.getOriginalPrice());
+        skuDTO.setSkuSn(skuPo.getSkuSn());
+        skuDTO.setWeight(skuPo.getWeight());
+        skuDTO.setGmtCreate(skuPo.getGmtCreate());
+        skuDTO.setGmtModified(skuPo.getGmtModified());
+        skuDTO.setDetail(skuPo.getDetail());
+        skuDTO.setGoodsSpuId(skuPo.getGoodsSpuId());
+        return skuDTO;
     }
 
     @Override
     public SpuDTO getSimpleSpuById(Long spuId) {
-        return null;
+       ReturnObject<HashMap<String,Object>> ret = goodsService.getSimpleSpuById(spuId);
+       if(ret.getCode() != ResponseCode.OK){
+           return null;
+       }
+       SpuDTO dto = new SpuDTO();
+       dto.setId((Long)ret.getData().get("id"));
+       dto.setName((String)ret.getData().get("name"));
+       dto.setGoodsSn((String)ret.getData().get("goodsSn"));
+       dto.setImageUrl((String)ret.getData().get("imageUrl"));
+       dto.setDisable((Byte)ret.getData().get(""));
+       return dto;
     }
 
     @Override

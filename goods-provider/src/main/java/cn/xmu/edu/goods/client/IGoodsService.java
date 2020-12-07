@@ -4,7 +4,7 @@ package cn.xmu.edu.goods.client;
 
 import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
 import cn.xmu.edu.goods.client.dubbo.ShopDTO;
-import cn.xmu.edu.goods.client.dubbo.Sku;
+import cn.xmu.edu.goods.client.dubbo.SkuDTO;
 import cn.xmu.edu.goods.client.dubbo.SpuDTO;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public interface IGoodsService {
 	 * @Author: Yifei Wang
 	 * @Date: 2020/12/6 14:46
 	 */
-	Sku getSku(Long skuId);
+	SkuDTO getSku(Long skuId);
 
 	/**
 	 * 根据SPU ID返回SPU的DTO
