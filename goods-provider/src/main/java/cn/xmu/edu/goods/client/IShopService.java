@@ -9,11 +9,12 @@ import cn.xmu.edu.goods.client.dubbo.ShopDTO;
  */
 public interface IShopService {
 
+
+
 	/**
-	 * 获取商铺消息
-	 * @param skuId
+	 * 根据ID获取店铺信息
+	 * @param id
 	 * @return
 	 */
-	ShopDTO getShop(Long skuId);
-
+	ShopDTO getShopById(Long id);
 }
