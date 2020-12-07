@@ -14,27 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ShopServiceImpl implements IShopService {
 
     @Autowired
-    private GoodsService goodsService;
-
-    @Autowired
     private ShopService shopService;
 
     @Override
-    public ShopDTO getShop(Long skuId) {
-        if(skuId == null){
+    public ShopDTO getShopById(Long shopId) {
+        var shop = shopService.getShopByShopId(shopId).getData();
+        if(shop == null){
             return null;
+        } else {
+            return shop.createDTO();
         }
-        ReturnObject shopIdRet = goodsService.getShopIdBySkuId(skuId);
-        if(shopIdRet.getCode() != ResponseCode.OK){
-            return null;
-        }
-        Long shopId=(Long)shopIdRet.getData();
-        ReturnObject<Shop> shopRet = shopService.getShopByShopId(shopId);
-        if(shopRet.getCode() != ResponseCode.OK){
-            return new ShopDTO();
-        }
-        Shop shop= shopRet.getData();
-        ShopDTO shopDTO =shop.createDTO();
-        return shopDTO;
     }
 }

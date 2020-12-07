@@ -5,6 +5,7 @@ import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
+import cn.edu.xmu.goods.service.ShopService;
 import cn.xmu.edu.goods.client.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -25,6 +26,9 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Autowired
     private GoodsService goodsService;
+
+    @Autowired
+    private ShopService shopService;
 
     @Autowired
     private GoodsDao goodsDao;
@@ -105,10 +109,23 @@ public class GoodsServiceImpl implements IGoodsService {
        return dto;
     }
 
+
     @Override
-    public Long getShopIdBySkuId(long skuId) {
-        return null;
+    public ShopDTO getShopBySKUId(Long skuId) {
+        if(skuId == null){
+            return null;
+        }
+        ReturnObject shopIdRet = goodsService.getShopIdBySkuId(skuId);
+        if(shopIdRet.getCode() != ResponseCode.OK){
+            return null;
+        }
+        Long shopId=(Long)shopIdRet.getData();
+        ReturnObject<Shop> shopRet = shopService.getShopByShopId(shopId);
+        if(shopRet.getCode() != ResponseCode.OK){
+            return new ShopDTO();
+        }
+        Shop shop= shopRet.getData();
+        ShopDTO shopDTO =shop.createDTO();
+        return shopDTO;
     }
-
-
 }

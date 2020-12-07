@@ -84,15 +84,14 @@ public class ActivityService {
 
     public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long skuId, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
-        Long skuShopId = goodsService.getShopIdBySkuId(skuId);
-        ShopDTO shopDTO = shopService.getShop(shopId);
+        ShopDTO shopDTO = goodsService.getShopBySKUId(skuId);
         if(shopDTO == null){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在");
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺或商品不存在");
         }
-        if(skuShopId == null){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "对应的SPU不存在");
-        }
-        if(!skuShopId.equals(shopId)){
+//        if(skuShopId == null){
+//            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "对应的SPU不存在");
+//        }
+        if(!shopDTO.getId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不允许使用其他店铺的SPU");
         }
 
@@ -247,7 +246,7 @@ public class ActivityService {
 
         GrouponActivityPo po = grouponActivityVo.createPo();
         if (grouponActivityDao.addActivity(po, spuId, shopId)) {
-            ShopDTO shopDTO = shopService.getShop(shopId);
+            ShopDTO shopDTO = shopService.getShopById(shopId);
             Map<String,Object> shopMap=new HashMap<>();
             shopMap.put("id", shopDTO.getId());
             shopMap.put("name", shopDTO.getName());
@@ -323,7 +322,7 @@ public class ActivityService {
      */
     public ReturnObject<CouponActivityVo> getCouponActivity(long activityId, long shopId){
         CouponActivityPo activityPo = couponActivityDao.getActivityById(activityId);
-        ShopDTO shopDTO = shopService.getShop(shopId);
+        ShopDTO shopDTO = shopService.getShopById(shopId);
         if (activityPo == null || shopDTO == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "活动或对应店铺不存在");
         }

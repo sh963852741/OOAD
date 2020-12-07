@@ -48,9 +48,9 @@ public interface IGoodsService {
 	SpuDTO getSimpleSpuById(Long spuId);
 
 	/**
-	 * 根据SKU ID获取其所在店铺
+	 * 根据SKU ID获取店铺
 	 * @param skuId
 	 * @return
 	 */
-	Long getShopIdBySkuId(long skuId);
+	ShopDTO getShopBySKUId(Long skuId);
 }
