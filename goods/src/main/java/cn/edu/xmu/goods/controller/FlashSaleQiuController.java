@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
  * @author Ming Qiu
  * @date Created in 2020/11/21 14:09
  **/
+@Deprecated
 @Api(value = "秒杀服务", tags = "flashsale")
 @RestController
 @RequestMapping(value = "/flashsale", produces = "application/json;charset=UTF-8")

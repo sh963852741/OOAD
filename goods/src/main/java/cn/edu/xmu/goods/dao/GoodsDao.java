@@ -294,7 +294,7 @@ public class GoodsDao {
      * @Author: Yifei Wang
      * @Date: 2020/11/26 20:16
      */
-    public ReturnObject getShopIdBySkuId(Long id){
+    public ReturnObject<Long> getShopIdBySkuId(Long id){
         try {
             SKUPo skuPo = skuPoMapper.selectByPrimaryKey(id);
             if(skuPo==null){

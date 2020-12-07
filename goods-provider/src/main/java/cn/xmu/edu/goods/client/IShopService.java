@@ -1,7 +1,7 @@
 package cn.xmu.edu.goods.client;
 
 
-import cn.xmu.edu.goods.client.dubbo.Shop;
+import cn.xmu.edu.goods.client.dubbo.ShopDTO;
 
 /**
  * @Author: Yifei Wang
@@ -14,6 +14,6 @@ public interface IShopService {
 	 * @param skuId
 	 * @return
 	 */
-	Shop getShop(Long skuId);
+	ShopDTO getShop(Long skuId);
 
 }

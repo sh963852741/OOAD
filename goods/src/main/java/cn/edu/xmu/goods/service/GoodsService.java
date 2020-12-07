@@ -683,7 +683,7 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/12/5 17:19
      */
-    public ReturnObject getShopIdBySkuId(Long id){
+    public ReturnObject<Long> getShopIdBySkuId(Long id){
         return goodsDao.getShopIdBySkuId(id);
     }
 

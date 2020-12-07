@@ -17,8 +17,9 @@
     <modules>
         <module>goods</module>
         <module>core</module>
-        <module>goods-provider</module>
+        <module>activity</module>
         <module>flashsale</module>
+        <module>goods-provider</module>
         <module>order-consumer</module>
     </modules>
     <name>oomall</name>

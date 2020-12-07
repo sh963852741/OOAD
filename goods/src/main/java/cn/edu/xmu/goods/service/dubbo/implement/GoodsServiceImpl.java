@@ -2,15 +2,17 @@ package cn.edu.xmu.goods.service.dubbo.implement;
 
 
 import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.xmu.edu.goods.client.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goods.client.dubbo.OrderItem;
-import cn.xmu.edu.goods.client.dubbo.Shop;
+import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
+import cn.xmu.edu.goods.client.dubbo.ShopDTO;
 import cn.xmu.edu.goods.client.dubbo.Sku;
+import cn.xmu.edu.goods.client.dubbo.SpuDTO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @DubboService(version = "0.0.1-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
@@ -42,26 +43,26 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public Map<Shop, List<OrderItem>> classifySku(List<OrderItem> orderItems) {
-        Map<Long,List<OrderItem>> temp = new HashMap<Long,List<OrderItem>>();
-        for(OrderItem orderItem : orderItems){
-            ReturnObject<Long> ret = goodsService.getShopIdBySkuId(orderItem.getId());
+    public Map<ShopDTO, List<OrderItemDTO>> classifySku(List<OrderItemDTO> orderItemDTOS) {
+        Map<Long,List<OrderItemDTO>> temp = new HashMap<Long,List<OrderItemDTO>>();
+        for(OrderItemDTO orderItemDTO : orderItemDTOS){
+            ReturnObject<Long> ret = goodsService.getShopIdBySkuId(orderItemDTO.getId());
             if(ret.getCode() != ResponseCode.OK){
                 return null;
             }
             Long shopId = ret.getData();
             if(temp.containsKey(ret.getData())){
-                temp.get(shopId).add(orderItem);
+                temp.get(shopId).add(orderItemDTO);
             }else{
-                List<OrderItem> orderItemList=new ArrayList<>();
-                orderItemList.add(orderItem);
-                temp.put(shopId,orderItemList);
+                List<OrderItemDTO> orderItemDTOList =new ArrayList<>();
+                orderItemDTOList.add(orderItemDTO);
+                temp.put(shopId, orderItemDTOList);
             }
         }
-        Map<Shop,List<OrderItem>> ret = new HashMap<>();
-        for (Map.Entry<Long, List<OrderItem>> entry : temp.entrySet()) {
-            Shop shop = new Shop(entry.getKey());
-            ret.put(shop,entry.getValue());
+        Map<ShopDTO,List<OrderItemDTO>> ret = new HashMap<>();
+        for (Map.Entry<Long, List<OrderItemDTO>> entry : temp.entrySet()) {
+            ShopDTO shopDTO = new ShopDTO(entry.getKey());
+            ret.put(shopDTO,entry.getValue());
         }
         return ret;
     }
@@ -88,6 +89,16 @@ public class GoodsServiceImpl implements IGoodsService {
         sku.setDetail(skuPo.getDetail());
         sku.setGoodsSpuId(skuPo.getGoodsSpuId());
         return sku;
+    }
+
+    @Override
+    public SpuDTO getSimpleSpuById(Long spuId) {
+        return null;
+    }
+
+    @Override
+    public Long getShopIdBySkuId(long skuId) {
+        return null;
     }
 
 

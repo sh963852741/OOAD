@@ -4,7 +4,7 @@ import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.xmu.edu.goods.client.IInventoryService;
-import cn.xmu.edu.goods.client.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,15 +18,15 @@ public class InventoryServiceImpl implements IInventoryService {
     private GoodsService goodsService;
 
     @Override
-    public List<OrderItem> modifyInventory(List<OrderItem> orderItems) {
-        List<OrderItem> retData = new ArrayList<>();
-        if(orderItems == null || orderItems.size() <= 0){
+    public List<OrderItemDTO> modifyInventory(List<OrderItemDTO> orderItemDTOS) {
+        List<OrderItemDTO> retData = new ArrayList<>();
+        if(orderItemDTOS == null || orderItemDTOS.size() <= 0){
             return  retData;
         }
-        for(OrderItem orderItem : orderItems){
-            ReturnObject ret=goodsService.changSkuInventory(orderItem.getSkuId(),orderItem.getQuantity());
+        for(OrderItemDTO orderItemDTO : orderItemDTOS){
+            ReturnObject ret=goodsService.changSkuInventory(orderItemDTO.getSkuId(), orderItemDTO.getQuantity());
             if(ret.getCode() == ResponseCode.OK){
-                retData.add(orderItem);
+                retData.add(orderItemDTO);
             }
         }
         return retData;

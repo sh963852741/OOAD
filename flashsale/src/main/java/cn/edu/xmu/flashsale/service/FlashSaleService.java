@@ -24,8 +24,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import cn.xmu.edu.goods.client.IGoodsService;
 
 /**
  * @author Ming Qiu
@@ -44,16 +47,21 @@ public class FlashSaleService implements InitializingBean {
     private RedisTemplate<String, Serializable> redisTemplate;
 
     @Autowired
+    IGoodsService goodsService;
+    @Autowired
     ITimeSegmentService timeSegmentService;
     @Autowired
     FlashSaleDao flashSaleDao;
 
-    public Flux<FlashSaleItem> getFlashSale(Long segId) {
-        return reactiveRedisTemplate.opsForSet().members("1").map(x -> (FlashSaleItem) x);
+    public Flux<FlashSaleItem> getFlashSale(Long timeSegId) {
+        return reactiveRedisTemplate.opsForSet()
+                .members("FlashSale" + LocalDate.now().toString())
+                .map(x -> (FlashSaleItem) x);
     }
 
+    /* 加载今日秒杀，不允许同时加载 */
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public synchronized void afterPropertiesSet() throws Exception {
         List<TimeSegment> timeSegments = timeSegmentService.getFlashSaleSegments();
 
         List<TimeSegment> timeSegmentsForToday = new ArrayList<>();
@@ -84,6 +92,9 @@ public class FlashSaleService implements InitializingBean {
             String key ="FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString();
             redisTemplate.boundHashOps(key).put(flashSalePo.getTimeSegId(), flashSaleItemPos);
         }
+
+        String key ="FlashSale" + LocalDate.now().toString();
+        redisTemplate.expire(key,24, TimeUnit.HOURS);
     }
 }
 

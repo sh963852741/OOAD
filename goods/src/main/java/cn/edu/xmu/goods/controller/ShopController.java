@@ -120,7 +120,7 @@ public class ShopController {
         if(shopService.getShopByShopId(id).getData().getState()==7)
         {
             ReturnObject ret=shopService.passShop(id,conclusion);
-            return Shop.decorateReturnObject(ret);
+            return Common.decorateReturnObject(ret);
         }
         else
         {
@@ -160,7 +160,7 @@ public class ShopController {
         if(shopService.getShopByShopId(id).getData().getState()==4)
         {
             ReturnObject ret=shopService.offShelfShop(id);
-            return Shop.decorateReturnObject(ret);
+            return Common.decorateReturnObject(ret);
         }
         else return Common.decorateReturnObject(new ReturnObject(ResponseCode.OFFLINESHOP_ERROR));
     }

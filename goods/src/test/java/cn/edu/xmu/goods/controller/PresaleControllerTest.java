@@ -39,6 +39,7 @@ public class PresaleControllerTest {
     }
 
     @Test
+    //正确
     public void addPresaleActivity1() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
@@ -74,6 +75,7 @@ public class PresaleControllerTest {
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
+    //无名称
     public void addPresaleActivity2() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
@@ -92,6 +94,7 @@ public class PresaleControllerTest {
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
+    //开始时间早于当前时间
     public void addPresaleActivity3() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.minusHours(1);
@@ -110,6 +113,7 @@ public class PresaleControllerTest {
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
+    //结束时间早于当前时间
     public void addPresaleActivity4() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
@@ -128,6 +132,7 @@ public class PresaleControllerTest {
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
+    //尾款支付时间早于当前时间
     public void addPresaleActivity5() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
@@ -146,6 +151,7 @@ public class PresaleControllerTest {
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
+    //尾款是负数
     public void addPresaleActivity6() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
@@ -164,7 +170,7 @@ public class PresaleControllerTest {
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
-    //测试错误
+    //测试错误！指定的sku不存在（错误码应为操作的资源不存在）
     public void addPresaleActivity7() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
@@ -183,7 +189,7 @@ public class PresaleControllerTest {
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
-    //测试错误
+    //测试错误！ 指定的sku不是本商铺的sku（错误码应为对自己店铺外资源操作）
     public void addPresaleActivity8() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
@@ -217,7 +223,7 @@ public class PresaleControllerTest {
     }
 
     @Test
-    public void modifyPresaleActivity()throws Exception{
+    public void modifyPresaleActivity1()throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(2);
         LocalDateTime payTime = time.plusHours(3);
@@ -236,7 +242,46 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
     }
+    @Test
+    public void modifyPresaleActivity2()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
 
+        String request="{ \"name\": \"\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(put("/presale/shops/0/presales/1")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", adminToken));
+        String responseString = response.andExpect((status().isBadRequest()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andExpect(jsonPath("$.errmsg").value("must not be blank;"))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andReturn().getResponse().getContentAsString();
+    }
+    @Test
+    public void modifyPresaleActivity3()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        String request="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        ResultActions response = mvc.perform(put("/presale/shops/0/presales/1")
+                .contentType("application/json;charset=UTF-8").content(request)
+                .header("authorization", adminToken));
+        String responseString = response.andExpect((status().isOk()))
+                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andExpect(jsonPath("$.errmsg").value("成功"))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andReturn().getResponse().getContentAsString();
+    }
     @Test
     public void delPresaleActivity(){
 

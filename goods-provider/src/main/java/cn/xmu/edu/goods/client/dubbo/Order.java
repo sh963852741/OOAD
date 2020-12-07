@@ -19,7 +19,7 @@ public class Order {
 
 	private Long id;
 	private Customer customer;
-	private Shop shop;
+	private ShopDTO shopDTO;
 	private String orderSn;
 	private List<Order> subOrders;
 	private Long pid;
@@ -43,20 +43,20 @@ public class Order {
 	private Integer state;
 	private Integer subState;
 	private Integer beDeleted;
-	private List<OrderItem> orderItems;
+	private List<OrderItemDTO> orderItemDTOS;
 	private LocalDateTime gmtCreated;
 	private LocalDateTime gmtModified;
 
 
-	public Order createAndAddSubOrder(Shop shop, List<OrderItem> orderItems) {
+	public Order createAndAddSubOrder(ShopDTO shopDTO, List<OrderItemDTO> orderItemDTOS) {
 		Order subOrder = new Order();
 
 		subOrder.customer = this.customer;
 
-		subOrder.shop = shop;
+		subOrder.shopDTO = shopDTO;
 
-		subOrder.orderItems = new ArrayList<>();
-		subOrder.orderItems.addAll(orderItems);
+		subOrder.orderItemDTOS = new ArrayList<>();
+		subOrder.orderItemDTOS.addAll(orderItemDTOS);
 
 		subOrder.consignee = this.consignee;
 		subOrder.regionId = this.regionId;
@@ -80,7 +80,7 @@ public class Order {
 	public void calcAndSetSubOrdersOriginPrice() {
 		for (Order subOrder : getSubOrders()) {
 			long price = 0L;
-			for (OrderItem oi : subOrder.getOrderItems()) {
+			for (OrderItemDTO oi : subOrder.getOrderItemDTOS()) {
 				price += oi.getQuantity() * oi.getPrice();
 			}
 			subOrder.setOriginPrice(price);

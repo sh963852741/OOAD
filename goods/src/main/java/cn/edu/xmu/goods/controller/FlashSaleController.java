@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
  * @author Yifei Wang
  * Modified at 2020/11/14 22:48
  **/
+@Deprecated
 @Api(value = "秒杀服务", tags = "flashsale")
 @RestController /*Restful的Controller对象*/
 @RequestMapping(value = "/flashsale", produces = "application/json;charset=UTF-8")
