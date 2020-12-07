@@ -1,12 +1,14 @@
-package cn.edu.xmu.goods.service.dubbo;
+package cn.xmu.edu.goods.client;
 
-import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
+
+
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
 
 import java.util.List;
 
 /**
- * @author xincong yao
- * @date 2020-11-17
+ * @Author: Yifei Wang
+ * @Date: 2020/12/6 10:48
  */
 public interface IInventoryService {
 

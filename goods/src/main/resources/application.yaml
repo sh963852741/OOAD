@@ -58,6 +58,11 @@ goodsservice:
     username: oomall
     password: 123465
     baseUrl: http://localhost:8088/web/
+brandservice:
+  webdav:
+    username: oomall
+    password: 123465
+    baseUrl: http://localhost:8088/web/
 
 mybatis:
   # 将包中的类添加为类型别名

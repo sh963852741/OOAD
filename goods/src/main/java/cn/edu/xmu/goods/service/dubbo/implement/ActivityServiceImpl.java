@@ -3,12 +3,12 @@ package cn.edu.xmu.goods.service.dubbo.implement;
 import cn.edu.xmu.goods.dao.CouponActivityDao;
 import cn.edu.xmu.goods.dao.CouponDao;
 import cn.edu.xmu.goods.model.bo.Coupon;
-import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
 import cn.edu.xmu.goods.model.po.CouponPo;
 import cn.edu.xmu.goods.model.po.CouponSPUPo;
-import cn.edu.xmu.goods.service.dubbo.IActivityService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goods.client.IActivityService;
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,6 +23,7 @@ public class ActivityServiceImpl implements IActivityService {
     @Autowired
     CouponDao couponDao;
 
+    @Override
     public Map<Long, Long> validateActivity(List<OrderItem> orderItems, Long couponId){
         // 考虑增加HashMap以进行优惠券和活动的对应
         CouponPo couponPo = couponDao.getCoupon(couponId);
@@ -49,6 +50,7 @@ public class ActivityServiceImpl implements IActivityService {
 
         return map;
     }
+
 
     /**
      * 使用指定ID的优惠券，订单模块调用

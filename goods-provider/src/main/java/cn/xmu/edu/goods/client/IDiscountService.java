@@ -1,14 +1,15 @@
-package cn.edu.xmu.goods.service.dubbo;
+package cn.xmu.edu.goods.client;
 
-import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
+
+
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
- * @author xincong yao
- * @date 2020-11-17
+ * @Author: Yifei Wang
+ * @Date: 2020/12/6 10:49
  */
 public interface IDiscountService {
 

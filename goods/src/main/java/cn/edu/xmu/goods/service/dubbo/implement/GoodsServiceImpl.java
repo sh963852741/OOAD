@@ -1,13 +1,16 @@
 package cn.edu.xmu.goods.service.dubbo.implement;
 
-import cn.edu.xmu.goods.model.bo.dubbo.OrderItem;
-import cn.edu.xmu.goods.model.bo.dubbo.Shop;
+
+import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
-import cn.edu.xmu.goods.service.ShopService;
-import cn.edu.xmu.goods.service.dubbo.IGoodsService;
+import cn.xmu.edu.goods.client.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goods.client.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.dubbo.Shop;
+import cn.xmu.edu.goods.client.dubbo.Sku;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,10 +24,10 @@ import java.util.Map;
 public class GoodsServiceImpl implements IGoodsService {
 
     @Autowired
-    private ShopService shopService;
+    private GoodsService goodsService;
 
     @Autowired
-    private GoodsService goodsService;
+    private GoodsDao goodsDao;
 
     @Override
     public Long getPrice(Long skuId) {
@@ -64,21 +67,28 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public Shop getShop(Long skuId) {
-        if(skuId == null){
-            return new Shop();
+    public Sku getSku(Long skuId) {
+        ReturnObject<SKUPo> skuRet=goodsDao.getSkuById(skuId);
+        if(skuRet.getCode()!=ResponseCode.OK){
+            return new Sku();
         }
-        ReturnObject shopIdRet=goodsService.getShopIdBySkuId(skuId);
-        if(shopIdRet.getCode() != ResponseCode.OK){
-            return new Shop();
-        }
-        Long shopId=(Long)shopIdRet.getData();
-        ReturnObject shopRet=shopService.getShopByShopId(shopId);
-        if(shopRet.getCode() != ResponseCode.OK){
-            return new Shop();
-        }
-        cn.edu.xmu.goods.model.bo.Shop shop=(cn.edu.xmu.goods.model.bo.Shop) shopRet.getData();
-        Shop shopData=new Shop(shop.getId(),shop.getName(),shop.getGmtCreated().toString(),shop.getGmtModified().toString());
-        return shopData;
+        Sku sku=new Sku();
+        SKUPo skuPo=skuRet.getData();
+        sku.setConfiguration(skuPo.getConfiguration());
+        sku.setDisable(skuPo.getDisabled());
+        sku.setId(skuPo.getId());
+        sku.setImageUrl(skuPo.getImageUrl());
+        sku.setInventory(skuPo.getInventory());
+        sku.setName(skuPo.getName());
+        sku.setOriginalPrice(skuPo.getOriginalPrice());
+        sku.setSkuSn(skuPo.getSkuSn());
+        sku.setWeight(skuPo.getWeight());
+        sku.setGmtCreate(skuPo.getGmtCreate());
+        sku.setGmtModified(skuPo.getGmtModified());
+        sku.setDetail(skuPo.getDetail());
+        sku.setGoodsSpuId(skuPo.getGoodsSpuId());
+        return sku;
     }
+
+
 }
