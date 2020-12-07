@@ -1,9 +1,9 @@
-package cn.edu.xmu.goods.dao;
+package cn.edu.xmu.activity.dao;
 
-import cn.edu.xmu.goods.mapper.CouponPoMapper;
-import cn.edu.xmu.goods.model.bo.Coupon;
-import cn.edu.xmu.goods.model.po.CouponPo;
-import cn.edu.xmu.goods.model.po.CouponPoExample;
+import cn.edu.xmu.activity.mapper.CouponPoMapper;
+import cn.edu.xmu.activity.model.bo.Coupon;
+import cn.edu.xmu.activity.model.po.CouponPo;
+import cn.edu.xmu.activity.model.po.CouponPoExample;
 import cn.edu.xmu.ooad.util.Common;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;

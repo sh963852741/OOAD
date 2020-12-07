@@ -33,7 +33,7 @@ public class CommentDao {
     SKUPoMapper skuPoMapper;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(CouponActivityDao.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommentDao.class);
 
     /**
      * 获取评论所有状态

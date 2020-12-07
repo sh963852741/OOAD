@@ -1,14 +1,14 @@
-package cn.edu.xmu.goods.service.dubbo.implement;
+package cn.edu.xmu.activity.service.dubbo;
 
-import cn.edu.xmu.goods.dao.CouponActivityDao;
-import cn.edu.xmu.goods.dao.CouponDao;
-import cn.edu.xmu.goods.model.bo.Coupon;
-import cn.edu.xmu.goods.model.po.CouponPo;
-import cn.edu.xmu.goods.model.po.CouponSPUPo;
+import cn.edu.xmu.activity.dao.CouponActivityDao;
+import cn.edu.xmu.activity.dao.CouponDao;
+import cn.edu.xmu.activity.model.bo.Coupon;
+import cn.edu.xmu.activity.model.po.CouponPo;
+import cn.edu.xmu.activity.model.po.CouponSPUPo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.xmu.edu.goods.client.IActivityService;
-import cn.xmu.edu.goods.client.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,7 +24,7 @@ public class ActivityServiceImpl implements IActivityService {
     CouponDao couponDao;
 
     @Override
-    public Map<Long, Long> validateActivity(List<OrderItem> orderItems, Long couponId){
+    public Map<Long, Long> validateActivity(List<OrderItemDTO> orderItemDTOS, Long couponId){
         // 考虑增加HashMap以进行优惠券和活动的对应
         CouponPo couponPo = couponDao.getCoupon(couponId);
         if(couponPo == null){
@@ -39,7 +39,7 @@ public class ActivityServiceImpl implements IActivityService {
             spuSet.add(couponSPUPo.getSpuId());
         }
 
-        for(OrderItem o:orderItems){
+        for(OrderItemDTO o: orderItemDTOS){
             if(spuSet.contains(o.getSkuId())){
                 map.put(o.getSkuId(), activityId);
             }else{

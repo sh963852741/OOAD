@@ -1,11 +1,11 @@
-package cn.edu.xmu.goods.dao;
+package cn.edu.xmu.activity.dao;
 
-import cn.edu.xmu.goods.mapper.GrouponActivityPoMapper;
-import cn.edu.xmu.goods.model.bo.GrouponActivity;
-import cn.edu.xmu.goods.model.bo.PresaleActivity;
-import cn.edu.xmu.goods.model.po.GrouponActivityPo;
-import cn.edu.xmu.goods.model.po.GrouponActivityPoExample;
-import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
+import cn.edu.xmu.activity.mapper.GrouponActivityPoMapper;
+import cn.edu.xmu.activity.model.bo.GrouponActivity;
+import cn.edu.xmu.activity.model.bo.PresaleActivity;
+import cn.edu.xmu.activity.model.po.GrouponActivityPo;
+import cn.edu.xmu.activity.model.po.GrouponActivityPoExample;
+import cn.edu.xmu.activity.model.vo.GrouponActivityVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -21,6 +21,10 @@ public class GrouponActivityDao {
 
     @Autowired
     GrouponActivityPoMapper grouponActivityPoMapper;
+
+    public GrouponActivityPo getActivityById(long id){
+        return grouponActivityPoMapper.selectByPrimaryKey(id);
+    }
 
     public PageInfo<GrouponActivityPo> getActivitiesBySPUId(int page, int pageSize, Long id, Byte timeline){
         PageHelper.startPage(page, pageSize);

@@ -1,12 +1,10 @@
-package cn.edu.xmu.goods.service;
+package cn.edu.xmu.activity.service;
 
-import cn.edu.xmu.goods.model.bo.CouponActivity;
-import cn.edu.xmu.goods.model.bo.GrouponActivity;
-import cn.edu.xmu.goods.model.po.PresaleActivityPo;
-import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
-import cn.edu.xmu.goods.model.vo.CouponActivityVo;
-import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
-import cn.edu.xmu.goods.model.vo.PresaleActivityVo;
+import cn.edu.xmu.activity.model.bo.CouponActivity;
+import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
+import cn.edu.xmu.activity.model.vo.CouponActivityVo;
+import cn.edu.xmu.activity.model.vo.GrouponActivityVo;
+import cn.edu.xmu.activity.model.vo.PresaleActivityVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -14,7 +12,6 @@ import com.github.pagehelper.PageInfo;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -54,8 +51,8 @@ class ActivityServiceTest {
 
         ReturnObject<PresaleActivityVo> ret = activityService.addPresaleActivity(vo, 647L, 1L);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertEquals(vo.getAdvancePayPrice(),ret.getData().getAdvancePayPrice());
-        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        Assertions.assertEquals(vo.getAdvancePayPrice(),ret.getData().getAdvancePayPrice());
+        Assertions.assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
         assertNotNull(ret.getData().getId());
         activityIdHash.put("runningPActivity", ret.getData().getId());
     }
@@ -101,8 +98,8 @@ class ActivityServiceTest {
 
         ReturnObject<PresaleActivityVo> ret = activityService.modifyPresaleActivity(activityIdHash.get("runningPActivity"), vo,1L);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertEquals(vo.getAdvancePayPrice(),ret.getData().getAdvancePayPrice());
-        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        Assertions.assertEquals(vo.getAdvancePayPrice(),ret.getData().getAdvancePayPrice());
+        Assertions.assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
         assertNotNull(ret.getData().getId());
     }
 
@@ -161,8 +158,8 @@ class ActivityServiceTest {
 
         ReturnObject<GrouponActivityVo> ret = activityService.addGrouponActivity(vo, 647L, 1L);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
-        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        Assertions.assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        Assertions.assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
         assertNotNull(ret.getData().getId());
         activityIdHash.put("runningGActivity", ret.getData().getId());
     }
@@ -180,8 +177,8 @@ class ActivityServiceTest {
 
         ReturnObject<GrouponActivityVo> ret = activityService.modifyGrouponActivity(activityIdHash.get("runningGActivity"), vo, 1L);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
-        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        Assertions.assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        Assertions.assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
         // assertNotNull(ret.getData().getId());
     }
 
@@ -229,10 +226,10 @@ class ActivityServiceTest {
 
         ReturnObject<CouponActivityVo> ret = activityService.addCouponActivity(vo, 1L);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
-        assertEquals(vo.getQuantity(),ret.getData().getQuantity());
-        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
-        assertEquals(vo.getQuantityType(),ret.getData().getQuantityType());
+        Assertions.assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        Assertions.assertEquals(vo.getQuantity(),ret.getData().getQuantity());
+        Assertions.assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        Assertions.assertEquals(vo.getQuantityType(),ret.getData().getQuantityType());
         assertNotNull(ret.getData().getId());
         activityIdHash.put("runningCActivity", ret.getData().getId());
     }
@@ -252,10 +249,10 @@ class ActivityServiceTest {
 
         ReturnObject<CouponActivityVo> ret = activityService.modifyCouponActivity(activityIdHash.get("runningCActivity"), vo, 647L);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertEquals(vo.getStrategy(),ret.getData().getStrategy());
-        assertEquals(vo.getQuantity(),ret.getData().getQuantity());
-        assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
-        assertEquals(vo.getQuantityType(),ret.getData().getQuantityType());
+        Assertions.assertEquals(vo.getStrategy(),ret.getData().getStrategy());
+        Assertions.assertEquals(vo.getQuantity(),ret.getData().getQuantity());
+        Assertions.assertEquals(vo.getBeginTime(),ret.getData().getBeginTime());
+        Assertions.assertEquals(vo.getQuantityType(),ret.getData().getQuantityType());
         // assertNotNull(ret.getData().getId());
     }
 

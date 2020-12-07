@@ -1,9 +1,9 @@
-package cn.edu.xmu.goods.dao;
+package cn.edu.xmu.activity.dao;
 
-import cn.edu.xmu.goods.mapper.PresaleActivityPoMapper;
-import cn.edu.xmu.goods.model.bo.PresaleActivity;
-import cn.edu.xmu.goods.model.po.PresaleActivityPo;
-import cn.edu.xmu.goods.model.po.PresaleActivityPoExample;
+import cn.edu.xmu.activity.mapper.PresaleActivityPoMapper;
+import cn.edu.xmu.activity.model.bo.PresaleActivity;
+import cn.edu.xmu.activity.model.po.PresaleActivityPo;
+import cn.edu.xmu.activity.model.po.PresaleActivityPoExample;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;

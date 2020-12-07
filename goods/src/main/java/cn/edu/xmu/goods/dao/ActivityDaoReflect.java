@@ -4,7 +4,7 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 
 import java.lang.reflect.Method;
-
+@Deprecated
 public class ActivityDaoReflect {
 
     public Object getActivityById(String name, Long id){

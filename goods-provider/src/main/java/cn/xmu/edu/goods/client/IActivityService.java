@@ -1,6 +1,6 @@
 package cn.xmu.edu.goods.client;
 
-import cn.xmu.edu.goods.client.dubbo.OrderItem;
+import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -14,11 +14,11 @@ public interface IActivityService {
 	/**
 	 * 校验sku是否适用与给定的优惠活动
 	 * 以及优惠卷是否可用
-	 * @param orderItems
+	 * @param orderItemDTOS
 	 * @param couponId
 	 * @return skuId到couponActivityId的映射
 	 */
-	Map<Long, Long> validateActivity(List<OrderItem> orderItems, Long couponId);
+	Map<Long, Long> validateActivity(List<OrderItemDTO> orderItemDTOS, Long couponId);
 
 	/**
 	 * 使用优惠卷

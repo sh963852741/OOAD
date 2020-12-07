@@ -4,20 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * @Author: Yifei Wang
  * @Date: 2020/12/6 10:48
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Shop {
+public class ShopDTO {
 	private Long id;
 	private String name;
-	private String gmtCreateTime;
-	private String gmtModiTime;
+	private LocalDateTime gmtCreateTime;
+	private LocalDateTime gmtModiTime;
 
-	public Shop(Long shopId) {
-		this.id = shopId;
+	public ShopDTO(Long id){
+		this.id =id;
 	}
 }

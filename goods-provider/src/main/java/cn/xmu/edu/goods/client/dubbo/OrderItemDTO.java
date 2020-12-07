@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderItem {
+public class OrderItemDTO {
 
 	private Long id;
 	private Long skuId;

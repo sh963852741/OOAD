@@ -1,8 +1,8 @@
-package cn.edu.xmu.goods.controller;
+package cn.edu.xmu.activity.controller;
 
-import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
-import cn.edu.xmu.goods.model.vo.GrouponActivityVo;
-import cn.edu.xmu.goods.service.ActivityService;
+import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
+import cn.edu.xmu.activity.model.vo.GrouponActivityVo;
+import cn.edu.xmu.activity.service.ActivityService;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;

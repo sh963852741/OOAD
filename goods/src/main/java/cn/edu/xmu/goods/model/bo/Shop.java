@@ -6,6 +6,7 @@ import cn.edu.xmu.goods.model.vo.ShopSimpleRetVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goods.client.dubbo.ShopDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -87,6 +88,15 @@ public class Shop implements VoObject {
         this.setGmtModified(shopPo.getGmtModified());
     }
 
+    public ShopDTO createDTO(){
+        ShopDTO dto = new ShopDTO();
+        dto.setId(id);
+        dto.setName(name);
+        dto.setGmtCreateTime(gmtCreated);
+        dto.setGmtModiTime(gmtModified);
+        return dto;
+    }
+
     public ShopPo createPo(){
         ShopPo shopPo=new ShopPo();
         shopPo.setId(this.getId());
@@ -95,36 +105,6 @@ public class Shop implements VoObject {
         shopPo.setGmtCreate(this.getGmtCreated());
         shopPo.setGmtModified(this.getGmtModified());
         return shopPo;
-    }
-
-    /**
-     * 根据 errCode 修饰 API 返回对象的 HTTP Status
-     * @param returnObject 原返回 Object
-     * @return 修饰后的返回 Object
-     */
-    public static Object decorateReturnObject(ReturnObject returnObject) {
-        switch (returnObject.getCode()) {
-            case RESOURCE_ID_NOTEXIST:
-                // 404：资源不存在
-                return new ResponseEntity(
-                        ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg()),
-                        HttpStatus.NOT_FOUND);
-            case INTERNAL_SERVER_ERR:
-                // 500：数据库或其他严重错误
-                return new ResponseEntity(
-                        ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg()),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            case OK:
-                // 200: 无错误
-                Object data = returnObject.getData();
-                if (data != null){
-                    return ResponseUtil.ok(data);
-                }else{
-                    return ResponseUtil.ok();
-                }
-            default:
-                return ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg());
-        }
     }
 
 }

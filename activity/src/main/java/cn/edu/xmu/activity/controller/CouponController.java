@@ -1,9 +1,9 @@
-package cn.edu.xmu.goods.controller;
+package cn.edu.xmu.activity.controller;
 
-import cn.edu.xmu.goods.model.bo.CouponActivity;
-import cn.edu.xmu.goods.model.vo.ActivityFinderVo;
-import cn.edu.xmu.goods.model.vo.CouponActivityVo;
-import cn.edu.xmu.goods.service.ActivityService;
+import cn.edu.xmu.activity.model.bo.CouponActivity;
+import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
+import cn.edu.xmu.activity.model.vo.CouponActivityVo;
+import cn.edu.xmu.activity.service.ActivityService;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
@@ -23,8 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import java.util.List;
-
-import static cn.edu.xmu.goods.utility.Common.getPageRetObjectWisely;
 
 @RestController
 @RequestMapping(value = "coupon", produces = "application/json;charset=UTF-8", consumes = "application/json;charset=UTF-8")
@@ -108,7 +106,7 @@ public class CouponController {
 
         ReturnObject ret = activityService.getCouponActivities(activityFinderVo);
 
-        return getPageRetObjectWisely(ret);
+        return Common.getListRetObject(ret);
     }
 
     /**

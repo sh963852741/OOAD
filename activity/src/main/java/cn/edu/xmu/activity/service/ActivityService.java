@@ -1,20 +1,24 @@
-package cn.edu.xmu.goods.service;
+package cn.edu.xmu.activity.service;
 
-import cn.edu.xmu.goods.dao.CouponActivityDao;
-import cn.edu.xmu.goods.dao.CouponDao;
-import cn.edu.xmu.goods.dao.GrouponActivityDao;
-import cn.edu.xmu.goods.dao.PresaleActivityDao;
-import cn.edu.xmu.goods.model.bo.*;
-import cn.edu.xmu.goods.model.po.*;
-import cn.edu.xmu.goods.model.vo.*;
+import cn.edu.xmu.activity.dao.CouponActivityDao;
+import cn.edu.xmu.activity.dao.CouponDao;
+import cn.edu.xmu.activity.dao.GrouponActivityDao;
+import cn.edu.xmu.activity.dao.PresaleActivityDao;
+import cn.edu.xmu.activity.model.bo.*;
+import cn.edu.xmu.activity.model.po.*;
+import cn.edu.xmu.activity.model.vo.*;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goods.client.IGoodsService;
+import cn.xmu.edu.goods.client.IShopService;
 import com.github.pagehelper.PageInfo;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import cn.xmu.edu.goods.client.dubbo.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,10 +35,10 @@ public class ActivityService {
     @Autowired
     CouponDao couponDao;
 
-    @Autowired
-    GoodsService goodsService;
-    @Autowired
-    ShopService shopService;
+    @DubboReference(version = "0.0.1-SNAPSHOT")
+    IGoodsService goodsService;
+    @DubboReference(version = "0.0.1-SNAPSHOT")
+    IShopService shopService;
 
     //region 预售活动部分
     public ReturnObject<PresaleActivity.PresaleStatus[]> getPresaleActivityStatus() {
@@ -50,7 +54,7 @@ public class ActivityService {
         List<PresaleActivityPo> presaleList;
         presaleList = presaleActivityDao.getAllActivityBySPUId(activityFinderVo.getTimeline(),activityFinderVo.getSpuId());
         List<PresaleActivityVo> retList = presaleList.stream().map(PresaleActivityVo::new).collect(Collectors.toList());
-        return new ReturnObject<List<PresaleActivityVo>>(retList);
+        return new ReturnObject<>(retList);
     }
 
     /**
@@ -67,9 +71,9 @@ public class ActivityService {
                 po = presaleActivityDao.getEffectiveActivities(
                         activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline());
             }
-            List<PresaleActivityVo> retList = po.getList().stream().map(e -> new PresaleActivityVo(e)).collect(Collectors.toList());
+            List<PresaleActivityVo> retList = po.getList().stream().map(PresaleActivityVo::new).collect(Collectors.toList());
 
-            PageInfo<PresaleActivityVo> ret = new PageInfo(retList);
+            PageInfo<PresaleActivityVo> ret = new PageInfo<>(retList);
             ret.setPageNum(po.getPageNum());
             ret.setPages(po.getPages());
             ret.setTotal(po.getTotal());
@@ -78,26 +82,26 @@ public class ActivityService {
 
     }
 
-    public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long spuId, Long shopId) {
+    public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long skuId, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
-        HashMap<String,Object> spuVo = goodsService.getSimpleSpuById(spuId).getData();
-        Shop shop = shopService.getShopByShopId(shopId).getData();
-        if(shop == null){
+        Long skuShopId = goodsService.getShopIdBySkuId(skuId);
+        ShopDTO shopDTO = shopService.getShop(shopId);
+        if(shopDTO == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在");
         }
-        if(spuVo == null){
+        if(skuShopId == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "对应的SPU不存在");
         }
-        if(!((Long)(spuVo.get("shopId"))).equals(shopId)){
+        if(!skuShopId.equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不允许使用其他店铺的SPU");
         }
 
-        if (presaleActivityDao.addActivity(po, spuId, shopId) == 1) {
+        if (presaleActivityDao.addActivity(po, skuId, shopId) == 1) {
             presaleActivityVo = new PresaleActivityVo(po);
-            spuVo.remove("shopId");
-            presaleActivityVo.goodsSpu = spuVo;
-            presaleActivityVo.shop.put("id", shop.getId());
-            presaleActivityVo.shop.put("name", shop.getName());
+//            spuVo.remove("shopId");
+//            presaleActivityVo.goodsSpu = spuVo;
+            presaleActivityVo.shop.put("id", shopDTO.getId());
+            presaleActivityVo.shop.put("name", shopDTO.getName());
 
             return new ReturnObject(presaleActivityVo);
         } else {
@@ -147,6 +151,12 @@ public class ActivityService {
         return new ReturnObject(GrouponActivity.GrouponStatus.values());
     }
 
+    /**
+     * 获取团购活动列表
+     * @param activityFinderVo
+     * @param all
+     * @return
+     */
     @Transactional
     public ReturnObject getGrouponActivities(ActivityFinderVo activityFinderVo, boolean all) {
         List<GrouponActivityPo> grouponList;
@@ -192,6 +202,12 @@ public class ActivityService {
         return new ReturnObject(info);
     }
 
+
+    /**
+     * 管理员获取团购活动列表
+     * @param vo
+     * @return
+     */
     public ReturnObject getGrouponActivitiesByAdmin(ActivityFinderVo vo){
         List<GrouponActivityPo> grouponList;
         PageInfo info;
@@ -202,50 +218,65 @@ public class ActivityService {
         return new ReturnObject(info);
     }
 
+    /**
+     * 管理员获取单个团购活动
+     * @param vo
+     * @return
+     */
     public ReturnObject getGrouponBySpuIdAdmin(ActivityFinderVo vo){
         List<GrouponActivity> grouponActivities;
         grouponActivities=grouponActivityDao.getAllGrouponsBySpuAmdin(vo.getSpuId(),vo.getShopId(),vo.getState());
         return new ReturnObject(grouponActivities);
     }
 
+    /**
+     * 新增团购活动
+     * @param grouponActivityVo
+     * @param spuId
+     * @param shopId
+     * @return
+     */
     public ReturnObject<GrouponActivityVo> addGrouponActivity(GrouponActivityVo grouponActivityVo, long spuId, long shopId) {
-        if(shopId!=0){
-            ReturnObject shopIdret=goodsService.getShopIdBySpuId(spuId);
-            if(shopIdret.getCode()!=ResponseCode.OK){
-                return shopIdret;
-            }
-            if(((Long)shopIdret.getData()).equals(shopId)){
-                return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
-            }
+        SpuDTO spuDTO = goodsService.getSimpleSpuById(spuId);
+        if (spuDTO == null ) {
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "指定的SPU不存在");
         }
+        if(spuDTO.getShopId().equals(shopId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "指定的SPU不属于当前商铺");
+        }
+
         GrouponActivityPo po = grouponActivityVo.createPo();
         if (grouponActivityDao.addActivity(po, spuId, shopId)) {
-            ReturnObject spuRet=goodsService.getSimpleSpuById(spuId);
-            Map<String,Object> spu = (Map<String, Object>)spuRet.getData();
-            ReturnObject shopRet = shopService.getShopByShopId(shopId);
+            ShopDTO shopDTO = shopService.getShop(shopId);
             Map<String,Object> shopMap=new HashMap<>();
-            if(shopRet.getCode()==ResponseCode.OK){
-                Shop shop=(Shop) shopRet.getData();
-                shopMap.put("id",shop.getId());
-                shopMap.put("name",shop.getName());
-            }
-            var vo=new GrouponActivityVo(po);
-            vo.setGoodsSpu(spu);
+            shopMap.put("id", shopDTO.getId());
+            shopMap.put("name", shopDTO.getName());
+            GrouponActivityVo vo = new GrouponActivityVo(po);
+            vo.setGoodsSpu(new SpuInActivityVo(spuDTO));
             vo.setShop(shopMap);
-            return new ReturnObject(vo);
+            return new ReturnObject<>(vo);
         } else {
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
+    /**
+     * 修改团购活动
+     * @param id
+     * @param grouponActivityVo
+     * @param shopId
+     * @return
+     */
     public ReturnObject<GrouponActivityVo> modifyGrouponActivity(Long id, GrouponActivityVo grouponActivityVo, long shopId) {
-        ReturnObject ret=goodsService.getShopIdBySpuId(id);
-        if(ret.getCode()!=ResponseCode.OK){
-            return ret;
+        GrouponActivityPo activityPo = grouponActivityDao.getActivityById(id);
+
+        if(activityPo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "团购活动不存在");
         }
-        if(!((Long)ret.getData()).equals(shopId)){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        if(!activityPo.getShopId().equals(shopId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不能修改其他的店铺的团购活动");
         }
+
         if (grouponActivityDao.updateActivity(grouponActivityVo.createPo(), id)) {
             return new ReturnObject(grouponActivityVo);
         } else {
@@ -253,18 +284,31 @@ public class ActivityService {
         }
     }
 
+    /**
+     * 删除团购活动
+     * @param id
+     * @param shopId
+     * @return
+     */
     public ReturnObject<?> delGrouponActivity(long id,long shopId) {
-        ReturnObject<Long> ret=goodsService.getShopIdBySpuId(id);
-        if(ret.getCode()!=ResponseCode.OK){
-            return ret;
+        GrouponActivityPo activityPo = grouponActivityDao.getActivityById(id);
+
+        if(activityPo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "活动不存在");
         }
-        if(!ret.getData().equals(shopId)){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        if(activityPo.getBeginTime().isBefore(LocalDateTime.now())){
+            return new ReturnObject<>(ResponseCode.GROUPON_STATENOTALLOW, "不能取消开始过的团购活动");
         }
-        if (grouponActivityDao.delActivity(id)) {
-            return new ReturnObject();
-        } else {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        if(!activityPo.getShopId().equals(shopId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "本活动不属于你的店铺");
+        }
+
+        GrouponActivityPo po = new GrouponActivityPo();
+        po.setState(GrouponActivity.GrouponStatus.CANCELED.getCode());
+        if(grouponActivityDao.updateActivity(po,id)){
+            return new ReturnObject<>();
+        }else{
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
         }
     }
     //endregion
@@ -279,17 +323,17 @@ public class ActivityService {
      */
     public ReturnObject<CouponActivityVo> getCouponActivity(long activityId, long shopId){
         CouponActivityPo activityPo = couponActivityDao.getActivityById(activityId);
-        Shop shop = shopService.getShopByShopId(shopId).getData();
-        if (activityPo == null || shop == null){
+        ShopDTO shopDTO = shopService.getShop(shopId);
+        if (activityPo == null || shopDTO == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "活动或对应店铺不存在");
         }
-        if(!activityPo.getShopId().equals(shop.getId())){
+        if(!activityPo.getShopId().equals(shopDTO.getId())){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "活动不是自己店铺的活动");
         }
 
         CouponActivityVo couponActivityVo = new CouponActivityVo(activityPo);
-        couponActivityVo.shop.put("id", shop.getId());
-        couponActivityVo.shop.put("name", shop.getName());
+        couponActivityVo.shop.put("id", shopDTO.getId());
+        couponActivityVo.shop.put("name", shopDTO.getName());
 
         return new ReturnObject<CouponActivityVo>(couponActivityVo);
     }
@@ -402,11 +446,11 @@ public class ActivityService {
      */
     public ReturnObject addSPUToCouponActivity(List<Long> spuIds, long shopId, long activityId){
         for(Long spuId:spuIds){
-            var spu = goodsService.getSpuById(spuId).getData();
+            SpuDTO spu = goodsService.getSimpleSpuById(spuId);
             if(spu == null){
                 return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
             }
-            if((long)spu.getShop().get("id")!= shopId) {
+            if(!spu.getShopId().equals(shopId)) {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
             }
 
@@ -448,7 +492,7 @@ public class ActivityService {
     }
 
     /**
-     * 获取优惠活动中的SPU
+     * 获取优惠活动中的SKU
      * @param activityId
      * @param page
      * @param pageSize
@@ -456,18 +500,18 @@ public class ActivityService {
      */
     public ReturnObject getSPUInCouponActivity(long activityId,int page,int pageSize){
         PageInfo<CouponSPUPo> couponSPUPoPageInfo = couponActivityDao.getSPUsInActivity(activityId, page, pageSize);
-        List<HashMap<String,Object>> simpleSpuList = new ArrayList();
+        List<HashMap<String,Object>> simpleSkuList = new ArrayList();
         for(CouponSPUPo couponSPUPo:couponSPUPoPageInfo.getList()){
-            ReturnObject<SpuRetVo> ret = goodsService.getSpuById(couponSPUPo.getId());
-            HashMap<String,Object> hm = new HashMap<String,Object>(){
+            Sku sku = goodsService.getSku(couponSPUPo.getId());
+            HashMap<String,Object> hm = new HashMap<>(){
                 {
-                    put("id", ret.getData().getId());
-                    put("name", ret.getData().getName());
+                    put("id", sku.getId());
+                    put("name", sku.getName());
                 }
             };
-            simpleSpuList.add(hm);
+            simpleSkuList.add(hm);
         }
-        PageInfo<HashMap<String,Object>> ret = new PageInfo<>(simpleSpuList);
+        PageInfo<HashMap<String,Object>> ret = new PageInfo<>(simpleSkuList);
         ret.setPageNum(couponSPUPoPageInfo.getPageNum());
         ret.setPages(couponSPUPoPageInfo.getPages());
         ret.setTotal(couponSPUPoPageInfo.getTotal());
