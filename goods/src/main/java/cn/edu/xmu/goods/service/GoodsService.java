@@ -396,7 +396,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.DELETE.getCode().byteValue());
-        spu.setState(Spu.State.DELETE.getCode().byteValue());
+//        spu.setState(Spu.State.DELETE.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -422,7 +422,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.NORM.getCode().byteValue());
-        spu.setState(Spu.State.NORM.getCode().byteValue());
+//        spu.setState(Spu.State.NORM.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -448,7 +448,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
-        spu.setState(Spu.State.OFFSHELF.getCode().byteValue());
+//        spu.setState(Spu.State.OFFSHELF.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }

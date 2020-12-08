@@ -82,7 +82,7 @@ public class Spu {
 
     private String imageUrl;
 
-    private Byte state;
+//    private Byte state;
 
     private String spec;
 
@@ -102,11 +102,11 @@ public class Spu {
         this.setGoodsSn(po.getGoodsSn());
         this.setDetail(po.getDetail());
         this.setImageUrl(po.getImageUrl());
-        this.setState(po.getState());
+//        this.setState(po.getState());
         this.setSpec(po.getSpec());
         this.setGmtCreate(po.getGmtCreate());
         this.setGmtModified(po.getGmtModified());
-        this.setDisabled(po.getState());
+//        this.setDisabled(po.getState());
     }
 
     public SPUPo createPo(){
@@ -120,11 +120,11 @@ public class Spu {
         po.setGoodsSn(this.getGoodsSn());
         po.setDetail(this.getDetail());
         po.setImageUrl(this.getImageUrl());
-        po.setState(this.getState());
+//        po.setState(this.getState());
         po.setSpec(this.getSpec());
         po.setGmtCreate(this.getGmtCreate());
         po.setGmtModified(this.getGmtModified());
-        po.setDisabled(this.getState());
+//        po.setDisabled(this.getState());
         return po;
     }
 
@@ -138,7 +138,7 @@ public class Spu {
         vo.setName(this.getName());
         vo.setGmtCreate(this.getGmtCreate());
         vo.setGmtModified(this.getGmtModified());
-        vo.setState(this.getState());
+//        vo.setState(this.getState());
         vo.setSpec(this.getSpec());
         vo.setBrand(this.getSimpleBrandVo());
         vo.setCategory(this.getSimpleCategory());
@@ -154,7 +154,7 @@ public class Spu {
         simple.put("name",this.getName());
         simple.put("goodsSn",this.getGoodsSn());
         simple.put("imageUrl",this.getImageUrl());
-        simple.put("state",this.getState());
+//        simple.put("state",this.getState());
         simple.put("gmtCreate",this.getGmtCreate());
         simple.put("gmtModified",this.getGmtModified());
         simple.put("disable",this.getDisabled());

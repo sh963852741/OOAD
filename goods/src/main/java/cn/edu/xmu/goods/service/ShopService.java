@@ -33,6 +33,12 @@ public class ShopService {
      * @Date: 2020/11/29 23:21
      */
     public ReturnObject<Shop> getShopByShopId(Long ShopId){
+        if(ShopId.equals(0L)){
+            Shop shop = new Shop();
+            shop.setId(0L);
+            shop.setName("平台管理员");
+            return new ReturnObject<>(shop);
+        }
         return shopDao.getShopById(ShopId);
     }
 

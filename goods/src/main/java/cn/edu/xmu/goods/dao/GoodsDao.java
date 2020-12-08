@@ -361,7 +361,7 @@ public class GoodsDao {
             po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
-            po.setState(Spu.State.OFFSHELF.getCode().byteValue());
+//            po.setState(Spu.State.OFFSHELF.getCode().byteValue());
             po.setGoodsSn(UUID.randomUUID().toString());
             ret=spuPoMapper.insertSelective(po);
             if(ret==0){
