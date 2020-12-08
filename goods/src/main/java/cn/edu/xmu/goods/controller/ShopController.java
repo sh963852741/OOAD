@@ -4,6 +4,8 @@ import ch.qos.logback.classic.Logger;
 import cn.edu.xmu.goods.model.vo.ShopConclusionVo;
 import cn.edu.xmu.goods.model.vo.ShopVo;
 import cn.edu.xmu.goods.service.ShopService;
+import cn.edu.xmu.ooad.annotation.Audit;
+import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -60,15 +62,15 @@ public class ShopController {
             @ApiResponse(code = 908, message = "用户已经有店铺"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops")
-    public Object addShop(@RequestBody @Validated ShopVo shopvo, BindingResult bindingResult){
+    @Audit
+    public Object addShop(@Depart Long did, @RequestBody @Validated ShopVo shopvo, BindingResult bindingResult){
         Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
         if (null != obj) {
             return obj;
         }
-        else{
-            ReturnObject ret=shopService.newShop(shopvo);
-            return Common.decorateReturnObject(ret);
-        }
+
+        ReturnObject ret=shopService.newShop(shopvo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -168,6 +170,7 @@ public class ShopController {
             @ApiImplicitParam(name = "authorization", value = "adminToken", required = true, dataType = "String", paramType = "header")
     })
     @PutMapping(value = "/shops/{id}/onshelves")
+    @Audit
     public Object shopsIdOnshelvesPut(@PathVariable("id") long id){
         ReturnObject ret=shopService.onShelfShop(id);
         return Common.decorateReturnObject(ret);
