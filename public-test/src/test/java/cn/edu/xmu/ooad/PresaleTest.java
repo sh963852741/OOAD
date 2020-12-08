@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,7 +49,9 @@ public class PresaleTest {
         String requireJson = "{ \"name\": \"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/privileges/login").bodyValue(requireJson);
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/spus/290/presales")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -72,5 +75,11 @@ public class PresaleTest {
                 .jsonPath("$.data.shop.name").isEqualTo("张三商铺")
                 .returnResult()
                 .getResponseBodyContent();
+
+        try {
+            String response = new String(responseBuffer, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }

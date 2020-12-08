@@ -1,15 +1,14 @@
 package cn.edu.xmu.goods.controller;
 
 import ch.qos.logback.classic.Logger;
-import cn.edu.xmu.goods.model.bo.Shop;
-import cn.edu.xmu.goods.model.vo.*;
+import cn.edu.xmu.goods.model.vo.ShopConclusionVo;
+import cn.edu.xmu.goods.model.vo.ShopVo;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +60,7 @@ public class ShopController {
             @ApiResponse(code = 908, message = "用户已经有店铺"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops")
-    public Object addShop(@RequestBody @Validated ShopVo shopvo,BindingResult bindingResult){
+    public Object addShop(@RequestBody @Validated ShopVo shopvo, BindingResult bindingResult){
         Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
         if (null != obj) {
             return obj;

@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.mapper;
 
 import cn.edu.xmu.goods.model.po.CommentPo;
 import cn.edu.xmu.goods.model.po.CommentPoExample;
+
 import java.util.List;
 
 public interface CommentPoMapper {

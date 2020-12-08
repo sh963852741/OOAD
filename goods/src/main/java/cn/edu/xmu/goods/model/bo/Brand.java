@@ -1,9 +1,9 @@
 package cn.edu.xmu.goods.model.bo;
+import cn.edu.xmu.goods.model.po.BrandPo;
 import cn.edu.xmu.goods.model.vo.BrandRetVo;
 import cn.edu.xmu.goods.model.vo.BrandSimpleRetVo;
 import cn.edu.xmu.goods.model.vo.BrandVo;
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.goods.model.po.BrandPo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

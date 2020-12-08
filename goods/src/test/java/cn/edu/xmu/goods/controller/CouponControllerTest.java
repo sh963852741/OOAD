@@ -2,7 +2,6 @@ package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.bo.Coupon;
 import cn.edu.xmu.goods.model.bo.CouponActivity;
-import cn.edu.xmu.goods.model.bo.PresaleActivity;
 import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,7 +14,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

@@ -1,10 +1,10 @@
 package cn.edu.xmu.goods.dao;
 
 import cn.edu.xmu.goods.mapper.BrandPoMapper;
-import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.goods.model.bo.Brand;
 import cn.edu.xmu.goods.model.po.BrandPo;
 import cn.edu.xmu.goods.model.po.BrandPoExample;
+import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.goods.model.bo.Brand;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageHelper;

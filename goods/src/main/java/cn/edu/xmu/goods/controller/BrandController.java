@@ -1,8 +1,7 @@
 package cn.edu.xmu.goods.controller;
 
-import cn.edu.xmu.goods.model.bo.Brand;
 import cn.edu.xmu.goods.model.vo.BrandVo;
-import cn.edu.xmu.ooad.annotation.Audit;
+import cn.edu.xmu.goods.model.bo.Brand;
 import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
@@ -22,9 +21,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/", produces = "application/json;charset=UTF-8")

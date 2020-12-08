@@ -1,4 +1,4 @@
-package cn.xmu.edu.goods.client.dubbo;
+package cn.edu.xmu.goods.client.dubbo;
 
 
 import lombok.AllArgsConstructor;

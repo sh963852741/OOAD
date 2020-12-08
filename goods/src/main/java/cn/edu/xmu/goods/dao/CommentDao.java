@@ -2,10 +2,10 @@ package cn.edu.xmu.goods.dao;
 
 import cn.edu.xmu.goods.mapper.CommentPoMapper;
 import cn.edu.xmu.goods.mapper.SKUPoMapper;
-import cn.edu.xmu.goods.model.bo.Comment;
 import cn.edu.xmu.goods.model.po.CommentPo;
-import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.CommentPoExample;
+import cn.edu.xmu.goods.model.bo.Comment;
+import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.CommentRetVo;
 import cn.edu.xmu.goods.model.vo.CommentSelectRetVo;
 import org.slf4j.Logger;

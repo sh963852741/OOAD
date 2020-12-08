@@ -4,16 +4,16 @@ import cn.edu.xmu.goods.mapper.CategoryPoMapper;
 import cn.edu.xmu.goods.mapper.FloatPricePoMapper;
 import cn.edu.xmu.goods.mapper.SKUPoMapper;
 import cn.edu.xmu.goods.mapper.SPUPoMapper;
+import cn.edu.xmu.goods.model.vo.SkuSelectVo;
 import cn.edu.xmu.goods.model.bo.FloatPrice;
 import cn.edu.xmu.goods.model.bo.Good;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.*;
+import cn.xmu.edu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.FloatPriceRetVo;
 import cn.edu.xmu.goods.model.vo.SkuSelectReturnVo;
-import cn.edu.xmu.goods.model.vo.SkuSelectVo;
 import cn.edu.xmu.goods.model.vo.SkuSimpleRetVo;
-import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageHelper;
@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -91,7 +90,7 @@ public class GoodsDao {
      * @Author: Yifei Wang
      * @Date: 2020/11/25 21:03
      */
-    public ReturnObject getAllSkus(SkuSelectVo vo,Integer page,Integer pageSize){
+    public ReturnObject getAllSkus(SkuSelectVo vo, Integer page, Integer pageSize){
         SKUPoExample example =new SKUPoExample();
         SKUPoExample.Criteria criteria=example.createCriteria();
         if(null!=vo.getSkuSn() && !"".equals(vo.getSkuSn())){
@@ -366,7 +365,7 @@ public class GoodsDao {
             po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
             po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
-            po.setState(Spu.State.OFFSHELF.getCode().byteValue());
+//            po.setState(Spu.State.OFFSHELF.getCode().byteValue());
             po.setGoodsSn(UUID.randomUUID().toString());
             ret=spuPoMapper.insertSelective(po);
             if(ret==0){
