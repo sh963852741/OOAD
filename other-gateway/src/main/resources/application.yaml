@@ -21,7 +21,7 @@ spring:
         - id: presale
           uri: http://localhost:8988/
           predicates:
-            - Path=/presales/states,/presales,/shops/{shopId}/skus/{id}/presales,/shops/{shopId}/presales/{id}
+            - Path=/presales/states,/presales,/shops/{shopId}/spus/{id}/presales,/shops/{shopId}/presales/{id}
           filters:
             - PrefixPath=/presale
 
