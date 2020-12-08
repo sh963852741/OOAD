@@ -18,12 +18,6 @@
 			<groupId>cn.edu.xmu.ooad</groupId>
 			<artifactId>core</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>cn.edu.xmu</groupId>
-			<artifactId>goods-provider</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

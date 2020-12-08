@@ -94,6 +94,7 @@ public class Shop implements VoObject {
         dto.setName(name);
         dto.setGmtCreateTime(gmtCreated);
         dto.setGmtModiTime(gmtModified);
+        dto.setState(state);
         return dto;
     }
 

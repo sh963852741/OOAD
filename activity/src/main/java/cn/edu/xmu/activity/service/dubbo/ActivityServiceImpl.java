@@ -80,4 +80,14 @@ public class ActivityServiceImpl implements IActivityService {
             return false;
         }
     }
+
+    @Override
+    public Long getGrouponId(Long skuId) {
+        return null;
+    }
+
+    @Override
+    public Long getPreSale(Long skuId) {
+        return null;
+    }
 }

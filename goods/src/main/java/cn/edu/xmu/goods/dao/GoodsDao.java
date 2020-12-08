@@ -123,6 +123,7 @@ public class GoodsDao {
                 criteria1.andBeginTimeLessThanOrEqualTo(LocalDateTime.now());
                 criteria1.andEndTimeGreaterThan(LocalDateTime.now());
                 criteria1.andGoodsSkuIdEqualTo(po.getId());
+                criteria1.andValidEqualTo(FloatPrice.State.NORM.getCode().byteValue());
                 List<FloatPricePo> pricePos=floatPricePoMapper.selectByExample(example1);
 
                 if(pricePos.size()==0){
@@ -235,7 +236,11 @@ public class GoodsDao {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         Sku sku=new Sku(skuPo);
-
+        ReturnObject<Long> priceRet = getActivityPrice(id);
+        if(priceRet.getCode() != ResponseCode.OK){
+            sku.setPrice(sku.getOriginalPrice());
+        }
+        sku.setPrice(priceRet.getData());
         return new ReturnObject<>(sku);
     }
 
@@ -470,5 +475,35 @@ public class GoodsDao {
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
         }
     }
+
+    /**
+     * 功能描述: 获取生效的浮动价格
+     * @Param: [skuId]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/8 16:55
+     */
+    public ReturnObject getActivityPrice(Long skuId){
+        FloatPricePoExample example = new FloatPricePoExample();
+        FloatPricePoExample.Criteria criteria = example.createCriteria();
+        criteria.andGoodsSkuIdEqualTo(skuId);
+        criteria.andBeginTimeLessThanOrEqualTo(LocalDateTime.now());
+        criteria.andEndTimeGreaterThan(LocalDateTime.now());
+        criteria.andValidEqualTo(FloatPrice.State.NORM.getCode().byteValue());
+        try{
+            List<FloatPricePo> floatPricePoList = floatPricePoMapper.selectByExample(example);
+            if(floatPricePoList == null || floatPricePoList.size()==0){
+                SKUPo po = skuPoMapper.selectByPrimaryKey(skuId);
+                if(po == null){
+                    return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+                }
+                return new ReturnObject(po.getOriginalPrice());
+            }
+            return new ReturnObject(floatPricePoList.get(0).getActivityPrice());
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
 
 }

@@ -516,6 +516,24 @@ public class GoodsService {
     }
 
     /**
+     * 功能描述: 获取当前生效的浮动价格
+     * @Param: [skuId]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/8 16:56
+     */
+    public ReturnObject getActicityPrice(Long skuId){
+        if(skuId == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        ReturnObject ret = goodsDao.getActivityPrice(skuId);
+        if(ret.getCode() != ResponseCode.OK){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        return ret;
+    }
+
+    /**
      * 功能描述: 将spu加入分类
      * @Param: [shopId, spuId, id]
      * @Return: cn.edu.xmu.ooad.util.ReturnObject

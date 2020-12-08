@@ -40,6 +40,8 @@ public interface IGoodsService {
 	 */
 	SkuDTO getSku(Long skuId);
 
+	SkuDTO getSimpleSku(Long skuId);
+
 	/**
 	 * 根据SPU ID返回SPU的DTO
 	 * @param spuId

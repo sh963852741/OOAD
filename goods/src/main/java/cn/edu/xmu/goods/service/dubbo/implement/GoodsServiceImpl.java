@@ -3,6 +3,7 @@ package cn.edu.xmu.goods.service.dubbo.implement;
 
 import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.bo.Shop;
+import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
@@ -41,15 +42,18 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
-        ReturnObject<SkuRetVo> ret = goodsService.getSkuDetails(skuId);
-        if(ret.getCode()!= ResponseCode.OK){
+        ReturnObject<Long> ret = goodsService.getActicityPrice(skuId);
+        if(ret.getCode() != ResponseCode.OK){
             return null;
         }
-        return ret.getData().getOriginalPrice();
+        return ret.getData();
     }
 
     @Override
     public Map<ShopDTO, List<OrderItemDTO>> classifySku(List<OrderItemDTO> orderItemDTOS) {
+        if(orderItemDTOS == null){
+            return null;
+        }
         Map<Long,List<OrderItemDTO>> temp = new HashMap<Long,List<OrderItemDTO>>();
         for(OrderItemDTO orderItemDTO : orderItemDTOS){
             ReturnObject<Long> ret = goodsService.getShopIdBySkuId(orderItemDTO.getId());
@@ -75,30 +79,53 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Override
     public SkuDTO getSku(Long skuId) {
-        ReturnObject<SKUPo> skuRet=goodsDao.getSkuById(skuId);
+        if(skuId == null){
+            return null;
+        }
+        ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
             return new SkuDTO();
         }
         SkuDTO skuDTO =new SkuDTO();
-        SKUPo skuPo=skuRet.getData();
-        skuDTO.setConfiguration(skuPo.getConfiguration());
-        skuDTO.setDisable(skuPo.getDisabled());
-        skuDTO.setId(skuPo.getId());
-        skuDTO.setImageUrl(skuPo.getImageUrl());
-        skuDTO.setInventory(skuPo.getInventory());
-        skuDTO.setName(skuPo.getName());
-        skuDTO.setOriginalPrice(skuPo.getOriginalPrice());
-        skuDTO.setSkuSn(skuPo.getSkuSn());
-        skuDTO.setWeight(skuPo.getWeight());
-        skuDTO.setGmtCreate(skuPo.getGmtCreate());
-        skuDTO.setGmtModified(skuPo.getGmtModified());
-        skuDTO.setDetail(skuPo.getDetail());
-        skuDTO.setGoodsSpuId(skuPo.getGoodsSpuId());
+        Sku sku=skuRet.getData();
+        skuDTO.setConfiguration(sku.getConfiguration());
+        skuDTO.setDisable(sku.getDisable());
+        skuDTO.setId(sku.getId());
+        skuDTO.setImageUrl(sku.getImageUrl());
+        skuDTO.setInventory(sku.getInventory());
+        skuDTO.setName(sku.getName());
+        skuDTO.setOriginalPrice(sku.getOriginalPrice());
+        skuDTO.setSkuSn(sku.getSkuSn());
+        skuDTO.setWeight(sku.getWeight());
+        skuDTO.setGmtCreate(sku.getGmtCreate());
+        skuDTO.setGmtModified(sku.getGmtModified());
+        skuDTO.setDetail(sku.getDetail());
+        skuDTO.setGoodsSpuId(sku.getGoodsSpuId());
+        skuDTO.setPrice(sku.getPrice());
+        return skuDTO;
+    }
+
+    @Override
+    public SkuDTO getSimpleSku(Long skuId) {
+        if(skuId == null){
+            return null;
+        }
+        ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
+        if(skuRet.getCode()!=ResponseCode.OK){
+            return new SkuDTO();
+        }
+        SkuDTO skuDTO =new SkuDTO();
+        Sku sku=skuRet.getData();
+        skuDTO.setName(sku.getName());
+        skuDTO.setPrice(sku.getPrice());
         return skuDTO;
     }
 
     @Override
     public SpuDTO getSimpleSpuById(Long spuId) {
+        if(spuId == null){
+            return null;
+        }
        ReturnObject<HashMap<String,Object>> ret = goodsService.getSimpleSpuById(spuId);
        if(ret.getCode() != ResponseCode.OK){
            return null;

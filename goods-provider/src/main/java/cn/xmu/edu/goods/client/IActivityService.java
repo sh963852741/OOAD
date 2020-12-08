@@ -26,4 +26,18 @@ public interface IActivityService {
 	 * @return
 	 */
 	Boolean useCoupon(Long couponId);
+
+	/**
+	 * 功能描述: 根据skuId获取团购活动id
+	 * @Param: skuId
+	 * @Return:不存在返回null
+	 */
+	Long getGrouponId(Long skuId);
+
+	/**
+	 * 功能描述: 根据skuId 获取预售活动id
+	 * @Param: [skuId]
+	 * @Return: 不存在返回null
+	 */
+	Long getPreSale(Long skuId);
 }
