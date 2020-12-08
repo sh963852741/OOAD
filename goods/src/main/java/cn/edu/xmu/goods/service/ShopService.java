@@ -3,7 +3,7 @@ package cn.edu.xmu.goods.service;
 import cn.edu.xmu.goods.dao.ShopDao;
 import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.ShopPo;
-import cn.xmu.edu.goods.model.vo.*;
+import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.model.vo.*;

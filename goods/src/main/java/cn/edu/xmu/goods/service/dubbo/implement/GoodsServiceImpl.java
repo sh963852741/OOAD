@@ -5,6 +5,7 @@ import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.po.SKUPo;
+import cn.edu.xmu.goods.model.bo.*;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
