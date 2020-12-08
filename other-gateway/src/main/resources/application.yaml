@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: other-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - HEAD
+              - OPTIONS
+      routes:
+        - id: presale
+          uri: http://localhost:8988/
+          predicates:
+            - Path=/presales/states,/presales,/shops/{shopId}/skus/{id}/presales,/shops/{shopId}/presales/{id}
+          filters:
+            - PrefixPath=/presale
+
+#        - id: adminusers
+#          uri: http://localhost:9999/
+#          predicates:
+#            - Path=/users
+#            - Method=GET
+#          filters:
+#            - Auth=authorization
+management:
+  endpoint:
+    gateway:
+      enabled: true

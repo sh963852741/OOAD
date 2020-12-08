@@ -94,14 +94,8 @@ public class ShopController {
         }
         else
         {
-            if(shopVo.getState()!=null)
-            {
-                return new ReturnObject(ResponseCode.ABNORMAL_MODIFY);
-            }
-            else{
-                ReturnObject ret=shopService.updateShop(id,shopVo);
-                return Common.decorateReturnObject(ret);
-            }
+            ReturnObject ret=shopService.updateShop(id,shopVo);
+            return Common.decorateReturnObject(ret);
         }
     }
 

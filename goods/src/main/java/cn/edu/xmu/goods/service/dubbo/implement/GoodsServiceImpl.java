@@ -119,11 +119,13 @@ public class GoodsServiceImpl implements IGoodsService {
             return null;
         }
         ReturnObject<Long> shopIdRet = goodsService.getShopIdBySkuId(skuId);
+        log.debug("shopIdRet:" + shopIdRet.getData());
         if(shopIdRet.getCode() != ResponseCode.OK){
             return null;
         }
         Long shopId=shopIdRet.getData();
         ReturnObject<Shop> shopRet = shopService.getShopByShopId(shopId);
+        log.debug("shopRet:" + shopRet.getData());
         if(shopRet.getCode() != ResponseCode.OK){
             return null;
         }
