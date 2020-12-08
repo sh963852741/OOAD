@@ -1,21 +1,17 @@
 package cn.edu.xmu.goods.service;
 
 import cn.edu.xmu.goods.dao.ShopDao;
-import cn.edu.xmu.goods.model.bo.Comment;
 import cn.edu.xmu.goods.model.bo.Shop;
-import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.ShopPo;
-import cn.edu.xmu.goods.model.vo.ShopRetVo;
-import cn.edu.xmu.goods.model.vo.ShopVo;
-import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.model.vo.*;
-import org.apache.dubbo.config.annotation.DubboService;
+import cn.edu.xmu.goods.model.vo.ShopRetVo;
+import cn.edu.xmu.goods.model.vo.ShopVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -33,6 +29,12 @@ public class ShopService {
      * @Date: 2020/11/29 23:21
      */
     public ReturnObject<Shop> getShopByShopId(Long ShopId){
+        if(ShopId.equals(0L)){
+            Shop shop = new Shop();
+            shop.setId(0L);
+            shop.setName("平台管理员");
+            return new ReturnObject<>(shop);
+        }
         return shopDao.getShopById(ShopId);
     }
 
@@ -99,7 +101,7 @@ public class ShopService {
      * @Author: Lei YangLong
      * @Date: 2020/12/1 20:36
      */
-    public ReturnObject passShop(Long id,ShopConclusionVo conclusion) {
+    public ReturnObject passShop(Long id, ShopConclusionVo conclusion) {
         Shop shop=new Shop();
         shop.setId(id.longValue());
         shop.setState(conclusion.getConclusion()==true? Shop.State.OFFLINE.getCode().byteValue() : Shop.State.NOTPASS.getCode().byteValue());

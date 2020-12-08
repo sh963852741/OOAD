@@ -7,8 +7,8 @@ import cn.edu.xmu.activity.model.po.CouponPo;
 import cn.edu.xmu.activity.model.po.CouponSPUPo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goods.client.IActivityService;
-import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
+import cn.edu.xmu.goods.client.IActivityService;
+import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -79,5 +79,15 @@ public class ActivityServiceImpl implements IActivityService {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public Long getGrouponId(Long skuId) {
+        return null;
+    }
+
+    @Override
+    public Long getPreSale(Long skuId) {
+        return null;
     }
 }

@@ -1,6 +1,6 @@
 package cn.edu.xmu.activity.model.vo;
 
-import cn.xmu.edu.goods.client.dubbo.SpuDTO;
+import cn.edu.xmu.goods.client.dubbo.SpuDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;

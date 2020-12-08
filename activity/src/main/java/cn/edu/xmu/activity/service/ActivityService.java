@@ -7,18 +7,20 @@ import cn.edu.xmu.activity.dao.PresaleActivityDao;
 import cn.edu.xmu.activity.model.bo.*;
 import cn.edu.xmu.activity.model.po.*;
 import cn.edu.xmu.activity.model.vo.*;
+import cn.edu.xmu.goods.client.dubbo.ShopDTO;
+import cn.edu.xmu.goods.client.dubbo.SkuDTO;
+import cn.edu.xmu.goods.client.dubbo.SpuDTO;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goods.client.IGoodsService;
-import cn.xmu.edu.goods.client.IShopService;
+import cn.edu.xmu.goods.client.IGoodsService;
+import cn.edu.xmu.goods.client.IShopService;
 import com.github.pagehelper.PageInfo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import cn.xmu.edu.goods.client.dubbo.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -84,15 +86,16 @@ public class ActivityService {
 
     public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long skuId, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
-        Long skuShopId = goodsService.getShopIdBySkuId(skuId);
-        ShopDTO shopDTO = shopService.getShop(shopId);
+//        SkuDTO skuDTO = goodsService.getSku(skuId);
+        ShopDTO shopDTO = goodsService.getShopBySKUId(skuId);
+
         if(shopDTO == null){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在");
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺或商品不存在");
         }
-        if(skuShopId == null){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "对应的SPU不存在");
-        }
-        if(!skuShopId.equals(shopId)){
+//        if(skuShopId == null){
+//            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "对应的SPU不存在");
+//        }
+        if(!shopDTO.getId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不允许使用其他店铺的SPU");
         }
 
@@ -247,7 +250,7 @@ public class ActivityService {
 
         GrouponActivityPo po = grouponActivityVo.createPo();
         if (grouponActivityDao.addActivity(po, spuId, shopId)) {
-            ShopDTO shopDTO = shopService.getShop(shopId);
+            ShopDTO shopDTO = shopService.getShopById(shopId);
             Map<String,Object> shopMap=new HashMap<>();
             shopMap.put("id", shopDTO.getId());
             shopMap.put("name", shopDTO.getName());
@@ -323,7 +326,7 @@ public class ActivityService {
      */
     public ReturnObject<CouponActivityVo> getCouponActivity(long activityId, long shopId){
         CouponActivityPo activityPo = couponActivityDao.getActivityById(activityId);
-        ShopDTO shopDTO = shopService.getShop(shopId);
+        ShopDTO shopDTO = shopService.getShopById(shopId);
         if (activityPo == null || shopDTO == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "活动或对应店铺不存在");
         }
@@ -502,11 +505,11 @@ public class ActivityService {
         PageInfo<CouponSPUPo> couponSPUPoPageInfo = couponActivityDao.getSPUsInActivity(activityId, page, pageSize);
         List<HashMap<String,Object>> simpleSkuList = new ArrayList();
         for(CouponSPUPo couponSPUPo:couponSPUPoPageInfo.getList()){
-            Sku sku = goodsService.getSku(couponSPUPo.getId());
+            SkuDTO skuDTO = goodsService.getSku(couponSPUPo.getId());
             HashMap<String,Object> hm = new HashMap<>(){
                 {
-                    put("id", sku.getId());
-                    put("name", sku.getName());
+                    put("id", skuDTO.getId());
+                    put("name", skuDTO.getName());
                 }
             };
             simpleSkuList.add(hm);

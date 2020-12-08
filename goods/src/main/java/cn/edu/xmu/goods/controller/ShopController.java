@@ -1,13 +1,16 @@
 package cn.edu.xmu.goods.controller;
 
-import cn.edu.xmu.goods.model.bo.Shop;
-import cn.edu.xmu.goods.model.vo.*;
+import ch.qos.logback.classic.Logger;
+import cn.edu.xmu.goods.model.vo.ShopConclusionVo;
+import cn.edu.xmu.goods.model.vo.ShopVo;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +30,8 @@ public class ShopController {
 
     @Autowired
     private ShopService shopService;
+    private Logger logger;
+
     /**
      * 获得店铺的所有状态
      * @param
@@ -50,14 +55,20 @@ public class ShopController {
      * createdBy Yifei Wang 2020/11/17 21:37
      */
     @ApiOperation(value = "店家申请店铺", nickname = "addShop", notes = "", tags={ "shop", })
-    @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header")
+    @ApiImplicitParam(name = "authorization", value = "shopToken", required = true, dataType = "String", paramType = "header")
     @ApiResponses(value = {
             @ApiResponse(code = 908, message = "用户已经有店铺"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops")
-    public Object addShop(@RequestBody ShopVo shopvo){
-        ReturnObject ret=shopService.newShop(shopvo);
-        return Common.decorateReturnObject(ret);
+    public Object addShop(@RequestBody @Validated ShopVo shopvo, BindingResult bindingResult){
+        Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if (null != obj) {
+            return obj;
+        }
+        else{
+            ReturnObject ret=shopService.newShop(shopvo);
+            return Common.decorateReturnObject(ret);
+        }
     }
 
     /**
@@ -68,16 +79,23 @@ public class ShopController {
      */
     @ApiOperation(value = "店家修改店铺信息", nickname = "modifyShop", notes = "", tags={ "shop", })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header"),
+            @ApiImplicitParam(name = "authorization", value = "shopToken", required = true, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "id", value = "商店id", required = true, dataType = "Long", paramType = "path")
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 140, message = "该店铺无法修改")})
     @PutMapping(value = "/shops/{id}")
-    public Object modifyShop(@PathVariable Long id,@RequestBody ShopVo shopVo){
-        ReturnObject ret=shopService.updateShop(id,shopVo);
-        return Common.decorateReturnObject(ret);
+    public Object modifyShop(@PathVariable Long id,@RequestBody @Validated ShopVo shopVo,BindingResult bindingResult){
+        Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if (null != obj) {
+            return obj;
+        }
+        else
+        {
+            ReturnObject ret=shopService.updateShop(id,shopVo);
+            return Common.decorateReturnObject(ret);
+        }
     }
 
     /**
@@ -90,6 +108,10 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") ,
             @ApiResponse(code = 180, message = "该店铺无法被执行关闭操作")
+    })
+    @ApiImplicitParams({
+            //不太对，要两个都用这个
+            @ApiImplicitParam(name = "authorization", value = "shopToken", required = true, dataType = "String", paramType = "header")
     })
     @DeleteMapping(value = "/shops/{id}")
     public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
@@ -115,8 +137,11 @@ public class ShopController {
             @ApiResponse(code = 200, message = "成功") ,
             @ApiResponse(code = 150, message = "该店铺不是待审核状态")
     })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization", value = "adminToken", required = true, dataType = "String", paramType = "header")
+    })
     @PutMapping(value = "/shops/{shopId}/newshops/{id}/audit")
-    public Object shopsShopIdNewshopsIdAuditPut(@PathVariable("shopId") Long shopId,@ApiParam(value = "新店 ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )   @RequestBody ShopConclusionVo conclusion){
+    public Object auditShop(@PathVariable("shopId") Long shopId,@ApiParam(value = "新店 ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )   @RequestBody ShopConclusionVo conclusion){
         if(shopService.getShopByShopId(id).getData().getState()==7)
         {
             ReturnObject ret=shopService.passShop(id,conclusion);
@@ -139,6 +164,9 @@ public class ShopController {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 160, message = "该店铺无法上线")
     })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization", value = "adminToken", required = true, dataType = "String", paramType = "header")
+    })
     @PutMapping(value = "/shops/{id}/onshelves")
     public Object shopsIdOnshelvesPut(@PathVariable("id") long id){
         ReturnObject ret=shopService.onShelfShop(id);
@@ -155,6 +183,9 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 170, message = "该店铺无法下线")})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization", value = "adminToken", required = true, dataType = "String", paramType = "header")
+    })
     @PutMapping(value = "/shops/{id}/offshelves")
     public Object shopsIdOffshelvesPut(@PathVariable("id") long id){
         if(shopService.getShopByShopId(id).getData().getState()==4)

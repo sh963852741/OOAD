@@ -1,6 +1,5 @@
 package cn.edu.xmu.goods.model.bo;
 
-import cn.edu.xmu.ooad.util.JacksonUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

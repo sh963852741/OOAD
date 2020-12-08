@@ -4,14 +4,10 @@ import cn.edu.xmu.goods.model.po.ShopPo;
 import cn.edu.xmu.goods.model.vo.ShopRetVo;
 import cn.edu.xmu.goods.model.vo.ShopSimpleRetVo;
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.ooad.util.ResponseUtil;
-import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goods.client.dubbo.ShopDTO;
+import cn.edu.xmu.goods.client.dubbo.ShopDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -94,6 +90,7 @@ public class Shop implements VoObject {
         dto.setName(name);
         dto.setGmtCreateTime(gmtCreated);
         dto.setGmtModiTime(gmtModified);
+        dto.setState(state);
         return dto;
     }
 

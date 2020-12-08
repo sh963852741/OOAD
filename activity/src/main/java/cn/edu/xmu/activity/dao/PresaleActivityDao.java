@@ -21,7 +21,7 @@ public class PresaleActivityDao {
     public List<PresaleActivityPo> getAllActivityBySPUId(byte state, long spuId){
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSpuIdEqualTo(spuId);
+        criteria.andGoodsSkuIdEqualTo(spuId);
         criteria.andStateEqualTo(state);
 
         return presaleActivityPoMapper.selectByExample(example);
@@ -39,7 +39,7 @@ public class PresaleActivityDao {
 
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSpuIdEqualTo(spuId);
+        criteria.andGoodsSkuIdEqualTo(spuId);
 
         if(timeline != null) {
             if (timeline == 0) {
@@ -112,7 +112,7 @@ public class PresaleActivityDao {
     }
 
     public int addActivity(PresaleActivityPo po, long skuId, long shopId){
-        po.setGoodsSpuId(skuId);
+        po.setGoodsSkuId(skuId);
         po.setShopId(shopId);
         po.setGmtCreate(LocalDateTime.now());
         po.setState(PresaleActivity.PresaleStatus.NEW.getCode());

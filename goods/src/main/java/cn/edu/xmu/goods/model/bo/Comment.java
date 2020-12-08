@@ -1,9 +1,8 @@
 package cn.edu.xmu.goods.model.bo;
 
 import cn.edu.xmu.goods.model.po.CommentPo;
-import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.goods.model.vo.CommentRetVo;
-import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.ooad.model.VoObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

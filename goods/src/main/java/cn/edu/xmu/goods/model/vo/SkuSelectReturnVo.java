@@ -1,7 +1,6 @@
 package cn.edu.xmu.goods.model.vo;
 
 
-import cn.edu.xmu.ooad.model.VoObject;
 import lombok.Data;
 
 import java.util.ArrayList;

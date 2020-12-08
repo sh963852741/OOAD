@@ -1,27 +1,15 @@
 package cn.edu.xmu.goods.model.vo;
 
-import cn.edu.xmu.goods.model.po.CouponActivityPo;
-import cn.edu.xmu.goods.utility.Common;
 import cn.edu.xmu.goods.utility.MyDeserializer;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cn.edu.xmu.goods.model.po.CouponActivityPo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.micrometer.core.instrument.util.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 

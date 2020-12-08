@@ -9,7 +9,6 @@ import cn.edu.xmu.goods.model.bo.Category;
 import cn.edu.xmu.goods.model.bo.FloatPrice;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
-import cn.edu.xmu.goods.model.po.CategoryPo;
 import cn.edu.xmu.goods.model.po.FloatPricePo;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.SPUPo;
@@ -18,6 +17,7 @@ import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.goods.model.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,7 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/26 16:35
      */
-    public ReturnObject getAllSkus(SkuSelectVo vo,Integer page,Integer pageSize){
+    public ReturnObject getAllSkus(SkuSelectVo vo, Integer page, Integer pageSize){
         return goodsDao.getAllSkus(vo, page, pageSize);
     }
 
@@ -396,7 +396,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.DELETE.getCode().byteValue());
-        spu.setState(Spu.State.DELETE.getCode().byteValue());
+//        spu.setState(Spu.State.DELETE.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -422,7 +422,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.NORM.getCode().byteValue());
-        spu.setState(Spu.State.NORM.getCode().byteValue());
+//        spu.setState(Spu.State.NORM.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -448,7 +448,7 @@ public class GoodsService {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
-        spu.setState(Spu.State.OFFSHELF.getCode().byteValue());
+//        spu.setState(Spu.State.OFFSHELF.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -512,6 +512,24 @@ public class GoodsService {
         price.setValid(FloatPrice.State.VALID.getCode().byteValue());
         price.setInvalidBy(userId);
         ReturnObject ret=goodsDao.updateFloatPrice(price);
+        return ret;
+    }
+
+    /**
+     * 功能描述: 获取当前生效的浮动价格
+     * @Param: [skuId]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/8 16:56
+     */
+    public ReturnObject getActicityPrice(Long skuId){
+        if(skuId == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        ReturnObject ret = goodsDao.getActivityPrice(skuId);
+        if(ret.getCode() != ResponseCode.OK){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         return ret;
     }
 
