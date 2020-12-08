@@ -1,4 +1,4 @@
-package cn.edu.xmu.goods.service.dubbo;
+package cn.xmu.edu.goods.client;
 
 /**
  * @author xincong yao
