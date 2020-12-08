@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
+import ch.qos.logback.classic.Logger;
 import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.service.ShopService;
@@ -8,6 +9,9 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +31,8 @@ public class ShopController {
 
     @Autowired
     private ShopService shopService;
+    private Logger logger;
+
     /**
      * 获得店铺的所有状态
      * @param
@@ -55,9 +61,15 @@ public class ShopController {
             @ApiResponse(code = 908, message = "用户已经有店铺"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops")
-    public Object addShop(@RequestBody ShopVo shopvo){
-        ReturnObject ret=shopService.newShop(shopvo);
-        return Common.decorateReturnObject(ret);
+    public Object addShop(@RequestBody @Validated ShopVo shopvo,BindingResult bindingResult){
+        Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if (null != obj) {
+            return obj;
+        }
+        else{
+            ReturnObject ret=shopService.newShop(shopvo);
+            return Common.decorateReturnObject(ret);
+        }
     }
 
     /**
@@ -75,9 +87,22 @@ public class ShopController {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 140, message = "该店铺无法修改")})
     @PutMapping(value = "/shops/{id}")
-    public Object modifyShop(@PathVariable Long id,@RequestBody ShopVo shopVo){
-        ReturnObject ret=shopService.updateShop(id,shopVo);
-        return Common.decorateReturnObject(ret);
+    public Object modifyShop(@PathVariable Long id,@RequestBody @Validated ShopVo shopVo,BindingResult bindingResult){
+        Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if (null != obj) {
+            return obj;
+        }
+        else
+        {
+            if(shopVo.getState()!=null)
+            {
+                return new ReturnObject(ResponseCode.ABNORMAL_MODIFY);
+            }
+            else{
+                ReturnObject ret=shopService.updateShop(id,shopVo);
+                return Common.decorateReturnObject(ret);
+            }
+        }
     }
 
     /**
