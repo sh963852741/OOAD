@@ -28,4 +28,13 @@ public class MockTimeService implements ITimeSegmentService {
 
         return list;
     }
+
+    @Override
+    public TimeSegment getTimeSegmentById(long id) {
+        TimeSegment timeSegment = new TimeSegment();
+        timeSegment.setId(1L);
+        timeSegment.setStartTime(LocalTime.MIDNIGHT);
+        timeSegment.setEndTime(LocalTime.NOON);
+        return timeSegment;
+    }
 }

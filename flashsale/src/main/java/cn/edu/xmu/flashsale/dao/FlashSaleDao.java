@@ -43,6 +43,14 @@ public class FlashSaleDao {
         return flashSalePoMapper.updateByPrimaryKeySelective(po);
     }
 
+    public int delFlashSaleItemByFlashSaleId(long flashSaleId){
+        FlashSaleItemPoExample example = new FlashSaleItemPoExample();
+        FlashSaleItemPoExample.Criteria criteria = example.createCriteria();
+        criteria.andSaleIdEqualTo(flashSaleId);
+
+        return flashSaleItemPoMapper.deleteByExample(example);
+    }
+
     public int addFlashSaleItem(FlashSaleItemPo po){
         return flashSaleItemPoMapper.insert(po);
     }

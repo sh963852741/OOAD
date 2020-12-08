@@ -55,7 +55,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("timesegments/{id}/flashsales")
-    public Object creatFlashsale(@PathVariable long id, @RequestBody String flashDate){
+    public Object createFlashSale(@PathVariable long id, @RequestBody String flashDate){
         return null;
     }
 
