@@ -27,12 +27,12 @@ public class GoodsControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @BeforeAll
-    private static void login(){
-        JwtHelper jwtHelper = new JwtHelper();
-        adminToken =jwtHelper.createToken(1L,0L, 3600);
-        shopToken =jwtHelper.createToken(59L,1L, 3600);
-    }
+//    @BeforeAll
+//    private static void login(){
+//        JwtHelper jwtHelper = new JwtHelper();
+//        adminToken =jwtHelper.createToken(1L,0L, 3600);
+//        shopToken =jwtHelper.createToken(59L,1L, 3600);
+//    }
 
 
     /**

@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.service.dubbo.implement;
 
 
 import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;

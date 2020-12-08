@@ -17,7 +17,7 @@ public class ShopDTO {
 	private String name;
 	private LocalDateTime gmtCreateTime;
 	private LocalDateTime gmtModiTime;
-
+	private Byte state;
 	public ShopDTO(Long id){
 		this.id =id;
 	}
