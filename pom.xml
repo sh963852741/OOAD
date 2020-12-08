@@ -21,6 +21,8 @@
         <module>flashsale</module>
         <module>goods-provider</module>
         <module>order-consumer</module>
+        <module>other-gateway</module>
+        <module>public-test</module>
     </modules>
     <name>oomall</name>
     <description>object oriented mall system</description>

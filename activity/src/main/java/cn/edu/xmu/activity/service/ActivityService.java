@@ -84,7 +84,9 @@ public class ActivityService {
 
     public ReturnObject<PresaleActivityVo> addPresaleActivity(PresaleActivityVo presaleActivityVo, Long skuId, Long shopId) {
         PresaleActivityPo po = presaleActivityVo.createPo();
+//        SkuDTO skuDTO = goodsService.getSku(skuId);
         ShopDTO shopDTO = goodsService.getShopBySKUId(skuId);
+
         if(shopDTO == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺或商品不存在");
         }
