@@ -1,9 +1,9 @@
 package cn.edu.xmu.goods.controller;
 
-import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
+/*import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.ooad.util.JacksonUtil;
-import net.minidev.json.JSONUtil;
+import net.minidev.json.JSONUtil;*/
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
