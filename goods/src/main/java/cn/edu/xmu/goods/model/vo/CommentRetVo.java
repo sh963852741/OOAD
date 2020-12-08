@@ -1,7 +1,6 @@
 package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.bo.Comment;
-import cn.edu.xmu.goods.model.po.CommentPo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

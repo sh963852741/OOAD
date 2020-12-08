@@ -2,12 +2,12 @@ package cn.edu.xmu.activity.service.dubbo;
 
 import cn.edu.xmu.activity.model.vo.CouponActivityVo;
 import cn.edu.xmu.activity.service.ActivityService;
+import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
 import cn.edu.xmu.ooad.order.bo.OrderItem;
 import cn.edu.xmu.ooad.order.discount.BaseCouponDiscount;
-import cn.xmu.edu.goods.client.dubbo.*;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.xmu.edu.goods.client.IDiscountService;
+import cn.edu.xmu.goods.client.IDiscountService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 

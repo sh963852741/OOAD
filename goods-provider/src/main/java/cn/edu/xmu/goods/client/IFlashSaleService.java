@@ -1,4 +1,4 @@
-package cn.xmu.edu.goods.client;
+package cn.edu.xmu.goods.client;
 
 /**
  * @author xincong yao

@@ -1,19 +1,11 @@
 package cn.edu.xmu.goods.controller;
 
-import cn.edu.xmu.goods.model.vo.CategoryVo;
 import cn.edu.xmu.goods.service.CategoryService;
-import cn.edu.xmu.ooad.annotation.Audit;
-import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/goods", produces = "application/json;charset=UTF-8")

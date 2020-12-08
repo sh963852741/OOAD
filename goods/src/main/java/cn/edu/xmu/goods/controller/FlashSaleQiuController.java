@@ -1,7 +1,6 @@
 package cn.edu.xmu.goods.controller;
 
 
-import cn.edu.xmu.goods.model.bo.FlashSaleItem;
 import cn.edu.xmu.goods.model.vo.FlashSaleItemRetVo;
 import cn.edu.xmu.goods.service.FlashSaleService;
 import io.swagger.annotations.Api;

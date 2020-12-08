@@ -1,23 +1,17 @@
 package cn.edu.xmu.goods.model.bo;
 
 
-import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuChangeVo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.model.vo.SkuSimpleRetVo;
-import cn.edu.xmu.goods.utility.SpringContextHelper;
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.ooad.util.ResponseCode;
-import cn.edu.xmu.ooad.util.ReturnObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
-import java.util.List;
 import java.time.LocalDateTime;
-import java.util.ListIterator;
 import java.util.Map;
 
 @Data

@@ -1,6 +1,6 @@
-package cn.xmu.edu.goods.client;
+package cn.edu.xmu.goods.client;
 
-import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
+import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
 
 import java.util.List;
 import java.util.Map;

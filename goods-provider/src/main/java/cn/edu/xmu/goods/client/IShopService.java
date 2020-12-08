@@ -1,7 +1,7 @@
-package cn.xmu.edu.goods.client;
+package cn.edu.xmu.goods.client;
 
 
-import cn.xmu.edu.goods.client.dubbo.ShopDTO;
+import cn.edu.xmu.goods.client.dubbo.ShopDTO;
 
 /**
  * @Author: Yifei Wang

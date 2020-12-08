@@ -1,11 +1,11 @@
-package cn.xmu.edu.goods.client;
+package cn.edu.xmu.goods.client;
 
 
 
-import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
-import cn.xmu.edu.goods.client.dubbo.ShopDTO;
-import cn.xmu.edu.goods.client.dubbo.SkuDTO;
-import cn.xmu.edu.goods.client.dubbo.SpuDTO;
+import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
+import cn.edu.xmu.goods.client.dubbo.ShopDTO;
+import cn.edu.xmu.goods.client.dubbo.SkuDTO;
+import cn.edu.xmu.goods.client.dubbo.SpuDTO;
 
 import java.util.List;
 import java.util.Map;

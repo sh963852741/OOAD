@@ -1,14 +1,10 @@
 package cn.edu.xmu.goods.dao;
 
-import cn.edu.xmu.goods.mapper.*;
-import cn.edu.xmu.goods.model.bo.*;
-import cn.edu.xmu.goods.model.po.CommentPo;
-import cn.edu.xmu.goods.model.po.SKUPo;
+import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.ShopPo;
-import cn.edu.xmu.goods.model.vo.ShopVo;
-import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.goods.mapper.ShopPoMapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

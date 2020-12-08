@@ -2,7 +2,6 @@ package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.po.CouponPo;
 import lombok.Data;
-import org.apache.tomcat.jni.Local;
 
 import java.time.LocalDateTime;
 

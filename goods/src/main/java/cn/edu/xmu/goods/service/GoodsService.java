@@ -9,7 +9,6 @@ import cn.edu.xmu.goods.model.bo.Category;
 import cn.edu.xmu.goods.model.bo.FloatPrice;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
-import cn.edu.xmu.goods.model.po.CategoryPo;
 import cn.edu.xmu.goods.model.po.FloatPricePo;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.SPUPo;
@@ -18,6 +17,7 @@ import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.xmu.edu.goods.model.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +82,7 @@ public class GoodsService {
      * @Author: Yifei Wang
      * @Date: 2020/11/26 16:35
      */
-    public ReturnObject getAllSkus(SkuSelectVo vo,Integer page,Integer pageSize){
+    public ReturnObject getAllSkus(SkuSelectVo vo, Integer page, Integer pageSize){
         return goodsDao.getAllSkus(vo, page, pageSize);
     }
 

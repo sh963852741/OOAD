@@ -7,8 +7,6 @@ import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
 import cn.edu.xmu.flashsale.model.po.FlashSalePo;
 import cn.edu.xmu.flashsale.service.dubbo.ITimeSegmentService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -21,14 +19,11 @@ import javax.annotation.Resource;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import cn.xmu.edu.goods.client.IGoodsService;
+import cn.edu.xmu.goods.client.IGoodsService;
 
 /**
  * @author Ming Qiu

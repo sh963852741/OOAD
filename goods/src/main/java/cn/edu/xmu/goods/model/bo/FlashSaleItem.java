@@ -1,9 +1,9 @@
 package cn.edu.xmu.goods.model.bo;
 
-import cn.edu.xmu.goods.model.po.FlashSaleItemPo;
-import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.FlashSaleItemRetVo;
 import cn.edu.xmu.goods.model.vo.ProductRetVo;
+import cn.edu.xmu.goods.model.po.FlashSaleItemPo;
+import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.ooad.model.VoObject;
 import lombok.Data;
 
