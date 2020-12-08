@@ -2,10 +2,11 @@ package cn.xmu.edu.goods.client.dubbo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class SpuDTO {
+public class SpuDTO implements Serializable {
     private Long id;
     private String name;
     private String goodsSn;

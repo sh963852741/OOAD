@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.service.dubbo.implement;
 
 
 import cn.edu.xmu.goods.dao.GoodsDao;
+import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
@@ -13,6 +14,7 @@ import cn.xmu.edu.goods.client.dubbo.OrderItemDTO;
 import cn.xmu.edu.goods.client.dubbo.ShopDTO;
 import cn.xmu.edu.goods.client.dubbo.SkuDTO;
 import cn.xmu.edu.goods.client.dubbo.SpuDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @DubboService(version = "0.0.1-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
 
@@ -115,17 +118,18 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
-        ReturnObject shopIdRet = goodsService.getShopIdBySkuId(skuId);
+        ReturnObject<Long> shopIdRet = goodsService.getShopIdBySkuId(skuId);
         if(shopIdRet.getCode() != ResponseCode.OK){
             return null;
         }
-        Long shopId=(Long)shopIdRet.getData();
+        Long shopId=shopIdRet.getData();
         ReturnObject<Shop> shopRet = shopService.getShopByShopId(shopId);
         if(shopRet.getCode() != ResponseCode.OK){
-            return new ShopDTO();
+            return null;
         }
         Shop shop= shopRet.getData();
         ShopDTO shopDTO =shop.createDTO();
+        log.debug("shopDTO:" + shopDTO);
         return shopDTO;
     }
 }
