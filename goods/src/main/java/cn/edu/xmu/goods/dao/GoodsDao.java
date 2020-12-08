@@ -10,7 +10,6 @@ import cn.edu.xmu.goods.model.bo.Good;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.*;
-import cn.xmu.edu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.FloatPriceRetVo;
 import cn.edu.xmu.goods.model.vo.SkuSelectReturnVo;
 import cn.edu.xmu.goods.model.vo.SkuSimpleRetVo;

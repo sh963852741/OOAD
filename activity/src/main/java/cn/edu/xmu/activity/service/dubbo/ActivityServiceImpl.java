@@ -90,4 +90,9 @@ public class ActivityServiceImpl implements IActivityService {
     public Long getPreSale(Long skuId) {
         return null;
     }
+
+    @Override
+    public Map<String, Long> getPrePrice(Long skuId) {
+        return null;
+    }
 }

@@ -40,4 +40,11 @@ public interface IActivityService {
 	 * @Return: 不存在返回null
 	 */
 	Long getPreSale(Long skuId);
+
+	/**
+	 * 功能描述: 获取预售活动的定金和尾款
+	 * @Param: [skuId]
+	 * @Return: Map<String, Long> key为prePrice 和 finalPrice
+	 */
+	Map<String, Long> getPrePrice(Long skuId);
 }

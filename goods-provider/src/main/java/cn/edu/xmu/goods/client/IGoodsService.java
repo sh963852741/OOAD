@@ -2,10 +2,7 @@ package cn.edu.xmu.goods.client;
 
 
 
-import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
-import cn.edu.xmu.goods.client.dubbo.ShopDTO;
-import cn.edu.xmu.goods.client.dubbo.SkuDTO;
-import cn.edu.xmu.goods.client.dubbo.SpuDTO;
+import cn.edu.xmu.goods.client.dubbo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +37,7 @@ public interface IGoodsService {
 	 */
 	SkuDTO getSku(Long skuId);
 
-	SkuDTO getSimpleSku(Long skuId);
+	PriceDTO getSkuPriceAndName(Long skuId, Integer type);
 
 	/**
 	 * 根据SPU ID返回SPU的DTO

@@ -1,6 +1,8 @@
 package cn.edu.xmu.goods.service.dubbo.implement;
 
 
+import cn.edu.xmu.goods.client.IActivityService;
+import cn.edu.xmu.goods.client.dubbo.*;
 import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.bo.Sku;
@@ -12,11 +14,8 @@ import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.client.IGoodsService;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
-import cn.edu.xmu.goods.client.dubbo.ShopDTO;
-import cn.edu.xmu.goods.client.dubbo.SkuDTO;
-import cn.edu.xmu.goods.client.dubbo.SpuDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,6 +27,9 @@ import java.util.Map;
 @Slf4j
 @DubboService(version = "0.0.1-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
+
+    @DubboReference(version = "0.0.1-SNAPSHOT")
+    private IActivityService activityService;
 
     @Autowired
     private GoodsService goodsService;
@@ -107,19 +109,34 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public SkuDTO getSimpleSku(Long skuId) {
+    public PriceDTO getSkuPriceAndName(Long skuId, Integer type) {
         if(skuId == null){
             return null;
         }
         ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
-            return new SkuDTO();
+            return new PriceDTO();
         }
-        SkuDTO skuDTO =new SkuDTO();
+        PriceDTO priceDTO =new PriceDTO();
         Sku sku=skuRet.getData();
-        skuDTO.setName(sku.getName());
-        skuDTO.setPrice(sku.getPrice());
-        return skuDTO;
+        switch(type){
+            case 1:
+            case 2:
+                priceDTO.setSkuId(skuId);
+                priceDTO.setName(sku.getName());
+                priceDTO.setPrePrice(sku.getPrice());
+                priceDTO.setFinalPrice(null);
+                return priceDTO;
+            case 3:
+                Map<String, Long> price = activityService.getPrePrice(skuId);
+                priceDTO.setName(sku.getName());
+                priceDTO.setSkuId(skuId);
+                priceDTO.setPrePrice(price.get("prePrice"));
+                priceDTO.setFinalPrice(price.get("finalPrice"));
+                return priceDTO;
+            default:
+                return null;
+        }
     }
 
     @Override

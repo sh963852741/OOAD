@@ -2,7 +2,6 @@ package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.service.GoodsService;
-import cn.xmu.edu.goods.model.vo.*;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
