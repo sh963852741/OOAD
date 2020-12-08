@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8907
 
 spring:
   application:
@@ -57,12 +57,17 @@ goodsservice:
   webdav:
     username: oomall
     password: 123465
-    baseUrl: http://localhost:8088/web/
+    baseUrl: http://localhost:8080/web/
 brandservice:
   webdav:
     username: oomall
     password: 123465
-    baseUrl: http://localhost:8088/web/
+    baseUrl: http://localhost:8080/web/
+shopservice:
+  webdav:
+    username: oomall
+    password: 123465
+    baseUrl: http://localhost:8080/web/
 
 mybatis:
   # 将包中的类添加为类型别名
@@ -86,4 +91,4 @@ dubbo:
     address: nacos://47.115.162.144:8848
   protocol:
     name: dubbo
-    port: 28088
+    port: 28091

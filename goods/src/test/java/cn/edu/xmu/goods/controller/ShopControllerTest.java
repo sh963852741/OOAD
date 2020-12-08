@@ -41,7 +41,7 @@ public class ShopControllerTest {
     }
 
     /**
-     * 新建店铺
+     * 新建店铺（正常流程）
      * @throws Exception
      */
     @Test
@@ -53,6 +53,47 @@ public class ShopControllerTest {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
     }
+
+    /**
+     * 新建店铺（重复申请）
+     * @throws Exception
+     */
+    @Test
+    public void applyShop_again() throws Exception {
+        String requestJson = "{\"name\": \"张三商铺\"}";
+        String responseString = this.mvc.perform(post("/shop/shops").header("authorization", shopToken).contentType("application/json;charset=UTF-8").content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    /**
+     * 新建店铺（不传名称）
+     * @throws Exception
+     */
+    @Test
+    public void applyShop_null() throws Exception {
+        String requestJson = "{\"name\": \"\"}";
+        String responseString = this.mvc.perform(post("/shop/shops").header("authorization", shopToken).contentType("application/json;charset=UTF-8").content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+    }
+
+
+    /**
+     * 新建店铺（名称是空格）
+     * @throws Exception
+     */
+    @Test
+    public void applyShop_space() throws Exception {
+        String requestJson = "{\"name\": \"  \"}";
+        String responseString = this.mvc.perform(post("/shop/shops").header("authorization", shopToken).contentType("application/json;charset=UTF-8").content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+    }
+
 
     /**
      * 修改店铺
@@ -67,6 +108,35 @@ public class ShopControllerTest {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
     }
+
+    /**
+     * 修改店铺(试图改id)
+     * @throws Exception
+     */
+    @Test
+    @Order(3)
+    public void modifyShop_ID() throws Exception {
+        String requestJson = "{\"name\": \"修改后的店铺名称\",\"id\":\"123\"}";
+        String responseString = this.mvc.perform(put("/shop/shops/1").header("authorization", shopToken).contentType("application/json;charset=UTF-8").content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+    }
+
+    /**
+     * 修改店铺(试图改state)
+     * @throws Exception
+     */
+    @Test
+    @Order(3)
+    public void modifyShop_STATE() throws Exception {
+        String requestJson = "{\"name\": \"修改后的店铺名称\",\"state\":\"3\"}";
+        String responseString = this.mvc.perform(put("/shop/shops/1").header("authorization", shopToken).contentType("application/json;charset=UTF-8").content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+    }
+
 
     /**
      * 审核店铺
