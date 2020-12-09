@@ -26,7 +26,7 @@ public class SpuRetVo {
     private String detail;
     private String imageUrl;
     private Byte state;
-    private String spec;
+    private SpecVo spec;
     private List<SkuSimpleRetVo> skuList;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;

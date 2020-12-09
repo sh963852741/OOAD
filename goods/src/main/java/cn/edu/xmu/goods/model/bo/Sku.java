@@ -85,6 +85,8 @@ public class Sku implements VoObject {
 
     private Byte disable;
 
+    private Byte State;
+
     @Override
     public SkuRetVo createVo() {
         SkuRetVo vo=new SkuRetVo();
@@ -131,6 +133,7 @@ public class Sku implements VoObject {
         this.setGmtModified(skuPo.getGmtModified());
         this.setDetail(skuPo.getDetail());
         this.setGoodsSpuId(skuPo.getGoodsSpuId());
+        this.setState(skuPo.getState());
     }
 
     public Sku(SkuChangeVo vo){

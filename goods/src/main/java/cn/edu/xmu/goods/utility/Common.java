@@ -41,4 +41,9 @@ public class Common {
                 return ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg());
         }
     }
+
+    public static PageInfo getPage(List lists, Integer page, Integer pageSize){
+        PageInfo info = new PageInfo();
+        return null;
+    }
 }
