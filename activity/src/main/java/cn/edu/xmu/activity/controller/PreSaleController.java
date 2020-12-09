@@ -1,11 +1,10 @@
 package cn.edu.xmu.activity.controller;
 
+import cn.edu.xmu.activity.model.bo.PresaleActivity;
 import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
 import cn.edu.xmu.activity.model.vo.PresaleActivityVo;
 import cn.edu.xmu.activity.service.ActivityService;
 import cn.edu.xmu.ooad.annotation.Audit;
-import cn.edu.xmu.ooad.annotation.Depart;
-import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -57,17 +56,14 @@ public class PreSaleController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/presales")
-    public Object queryPresale(
-            @Valid @RequestBody ActivityFinderVo finderVo){
-
+    public Object queryPresale(@Valid @RequestBody ActivityFinderVo finderVo){
         var x= activityService.getPresaleActivities(finderVo);
-
         return getPageRetObject(x);
     }
 
 
     /**
-     * 管理员查询SPU所有预售活动(包括下线的)
+     * 管理员查询SKU所有预售活动
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
@@ -75,11 +71,13 @@ public class PreSaleController {
     @ApiOperation(value = "管理员查询SPU所有预售活动(包括下线的)", nickname = "queryPresaleofSPU", notes = "",  tags={ "presale", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @GetMapping(value = "/shops/{shopId}/skus/{id}/presales")
-    public Object queryPresaleActivity(@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Long id,
-                                       @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Integer state){
+    @GetMapping(value = "/shops/{shopId}/presales")
+    @Audit
+    public Object queryPresaleActivity(@ApiParam(value = "商品SPUid",required=true) @RequestParam("skuId") Long skuId,
+                                       @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state){
         ActivityFinderVo activityFinderVo = new ActivityFinderVo();
-        activityFinderVo.setSpuId(id);
+        activityFinderVo.setSkuId(skuId);
+        activityFinderVo.setState(state);
         var ret=  activityService.getAllPresaleActivities(activityFinderVo);
         return decorateReturnObject(ret);
     }
@@ -153,9 +151,47 @@ public class PreSaleController {
             @ApiResponse(code = 200, message = "成功") })
     @DeleteMapping(value = "/shops/{shopId}/presales/{id}")
     @Audit
-    public Object offlinePresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
+    public Object delPresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
                                       @ApiParam(value = "预售活动id",required=true) @PathVariable("id") Long id){
-        ReturnObject ret = activityService.delPresaleActivity(id,shopId);
+        ReturnObject ret = activityService.modifyPresaleActivity(id,shopId, PresaleActivity.PresaleStatus.DELETE.getCode());
+
+        return decorateReturnObject(ret);
+    }
+
+    /**
+     * 管理员上架SPU预售活动
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "管理员上线SPU预售活动", nickname = "offlinePresaleofSPU", notes = "`商店管理员`可逻辑删除预售活动",  tags={ "presale", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 906, message = "预售活动状态禁止"),
+            @ApiResponse(code = 200, message = "成功") })
+    @DeleteMapping(value = "/shops/{shopId}/presales/{id}/onshelves")
+    @Audit
+    public Object onlinePresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
+                                         @ApiParam(value = "预售活动id",required=true) @PathVariable("id") Long id){
+        ReturnObject ret = activityService.modifyPresaleActivity(id,shopId, PresaleActivity.PresaleStatus.ONLINE.getCode());
+
+        return decorateReturnObject(ret);
+    }
+
+    /**
+     * 管理员下架SPU预售活动
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "管理员逻辑删除SPU预售活动", nickname = "offlinePresaleofSPU", notes = "`商店管理员`可逻辑删除预售活动",  tags={ "presale", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 906, message = "预售活动状态禁止"),
+            @ApiResponse(code = 200, message = "成功") })
+    @DeleteMapping(value = "/shops/{shopId}/presales/{id}")
+    @Audit
+    public Object offlinePresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
+                                         @ApiParam(value = "预售活动id",required=true) @PathVariable("id") Long id){
+        ReturnObject ret = activityService.modifyPresaleActivity(id,shopId, PresaleActivity.PresaleStatus.OFFLINE.getCode());
 
         return decorateReturnObject(ret);
     }

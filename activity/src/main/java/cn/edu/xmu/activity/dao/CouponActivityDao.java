@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Repository
 public class CouponActivityDao {
 
@@ -20,6 +22,23 @@ public class CouponActivityDao {
     CouponActivityPoMapper couponActivityPoMapper;
     @Autowired
     CouponSKUPoMapper couponSKUPoMapper;
+
+    public Boolean hasSameSKU(long skuId){
+        CouponSKUPoExample example = new CouponSKUPoExample();
+        CouponSKUPoExample.Criteria criteria = example.createCriteria();
+        criteria.andSkuIdEqualTo(skuId);
+        List<CouponSKUPo> couponSKUPo = couponSKUPoMapper.selectByExample(example);
+        if(couponSKUPo.isEmpty()){
+            return false;
+        }
+
+        CouponActivityPoExample activityExample = new CouponActivityPoExample();
+        CouponActivityPoExample.Criteria activityCriteria = activityExample.createCriteria();
+        activityCriteria.andIdIn(
+                couponSKUPo.stream().map(CouponSKUPo::getActivityId).collect(Collectors.toList()));
+        var x = couponActivityPoMapper.selectByExample(activityExample).stream().filter(z -> !z.getState().equals(CouponActivity.CouponStatus.DELETE.getCode()));
+        return x.count() > 0;
+    }
 
     public List<CouponActivityPo> getActivitiesBySPUId(long id){
         CouponSKUPoExample example = new CouponSKUPoExample();
@@ -55,7 +74,7 @@ public class CouponActivityDao {
         CouponActivityPoExample example = new CouponActivityPoExample();
         CouponActivityPoExample.Criteria criteria = example.createCriteria();
         criteria.andShopIdEqualTo(shopId);
-        criteria.andStateEqualTo(CouponActivity.CouponStatus.CANCELED.getCode());
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.DELETE.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);
@@ -94,7 +113,7 @@ public class CouponActivityDao {
         if(shopId != null){
             criteria.andShopIdEqualTo(shopId);
         }
-        criteria.andStateEqualTo(CouponActivity.CouponStatus.NORMAL.getCode());
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.OFFLINE.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);

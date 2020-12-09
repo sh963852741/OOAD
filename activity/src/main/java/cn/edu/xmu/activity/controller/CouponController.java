@@ -1,5 +1,6 @@
 package cn.edu.xmu.activity.controller;
 
+import cn.edu.xmu.activity.model.bo.Coupon;
 import cn.edu.xmu.activity.model.bo.CouponActivity;
 import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
 import cn.edu.xmu.activity.model.vo.CouponActivityVo;
@@ -43,7 +44,7 @@ public class CouponController {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/coupons/states")
     public Object getCouponState(){
-        ReturnObject ret = activityService.getCouponStatus();
+        ReturnObject<Coupon.CouponStatus[]> ret = activityService.getCouponStatus();
         return Common.decorateReturnObject(ret) ;
     }
 
@@ -67,7 +68,7 @@ public class CouponController {
         }
 
         if(couponActivityVo.getBeginTime().isAfter(couponActivityVo.getEndTime())||couponActivityVo.getCouponTime().isAfter(couponActivityVo.getEndTime())){
-            return new ReturnObject(ResponseCode.FIELD_NOTVALID, "活动开始时间必须小于活动结束时间，优惠券一定要在活动结束前发放");
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "活动开始时间必须小于活动结束时间，优惠券一定要在活动结束前发放");
         }
 
         ReturnObject ret = activityService.addCouponActivity(couponActivityVo, shopId);
@@ -105,7 +106,7 @@ public class CouponController {
             return res;
         }
 
-        activityFinderVo.setState(CouponActivity.CouponStatus.NORMAL.getCode());
+        activityFinderVo.setState(CouponActivity.CouponStatus.OFFLINE.getCode());
         ReturnObject ret = activityService.getCouponActivities(activityFinderVo);
 
         return Common.getListRetObject(ret);
@@ -129,7 +130,7 @@ public class CouponController {
             return res;
         }
 
-        activityFinderVo.setState(CouponActivity.CouponStatus.CANCELED.getCode());
+        activityFinderVo.setState(CouponActivity.CouponStatus.DELETE.getCode());
         ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponActivities(activityFinderVo);
         return Common.getPageRetObject(ret);
     }
@@ -200,6 +201,10 @@ public class CouponController {
             return res;
         }
 
+        if(couponActivityVo.getBeginTime().isAfter(couponActivityVo.getEndTime())||couponActivityVo.getCouponTime().isAfter(couponActivityVo.getEndTime())){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "活动开始时间必须小于活动结束时间，优惠券一定要在活动结束前发放");
+        }
+
         ReturnObject ret = activityService.modifyCouponActivity(id, couponActivityVo, shopId);
 
         if(ret.getCode() == ResponseCode.OK){
@@ -222,7 +227,7 @@ public class CouponController {
     public Object cancelCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
                                        @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
         CouponActivityVo vo =  new CouponActivityVo();
-        vo.setState(CouponActivity.CouponStatus.CANCELED.getCode());
+        vo.setState(CouponActivity.CouponStatus.DELETE.getCode());
         ReturnObject ret = activityService.modifyCouponActivity(id, vo, shopId);
 //        ReturnObject ret = activityService.modifyCouponActivityStatus(id, CouponActivity.CouponStatus.CANCELED);
         return Common.decorateReturnObject(ret);
