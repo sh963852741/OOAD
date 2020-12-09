@@ -4,6 +4,7 @@ import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleItemRetVo;
 import cn.edu.xmu.flashsale.model.vo.FlashsaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
+import cn.edu.xmu.ooad.util.Common;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -132,8 +133,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("flashsales/{id}/flashitems")
-    public Object addFlashitems(@PathVariable Integer id, @RequestBody FlashsaleVo flashsaleVo){
-        return null;
+    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashsaleVo flashsaleVo){
+        var ret = flashSaleService.addSkuToFlashSale(id, flashsaleVo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -171,8 +173,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("flashsales/{fid}/flashitems/{id}")
-    public Object deleteFlashitems(@PathVariable Integer fid, @PathVariable Integer id){
-        return null;
+    public Object deleteFlashitems(@PathVariable Long flashSaleId, @PathVariable Long itemId){
+        var ret = flashSaleService.removeSkuToFlashSale(flashSaleId, itemId);
+        return Common.decorateReturnObject(ret);
     }
 
 
