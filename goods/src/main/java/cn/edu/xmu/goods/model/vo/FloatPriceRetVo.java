@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -17,8 +18,8 @@ public class FloatPriceRetVo {
     private Integer quantity;
     private LocalDateTime beginTime;
     private LocalDateTime endTime;
-    private Long createBy;
-    private Long modifiedBy;
+    private Map<String, Object> createBy;
+    private Map<String, Object> modifiedBy;
     private Byte valid;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;

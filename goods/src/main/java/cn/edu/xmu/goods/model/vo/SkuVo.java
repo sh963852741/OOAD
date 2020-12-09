@@ -7,7 +7,6 @@ import lombok.Data;
 @ApiModel(value = "Sku视图")
 public class SkuVo {
 
-    SpuSpecVo spuSpec;
     String sn;
     String name;
     Long originalPrice;

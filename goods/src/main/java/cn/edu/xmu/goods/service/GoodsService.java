@@ -13,10 +13,14 @@ import cn.edu.xmu.goods.model.po.FloatPricePo;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.po.SPUPo;
 import cn.edu.xmu.goods.model.vo.*;
+import cn.edu.xmu.goods.utility.OrderAdapter;
 import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.oomall.dto.FreightModelDto;
+import cn.edu.xmu.oomall.service.IFreightService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * @Author: Yifei Wang
@@ -41,6 +46,9 @@ import java.util.Map;
 public class GoodsService {
 
     private  static  final Logger logger = LoggerFactory.getLogger(GoodsService.class);
+
+    @DubboReference(version = "0.0.1-SNAPSHOT")
+    private IFreightService freightService;
 
     @Autowired
     private GoodsDao goodsDao;
@@ -82,6 +90,39 @@ public class GoodsService {
      * @Date: 2020/11/26 16:35
      */
     public ReturnObject getAllSkus(SkuSelectVo vo, Integer page, Integer pageSize){
+        //将spuSn转换为spuId
+        Long spuId = null;
+        if(vo.getSpuSn() != null){
+            ReturnObject spuIdRet=goodsDao.getSpuIdBySpuSn(vo.getSpuSn());
+            if(spuIdRet.getCode() == ResponseCode.OK){
+                spuId = (Long)spuIdRet.getData();
+            }
+        }
+        if(vo.getSpuId() != null && spuId != null){
+            if(!vo.getSpuId().equals(spuId)){
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
+        }else{
+            if(spuId != null){
+                vo.setSpuId(spuId);
+            }
+        }
+        //如果转换完spuId为空，则直接进行查询
+        if(vo.getSpuId() == null){
+            return goodsDao.getAllSkus(vo, page, pageSize);
+        }
+        //spuId不为空 且shopId也不空 检查这个spuId是否是这个shopId的 如果不是 直接返回错误
+        if(vo.getShopId() != null){
+            ReturnObject shopIdRet = goodsDao.getShopIdBySpuId(vo.getSpuId());
+            if(shopIdRet.getCode() != ResponseCode.OK){
+                return shopIdRet;
+            }
+            if(!(vo.getShopId().equals((Long)shopIdRet.getData()))){
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
+            vo.setShopId(null);
+            return goodsDao.getAllSkus(vo, page, pageSize);
+        }
         return goodsDao.getAllSkus(vo, page, pageSize);
     }
 
@@ -129,7 +170,7 @@ public class GoodsService {
         }
 
         //查看是否存在sku
-        ReturnObject<Sku> skuRetObject=goodsDao.getSkuById(id.longValue());
+        ReturnObject<Sku> skuRetObject = goodsDao.getSkuById(id.longValue());
         if(skuRetObject.getCode()== ResponseCode.INTERNAL_SERVER_ERR ||
                 skuRetObject.getCode()==ResponseCode.RESOURCE_ID_NOTEXIST){
             return skuRetObject;
@@ -193,7 +234,7 @@ public class GoodsService {
         }
         Sku updateSku=new Sku();
         updateSku.setId(id.longValue());
-        updateSku.setDisable(Sku.State.FORBID.getCode().byteValue());
+        updateSku.setDisable((byte)0);
         ReturnObject ret=goodsDao.updateSku(updateSku);
         return ret;
     }
@@ -238,6 +279,8 @@ public class GoodsService {
         }
         Spu spu=new Spu((SPUPo)ret.getData());
         SpuRetVo vo=spu.createVo();
+        FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
+        vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
         return new ReturnObject<>(vo);
     }
 
@@ -279,6 +322,7 @@ public class GoodsService {
         }
         Spu spu=new Spu((SPUPo) ret.getData());
         SpuRetVo vo=spu.createVo();
+        vo.setFreight(null);
         return new ReturnObject(vo);
     }
 
@@ -356,12 +400,12 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject updateSpu(Integer id, Integer shopId, SpuVo spuVo) {
-        if(shopId!=0){
+        if(shopId != 0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
@@ -394,7 +438,7 @@ public class GoodsService {
         }
         Spu spu=new Spu();
         spu.setId(id.longValue());
-        spu.setDisabled(Spu.State.DELETE.getCode().byteValue());
+        spu.setDisabled((byte)1);
 //        spu.setState(Spu.State.DELETE.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
@@ -408,21 +452,21 @@ public class GoodsService {
      * @Date: 2020/11/27 18:03
      */
     @Transactional
-    public ReturnObject onShelfSpu(Integer id, Integer shopId) {
+    public ReturnObject onShelfSku(Long id, Long shopId) {
         if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
+            ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        Spu spu=new Spu();
-        spu.setId(id.longValue());
-        spu.setDisabled(Spu.State.NORM.getCode().byteValue());
+        Sku sku=new Sku();
+        sku.setId(id);
+        sku.setState(Sku.State.NORM.getCode().byteValue());
 //        spu.setState(Spu.State.NORM.getCode().byteValue());
-        ReturnObject ret=goodsDao.updateSpu(spu);
+        ReturnObject ret=goodsDao.updateSku(sku);
         return ret;
     }
 
@@ -434,21 +478,21 @@ public class GoodsService {
      * @Date: 2020/11/28 10:01
      */
     @Transactional
-    public ReturnObject offShelfSpu(Integer id, Integer shopId) {
-        if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
+    public ReturnObject offShelfSku(Long id, Long shopId) {
+        if(shopId != 0){
+            ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id);
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue()!=check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        Spu spu=new Spu();
-        spu.setId(id.longValue());
-        spu.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
-//        spu.setState(Spu.State.OFFSHELF.getCode().byteValue());
-        ReturnObject ret=goodsDao.updateSpu(spu);
+        Sku sku=new Sku();
+        sku.setId(id);
+        sku.setState(Sku.State.OFFSHELF.getCode().byteValue());
+//        spu.setState(Spu.State.NORM.getCode().byteValue());
+        ReturnObject ret=goodsDao.updateSku(sku);
         return ret;
     }
 
@@ -460,30 +504,32 @@ public class GoodsService {
      * @Date: 2020/11/27 18:58
      */
     @Transactional
-    public ReturnObject newFloatPrice(Integer id, Integer shopId, FloatPriceVo floatPriceVo ,Long userId) {
-        if(shopId!=0){
+    public ReturnObject newFloatPrice(Long id, Long shopId, FloatPriceVo floatPriceVo ,Long userId) {
+        if(shopId != 0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         FloatPricePo po=new FloatPricePo();
         po.setActivityPrice(floatPriceVo.getActivityPrice());
         po.setCreatedBy(userId);
         po.setGoodsSkuId(id.longValue());
-        po.setQuantity(floatPriceVo.getQuantity().intValue());
-        try{
-            po.setBeginTime(LocalDateTime.parse(floatPriceVo.getBeginTime(), df));
-            po.setEndTime(LocalDateTime.parse(floatPriceVo.getEndTime(),df));
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.TIMEFORMAT_ERROR);
-        }
+        po.setQuantity(floatPriceVo.getQuantity());
+        po.setBeginTime(floatPriceVo.getBeginTime());
+        po.setEndTime(floatPriceVo.getEndTime());
         po.setValid((FloatPrice.State.NORM.getCode().byteValue()));
-        ReturnObject ret=goodsDao.newFloatPrice(po);
+        ReturnObject<FloatPrice> ret=goodsDao.newFloatPrice(po);
+        if(ret.getCode() == ResponseCode.OK){
+            FloatPrice floatPrice = ret.getData();
+            FloatPriceRetVo retVo = floatPrice.createVo();
+            /** @problem  需要添加simpleUser
+             *
+             */
+        }
         return ret;
     }
 
@@ -495,19 +541,19 @@ public class GoodsService {
      * @Date: 2020/11/27 19:56
      */
     @Transactional
-    public ReturnObject deleteFloatPrice(Integer id, Integer shopId, Long userId) {
-        if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdByFloatPriceId(id.longValue());
-            if(check.getCode()!=ResponseCode.OK){
+    public ReturnObject deleteFloatPrice(Long id, Long shopId, Long userId) {
+        if(shopId != 0){
+            ReturnObject<Long> check=goodsDao.getShopIdByFloatPriceId(id);
+            if(check.getCode() != ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
 
         FloatPrice price=new FloatPrice();
-        price.setId(id.longValue());
+        price.setId(id);
         price.setValid(FloatPrice.State.VALID.getCode().byteValue());
         price.setInvalidBy(userId);
         ReturnObject ret=goodsDao.updateFloatPrice(price);
@@ -540,27 +586,27 @@ public class GoodsService {
      * @Date: 2020/11/27 20:15
      */
     @Transactional
-    public ReturnObject addSpuToCategory(Integer shopId, Integer spuId, Integer id) {
+    public ReturnObject addSpuToCategory(Long shopId, Long spuId, Long id) {
         if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId.longValue());
+            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        ReturnObject<Category> ret=categoryDao.getCategoryById(id.longValue());
-        if(ret.getCode()!=ResponseCode.OK){
+        ReturnObject<Category> ret = categoryDao.getCategoryById(id);
+        if(ret.getCode() != ResponseCode.OK){
             return ret;
         }
-        Category category=ret.getData();
-        if(category.getPid()==0){
+        Category category = ret.getData();
+        if(category.getPid() == 0){
             return new ReturnObject(ResponseCode.CATEGORY_SET_ERROR);
         }
         Spu spu=new Spu();
-        spu.setId(spuId.longValue());
-        spu.setCategoryId(id.longValue());
+        spu.setId(spuId);
+        spu.setCategoryId(id);
         ReturnObject returnObject=goodsDao.updateSpu(spu);
         return returnObject;
     }
@@ -573,28 +619,20 @@ public class GoodsService {
      * @Date: 2020/11/27 20:22
      */
     @Transactional
-    public ReturnObject removeSpuFromCategory(Integer shopId, Integer spuId, Integer id) {
-        if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId.longValue());
-            if(check.getCode()!=ResponseCode.OK){
+    public ReturnObject removeSpuFromCategory(Long shopId, Long spuId, Long id) {
+        if(shopId != 0){
+            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId);
+            if(check.getCode() != ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
-        }
-        ReturnObject<Category> ret=categoryDao.getCategoryById(id.longValue());
-        if(ret.getCode()!=ResponseCode.OK){
-            return ret;
-        }
-        Category category=ret.getData();
-        if(category.getPid()==0){
-            return new ReturnObject(ResponseCode.CATEGORY_SET_ERROR);
         }
         Spu spu=new Spu();
         spu.setId(spuId.longValue());
         spu.setCategoryId(null);
-        ReturnObject returnObject=goodsDao.updateSpu(spu);
+        ReturnObject returnObject = goodsDao.updateSpu(spu);
         return returnObject;
     }
 
@@ -606,9 +644,9 @@ public class GoodsService {
      * @Date: 2020/11/27 20:24
      */
     @Transactional
-    public ReturnObject addSpuToBrand(Integer shopId, Integer spuId, Integer id) {
+    public ReturnObject addSpuToBrand(Long shopId, Long spuId, Long id) {
         if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId.longValue());
+            ReturnObject<Long> check = goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
@@ -617,9 +655,9 @@ public class GoodsService {
             }
         }
         Spu spu=new Spu();
-        spu.setId(spuId.longValue());
-        spu.setBrandId(id.longValue());
-        ReturnObject returnObject=goodsDao.updateSpu(spu);
+        spu.setId(spuId);
+        spu.setBrandId(id);
+        ReturnObject returnObject = goodsDao.updateSpu(spu);
         return returnObject;
     }
 
@@ -631,13 +669,13 @@ public class GoodsService {
      * @Date: 2020/11/27 20:25
      */
     @Transactional
-    public ReturnObject removeSpuFromBrand(Integer shopId, Integer spuId, Integer id) {
+    public ReturnObject removeSpuFromBrand(Long shopId, Long spuId, Long id) {
         if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId.longValue());
+            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue()!=check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
@@ -658,28 +696,28 @@ public class GoodsService {
     @Transactional
     public ReturnObject addSkuToSpu(Long shopId, Long id, SkuVo skuVo) {
         if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
-            if(check.getCode()!=ResponseCode.OK){
+            ReturnObject<Long> check = goodsDao.getShopIdBySpuId(id);
+            if(check.getCode() != ResponseCode.OK){
                 return check;
             }
-            if(shopId.longValue()!=check.getData()){
+            if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        SKUPo po=new SKUPo();
-        ReturnObject ret=goodsDao.newSku(po);
-        if(ret.getCode()!=ResponseCode.OK){
+        SKUPo po = new SKUPo();
+        ReturnObject ret = goodsDao.newSku(po);
+        if(ret.getCode() != ResponseCode.OK){
             return ret;
         }
-        String specs= JacksonUtil.toJson(skuVo.getSpuSpec());
         Spu spu=new Spu();
         spu.setId(id.longValue());
-        spu.setSpec(specs);
+        ReturnObject spuRet=goodsDao.updateSpu(spu);
+        /** @problem 需要更新spu的规格 但是规格参数不明;
         ReturnObject spuRet=goodsDao.updateSpu(spu);
         if(spuRet.getCode()!=ResponseCode.OK){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        }
-        return ret;
+        }**/
+        return spuRet;
     }
 
     /**
