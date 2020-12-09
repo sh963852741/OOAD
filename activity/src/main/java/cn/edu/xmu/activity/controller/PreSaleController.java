@@ -58,19 +58,9 @@ public class PreSaleController {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/presales")
     public Object queryPresale(
-            @ApiParam(value = "根据商铺id查询") @Valid @RequestParam(value = "shopId", required = false) Long shopId,
-            @ApiParam(value = "时间：0 还未开始的， 1 明天开始的，2 正在进行中的，3 已经结束的") @Valid @RequestParam(value = "timeline", required = false) Byte timeline,
-            @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuId", required = false) Long spuId,
-            @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
-        ActivityFinderVo activityFinderVo =new ActivityFinderVo();
-        activityFinderVo.setSpuId(spuId);
-        activityFinderVo.setShopId(shopId);
-        activityFinderVo.setTimeline(timeline);
-        activityFinderVo.setPage(page);
-        activityFinderVo.setPageSize(pageSize);
+            @Valid @RequestBody ActivityFinderVo finderVo){
 
-        var x= activityService.getPresaleActivities(activityFinderVo);
+        var x= activityService.getPresaleActivities(finderVo);
 
         return getPageRetObject(x);
     }
@@ -85,7 +75,7 @@ public class PreSaleController {
     @ApiOperation(value = "管理员查询SPU所有预售活动(包括下线的)", nickname = "queryPresaleofSPU", notes = "",  tags={ "presale", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @GetMapping(value = "/shops/{shopId}/spus/{id}/presales")
+    @GetMapping(value = "/shops/{shopId}/skus/{id}/presales")
     public Object queryPresaleActivity(@ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Long id,
                                        @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Integer state){
         ActivityFinderVo activityFinderVo = new ActivityFinderVo();
@@ -95,15 +85,15 @@ public class PreSaleController {
     }
 
     /**
-     * 管理员新增SPU预售活动
+     * 管理员新增SKU预售活动
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
      */
-    @ApiOperation(value = "管理员新增SPU预售活动", nickname = "createPresaleofSPU", notes = "", tags={ "presale", })
+    @ApiOperation(value = "管理员新增SKU预售活动", nickname = "createPresaleofSPU", notes = "", tags={ "presale", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @PostMapping(value = "/shops/{shopId}/spus/{id}/presales")
+    @PostMapping(value = "/shops/{shopId}/skus/{id}/presales")
     @Audit
     public Object addPresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
                                      @ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Long spuId,

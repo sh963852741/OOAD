@@ -4,9 +4,11 @@ import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleItemRetVo;
 import cn.edu.xmu.flashsale.model.vo.FlashsaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
+import cn.edu.xmu.ooad.util.Common;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 /**
  * 秒杀控制器
@@ -36,7 +38,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping(value= "/timesegments/{id}/flashsales")
-    public Object getFlashSales(@PathVariable long id){
+    public Flux<Object> getFlashSales(@PathVariable long id){
             return flashSaleService.getFlashSale(id).map(FlashSaleItem::createVo);
     }
 
@@ -55,7 +57,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("timesegments/{id}/flashsales")
-    public Object creatFlashsale(@PathVariable long id, @RequestBody String flashDate){
+    public Object createFlashSale(@PathVariable long id, @RequestBody String flashDate){
         return null;
     }
 
@@ -74,8 +76,8 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("flashsales/current")
-    public Object getCurrentFlashsales(@RequestParam Integer page,@RequestParam Integer pageSize){
-        return null;
+    public Flux<FlashSaleItem> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
+        return flashSaleService.getFlashSale(1L);
     }
 
     /**
@@ -132,8 +134,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("flashsales/{id}/flashitems")
-    public Object addFlashitems(@PathVariable Integer id, @RequestBody FlashsaleVo flashsaleVo){
-        return null;
+    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashsaleVo flashsaleVo){
+        var ret = flashSaleService.addSkuToFlashSale(id, flashsaleVo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -171,8 +174,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("flashsales/{fid}/flashitems/{id}")
-    public Object deleteFlashitems(@PathVariable Integer fid, @PathVariable Integer id){
-        return null;
+    public Object deleteFlashitems(@PathVariable Long flashSaleId, @PathVariable Long itemId){
+        var ret = flashSaleService.removeSkuToFlashSale(flashSaleId, itemId);
+        return Common.decorateReturnObject(ret);
     }
 
 

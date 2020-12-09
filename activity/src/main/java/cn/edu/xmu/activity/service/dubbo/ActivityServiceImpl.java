@@ -4,7 +4,7 @@ import cn.edu.xmu.activity.dao.CouponActivityDao;
 import cn.edu.xmu.activity.dao.CouponDao;
 import cn.edu.xmu.activity.model.bo.Coupon;
 import cn.edu.xmu.activity.model.po.CouponPo;
-import cn.edu.xmu.activity.model.po.CouponSPUPo;
+import cn.edu.xmu.activity.model.po.CouponSKUPo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IActivityService;
@@ -33,10 +33,10 @@ public class ActivityServiceImpl implements IActivityService {
         Map<Long, Long> map = new HashMap<>();
         // 考虑增加缓存，缓存活动适用的SPU
         Long activityId = couponPo.getActivityId();
-        List<CouponSPUPo> couponSPUPoList = couponActivityDao.getSPUsInActivity(activityId);
+        List<CouponSKUPo> couponSPUPoList = couponActivityDao.getSKUsInActivity(activityId);
         Set<Long> spuSet = new HashSet<>();
-        for(CouponSPUPo couponSPUPo:couponSPUPoList){
-            spuSet.add(couponSPUPo.getSpuId());
+        for(CouponSKUPo couponSPUPo:couponSPUPoList){
+            spuSet.add(couponSPUPo.getSkuId());
         }
 
         for(OrderItemDTO o: orderItemDTOS){
