@@ -22,9 +22,12 @@ public class ActivityFinderVo {
     @ApiModelProperty(value = "时间线")
     Byte timeline;
 
+    @ApiModelProperty(value = "活动状态")
     Byte state;
 
+    @ApiModelProperty(value = "开始时间")
     LocalDateTime beginTime;
 
+    @ApiModelProperty(value = "结束时间")
     LocalDateTime endTime;
 }

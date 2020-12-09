@@ -30,9 +30,11 @@ public class CouponDao {
         CouponPoExample example = new CouponPoExample();
         CouponPoExample.Criteria criteria = example.createCriteria();
         criteria.andActivityIdEqualTo(activityId);
+        criteria.andStateEqualTo(Coupon.CouponStatus.NORMAL.getCode());
 
         CouponPo couponPo =new CouponPo();
         couponPo.setState(Coupon.CouponStatus.EXPIRED.getCode());
+        couponPo.setGmtModified(LocalDateTime.now());
         // 按理说不能把已使用的优惠券设置为已作废，记得改
         return couponPoMapper.updateByExampleSelective(couponPo, example);
     }

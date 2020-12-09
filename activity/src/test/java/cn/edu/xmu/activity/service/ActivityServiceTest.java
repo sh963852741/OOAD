@@ -208,7 +208,7 @@ class ActivityServiceTest {
         vo.setPageSize(10);
         vo.setShopId(1L);
         vo.setTimeline((byte)2);
-        ReturnObject<PageInfo<CouponActivityVo>> ret = activityService.getCouponActivities(vo);
+        ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponActivities(vo);
         assertEquals(ResponseCode.OK, ret.getCode());
         assertTrue(ret.getData().getList().size() > 0);
     }
