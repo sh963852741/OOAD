@@ -8,6 +8,7 @@ import cn.edu.xmu.ooad.util.Common;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 /**
  * 秒杀控制器
@@ -37,7 +38,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping(value= "/timesegments/{id}/flashsales")
-    public Object getFlashSales(@PathVariable long id){
+    public Flux<Object> getFlashSales(@PathVariable long id){
             return flashSaleService.getFlashSale(id).map(FlashSaleItem::createVo);
     }
 
@@ -75,8 +76,8 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("flashsales/current")
-    public Object getCurrentFlashsales(@RequestParam Integer page,@RequestParam Integer pageSize){
-        return null;
+    public Flux<FlashSaleItem> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
+        return flashSaleService.getFlashSale(1L);
     }
 
     /**
