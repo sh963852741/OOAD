@@ -2,7 +2,6 @@ package cn.edu.xmu.goods.mapper;
 
 import cn.edu.xmu.goods.model.po.CategoryPo;
 import cn.edu.xmu.goods.model.po.CategoryPoExample;
-
 import java.util.List;
 
 public interface CategoryPoMapper {

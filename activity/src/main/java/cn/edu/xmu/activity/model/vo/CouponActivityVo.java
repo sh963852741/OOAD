@@ -2,6 +2,7 @@ package cn.edu.xmu.activity.model.vo;
 
 import cn.edu.xmu.activity.model.po.CouponActivityPo;
 import cn.edu.xmu.activity.utility.MyDeserializer;
+import cn.edu.xmu.ooad.model.VoObject;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 @Data
 @NoArgsConstructor
 @ApiModel(value = "优惠活动")
-public class CouponActivityVo {
+public class CouponActivityVo implements VoObject {
 
     @NotBlank
     @ApiModelProperty(value = "优惠名称")
@@ -63,8 +64,8 @@ public class CouponActivityVo {
     private LocalDateTime gmtModified;
     private Byte state;
     public HashMap<String, Object> shop = new HashMap<>();
-    public HashMap<String, Object> createdBy = new HashMap<>();
-    public HashMap<String, Object> modiBy = new HashMap<>();
+    public UserVo createdBy;
+    public UserVo modiBy;
 
     public CouponActivityPo createPo() {
         CouponActivityPo po = new CouponActivityPo();
@@ -92,5 +93,15 @@ public class CouponActivityVo {
         strategy = po.getStrategy();
         gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
+    }
+
+    @Override
+    public Object createVo() {
+        return this;
+    }
+
+    @Override
+    public Object createSimpleVo() {
+        return this;
     }
 }

@@ -2,7 +2,6 @@ package cn.edu.xmu.goods.mapper;
 
 import cn.edu.xmu.goods.model.po.BrandPo;
 import cn.edu.xmu.goods.model.po.BrandPoExample;
-
 import java.util.List;
 
 public interface BrandPoMapper {

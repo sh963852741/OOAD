@@ -1,10 +1,10 @@
 package cn.edu.xmu.activity.dao;
 
 import cn.edu.xmu.activity.mapper.CouponActivityPoMapper;
-import cn.edu.xmu.activity.mapper.CouponSPUPoMapper;
+import cn.edu.xmu.activity.mapper.CouponSKUPoMapper;
+import cn.edu.xmu.activity.model.Timeline;
 import cn.edu.xmu.activity.model.bo.CouponActivity;
 import cn.edu.xmu.activity.model.po.*;
-import cn.edu.xmu.ooad.model.VoObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,40 +19,56 @@ public class CouponActivityDao {
     @Autowired
     CouponActivityPoMapper couponActivityPoMapper;
     @Autowired
-    CouponSPUPoMapper couponSPUPoMapper;
+    CouponSKUPoMapper couponSKUPoMapper;
 
     public List<CouponActivityPo> getActivitiesBySPUId(long id){
-        CouponSPUPoExample example = new CouponSPUPoExample();
-        CouponSPUPoExample.Criteria criteria = example.createCriteria();
-        criteria.andSpuIdEqualTo(id);
+        CouponSKUPoExample example = new CouponSKUPoExample();
+        CouponSKUPoExample.Criteria criteria = example.createCriteria();
+        criteria.andSkuIdEqualTo(id);
 
-        List<CouponSPUPo> couponSPUList = couponSPUPoMapper.selectByExample(example);
+        List<CouponSKUPo> couponSPUList = couponSKUPoMapper.selectByExample(example);
         List<CouponActivityPo> activities = new ArrayList<>();
-        for(CouponSPUPo couponSPU: couponSPUList){
+        for(CouponSKUPo couponSPU: couponSPUList){
             activities.add(couponActivityPoMapper.selectByPrimaryKey(couponSPU.getActivityId()));
         }
         return activities;
     }
 
-    public List<CouponSPUPo> getSPUsInActivity(long activityId){
-        CouponSPUPoExample couponSPUPoExample = new CouponSPUPoExample();
+    public List<CouponSKUPo> getSKUsInActivity(long activityId){
+        CouponSKUPoExample couponSPUPoExample = new CouponSKUPoExample();
         var criteria = couponSPUPoExample.createCriteria();
         criteria.andActivityIdEqualTo(activityId);
-        List<CouponSPUPo> list = couponSPUPoMapper.selectByExample(couponSPUPoExample);
+        List<CouponSKUPo> list = couponSKUPoMapper.selectByExample(couponSPUPoExample);
         return list;
     }
 
+    /**
+     * 获取已经被取消的优惠活动
+     * @param page
+     * @param pageSize
+     * @param shopId 店铺ID
+     * @return
+     */
     public PageInfo<CouponActivityPo> getInvalidActivities(int page, int pageSize, long shopId) {
         PageHelper.startPage(page, pageSize);
 
         CouponActivityPoExample example = new CouponActivityPoExample();
         CouponActivityPoExample.Criteria criteria = example.createCriteria();
         criteria.andShopIdEqualTo(shopId);
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.CANCELED.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);
     }
 
+    /**
+     * 获取有效的优惠活动
+     * @param page
+     * @param pageSize
+     * @param shopId
+     * @param timeline 时间判断
+     * @return
+     */
     public PageInfo<CouponActivityPo> getEffectiveActivities(int page, int pageSize, Long shopId, Byte timeline){
         PageHelper.startPage(page, pageSize);
 
@@ -60,24 +76,25 @@ public class CouponActivityDao {
         CouponActivityPoExample.Criteria criteria = example.createCriteria();
 
         if (timeline != null) {
-            if (timeline == 0) {
+            if (timeline == Timeline.PENDING.ordinal()) {
                 /* 获取未开始的活动 */
                 criteria.andBeginTimeGreaterThan(LocalDateTime.now());
-            } else if (timeline == 1) {
+            } else if (timeline == Timeline.TOMORROW.ordinal()) {
                 /* 获取明天开始的活动 */
                 criteria.andBeginTimeGreaterThan(LocalDateTime.now());
                 criteria.andBeginTimeLessThan(LocalDateTime.now().plusDays(1));
-            } else if(timeline == 2) {
+            } else if(timeline == Timeline.RUNNING.ordinal()) {
                 /* 获取正在进行中的活动 */
                 criteria.andBeginTimeLessThan(LocalDateTime.now());
                 criteria.andEndTimeGreaterThan(LocalDateTime.now());
-            } else if(timeline == 3) {
+            } else if(timeline == Timeline.FINISHED.ordinal()) {
                 criteria.andEndTimeLessThan(LocalDateTime.now());
             }
         }
         if(shopId != null){
             criteria.andShopIdEqualTo(shopId);
         }
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.NORMAL.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);
@@ -93,6 +110,7 @@ public class CouponActivityDao {
     public boolean addActivity(CouponActivityPo po, long shopId){
         po.setShopId(shopId);
         po.setGmtCreate(LocalDateTime.now());
+        po.setCreatedBy(shopId);
         return couponActivityPoMapper.insert(po) == 1;
     }
 
@@ -100,38 +118,45 @@ public class CouponActivityDao {
         return couponActivityPoMapper.deleteByPrimaryKey(id) == 1;
     }
 
-    public boolean updateActivity(CouponActivityPo po, long id) {
+    public boolean updateActivity(CouponActivityPo po, long id, long shopId) {
         po.setId(id);
+        po.setModiBy(shopId);
+        po.setGmtModified(LocalDateTime.now());
         return couponActivityPoMapper.updateByPrimaryKeySelective(po) == 1;
     }
 
+    /**
+     * 获取有效的活动详情
+     * @param id
+     * @return
+     */
     public CouponActivityPo getActivityById(long id){
         return couponActivityPoMapper.selectByPrimaryKey(id);
     }
 
-    public Long addSpuToActivity(long activityId,long spuId){
-        CouponSPUPo po = new CouponSPUPo();
+    public Long addSpuToActivity(long activityId,long skuId){
+        CouponSKUPo po = new CouponSKUPo();
         po.setActivityId(activityId);
-        po.setSpuId(spuId);
-        couponSPUPoMapper.insert(po);
+        po.setSkuId(skuId);
+        couponSKUPoMapper.insert(po);
         return po.getId();
     }
 
-    public CouponSPUPo getCouponSPUPoById(long id){
-        return couponSPUPoMapper.selectByPrimaryKey(id);
+    public CouponSKUPo getCouponSPUPoById(long id){
+        return couponSKUPoMapper.selectByPrimaryKey(id);
     }
 
-    public boolean removeSpuFromActivity(long id){
-        return couponSPUPoMapper.deleteByPrimaryKey(id)==1;
+    public boolean removeSkuFromActivity(long id){
+        return couponSKUPoMapper.deleteByPrimaryKey(id)==1;
     }
 
-    public PageInfo<CouponSPUPo> getSPUsInActivity(long activityID, int page, int pageSize){
+    public PageInfo<CouponSKUPo> getSKUsInActivity(long activityID, int page, int pageSize){
         PageHelper.startPage(page,pageSize);
 
-        CouponSPUPoExample couponSPUPoExample = new CouponSPUPoExample();
+        CouponSKUPoExample couponSPUPoExample = new CouponSKUPoExample();
         var criteria = couponSPUPoExample.createCriteria();
         criteria.andActivityIdEqualTo(activityID);
-        List<CouponSPUPo> list = couponSPUPoMapper.selectByExample(couponSPUPoExample);
+        List<CouponSKUPo> list = couponSKUPoMapper.selectByExample(couponSPUPoExample);
         return PageInfo.of(list);
     }
 }
