@@ -96,7 +96,7 @@ public class ShopTest {
                 .jsonPath("$.data.name").isEqualTo("张三商铺")
                 .jsonPath("$.data.state").isEqualTo(0)
                 .jsonPath("$.data.gmtCreate").isNotEmpty()
-                .jsonPath("$.data.gmtModified").isEmpty()
+                .jsonPath("$.data.gmtModified").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -113,15 +113,13 @@ public class ShopTest {
     public void applyShop_null() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"    \"}";
-        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/shop/shops")
-                .header("authorization", shopToken)
+        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/shops")
+                .header("authorization", noShopToken)
                 .bodyValue(requestJson);
-
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("商铺名称输入不合法")
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -138,15 +136,14 @@ public class ShopTest {
     public void applyShop_again() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"张三商铺\"}";
-        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/shop/shops")
+        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/shops")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.USER_HASSHOP.getCode())
+                .jsonPath("$.errmsg").isEqualTo("您已经拥有店铺，无法重新申请")
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -164,7 +161,7 @@ public class ShopTest {
     public void modifyShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"已经改了哈\"}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 

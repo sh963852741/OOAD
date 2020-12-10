@@ -74,7 +74,8 @@ public class ShopController {
             ReturnObject ret=shopService.newShop(shopvo);
             return Common.decorateReturnObject(ret);
         }
-        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "不能重复申请店铺"));
+        else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR, "您已经拥有店铺，无法重新申请"));
+        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "商铺名称不能为空"));
     }
 
     /**
