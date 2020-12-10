@@ -1,7 +1,9 @@
 package cn.edu.xmu.activity.model.vo;
 
 import cn.edu.xmu.activity.model.po.GrouponActivityPo;
+import cn.edu.xmu.activity.utility.MyDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,6 +21,7 @@ public class GrouponActivityVo {
     @ApiModelProperty(value = "活动名称")
     String name;
 
+    @JsonDeserialize(using = MyDeserializer.class)
     @ApiModelProperty(value = "团购规则")
     String strategy;
 

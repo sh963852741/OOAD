@@ -1,6 +1,8 @@
 package cn.edu.xmu.activity.service;
 
 import cn.edu.xmu.activity.model.bo.CouponActivity;
+import cn.edu.xmu.activity.model.bo.GrouponActivity;
+import cn.edu.xmu.activity.model.bo.PresaleActivity;
 import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
 import cn.edu.xmu.activity.model.vo.CouponActivityVo;
 import cn.edu.xmu.activity.model.vo.GrouponActivityVo;
@@ -15,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -108,7 +109,7 @@ class ActivityServiceTest {
     void delPresaleActivity() {
         assertTrue(activityIdHash.containsKey("runningPActivity"));
 
-        ReturnObject ret = activityService.delPresaleActivity(activityIdHash.get("runningPActivity"),1L);
+        ReturnObject ret = activityService.modifyPresaleActivity(activityIdHash.get("runningPActivity"),1L, PresaleActivity.PresaleStatus.DELETE.getCode());
         assertEquals(ResponseCode.OK, ret.getCode());
         activityIdHash.remove("runningPActivity");
     }
@@ -142,9 +143,9 @@ class ActivityServiceTest {
         vo.setShopId(1L);
         vo.setTimeline((byte)2);
         vo.setSpuId(647L);
-        ReturnObject<List<GrouponActivityVo>> ret = activityService.getGrouponActivities(vo, true);
+        ReturnObject<PageInfo<VoObject>> ret = activityService.getGrouponActivities(vo, true);
         assertEquals(ResponseCode.OK, ret.getCode());
-        assertTrue(ret.getData().size() > 0);
+        assertTrue(ret.getData().getList().size() > 0);
     }
 
     @Test
@@ -187,7 +188,7 @@ class ActivityServiceTest {
     void delGrouponActivity() {
         assertTrue(activityIdHash.containsKey("runningGActivity"));
 
-        ReturnObject<?> ret = activityService.delGrouponActivity(activityIdHash.get("runningGActivity"),1);
+        ReturnObject<?> ret = activityService.modifyGrouponActivity(activityIdHash.get("runningGActivity"),1, GrouponActivity.GrouponStatus.DELETE.getCode());
         assertEquals(ResponseCode.OK, ret.getCode());
         activityIdHash.remove("runningGActivity");
     }

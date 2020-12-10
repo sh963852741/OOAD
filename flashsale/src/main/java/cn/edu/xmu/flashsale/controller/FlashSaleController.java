@@ -1,8 +1,8 @@
 package cn.edu.xmu.flashsale.controller;
 
 import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
-import cn.edu.xmu.flashsale.model.vo.FlashSaleItemRetVo;
-import cn.edu.xmu.flashsale.model.vo.FlashsaleVo;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleItemVo;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
 import cn.edu.xmu.ooad.util.Common;
 import io.swagger.annotations.*;
@@ -57,8 +57,10 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("timesegments/{id}/flashsales")
-    public Object createFlashSale(@PathVariable long id, @RequestBody String flashDate){
-        return null;
+    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleRetVo flashDate){
+        var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
+
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -96,7 +98,8 @@ public class FlashSaleController {
     })
     @DeleteMapping("flashsales/{id}")
     public Object deleteFlashsale(@PathVariable Integer id){
-        return null;
+        var ret = flashSaleService.delFlashSale(id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -134,7 +137,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("flashsales/{id}/flashitems")
-    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashsaleVo flashsaleVo){
+    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo){
         var ret = flashSaleService.addSkuToFlashSale(id, flashsaleVo);
         return Common.decorateReturnObject(ret);
     }
@@ -175,7 +178,7 @@ public class FlashSaleController {
     })
     @DeleteMapping("flashsales/{fid}/flashitems/{id}")
     public Object deleteFlashitems(@PathVariable Long flashSaleId, @PathVariable Long itemId){
-        var ret = flashSaleService.removeSkuToFlashSale(flashSaleId, itemId);
+        var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
         return Common.decorateReturnObject(ret);
     }
 

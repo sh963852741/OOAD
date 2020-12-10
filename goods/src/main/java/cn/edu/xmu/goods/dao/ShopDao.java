@@ -98,7 +98,7 @@ public class ShopDao {
         int ret;
         ShopPo shopPo=shopPoMapper.selectByPrimaryKey(id);
         shopPo.setName(shop.getName());
-        if(shopPo.getState()==6||shopPo.getState()==3)
+        if(shopPo.getState()==Shop.State.NOTPASS.getCode().byteValue()||shopPo.getState()==Shop.State.FORBID.getCode().byteValue())
         {
             return new ReturnObject(ResponseCode.MODIFYSHOP_ERROR);
         }

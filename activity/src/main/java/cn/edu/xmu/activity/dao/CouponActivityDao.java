@@ -8,11 +8,15 @@ import cn.edu.xmu.activity.model.po.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Repository
 public class CouponActivityDao {
 
@@ -20,6 +24,26 @@ public class CouponActivityDao {
     CouponActivityPoMapper couponActivityPoMapper;
     @Autowired
     CouponSKUPoMapper couponSKUPoMapper;
+
+    @Autowired
+    RedisTemplate redisTemplate;
+
+    public Boolean hasSameSKU(long skuId){
+        CouponSKUPoExample example = new CouponSKUPoExample();
+        CouponSKUPoExample.Criteria criteria = example.createCriteria();
+        criteria.andSkuIdEqualTo(skuId);
+        List<CouponSKUPo> couponSKUPo = couponSKUPoMapper.selectByExample(example);
+        if(couponSKUPo.isEmpty()){
+            return false;
+        }
+
+        CouponActivityPoExample activityExample = new CouponActivityPoExample();
+        CouponActivityPoExample.Criteria activityCriteria = activityExample.createCriteria();
+        activityCriteria.andIdIn(
+                couponSKUPo.stream().map(CouponSKUPo::getActivityId).collect(Collectors.toList()));
+        var x = couponActivityPoMapper.selectByExample(activityExample).stream().filter(z -> !z.getState().equals(CouponActivity.CouponStatus.DELETE.getCode()));
+        return x.count() > 0;
+    }
 
     public List<CouponActivityPo> getActivitiesBySPUId(long id){
         CouponSKUPoExample example = new CouponSKUPoExample();
@@ -55,7 +79,7 @@ public class CouponActivityDao {
         CouponActivityPoExample example = new CouponActivityPoExample();
         CouponActivityPoExample.Criteria criteria = example.createCriteria();
         criteria.andShopIdEqualTo(shopId);
-        criteria.andStateEqualTo(CouponActivity.CouponStatus.CANCELED.getCode());
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.DELETE.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);
@@ -94,13 +118,14 @@ public class CouponActivityDao {
         if(shopId != null){
             criteria.andShopIdEqualTo(shopId);
         }
-        criteria.andStateEqualTo(CouponActivity.CouponStatus.NORMAL.getCode());
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.OFFLINE.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);
     }
 
     public boolean changeActivityStatus(long id, Byte status){
+        redisTemplate.boundHashOps("coupon-activity").delete(id);
         CouponActivityPo po = new CouponActivityPo();
         po.setId(id);
         po.setState(status);
@@ -115,6 +140,7 @@ public class CouponActivityDao {
     }
 
     public boolean delActivity(long id){
+        redisTemplate.boundHashOps("coupon-activity").delete(id);
         return couponActivityPoMapper.deleteByPrimaryKey(id) == 1;
     }
 
@@ -126,12 +152,21 @@ public class CouponActivityDao {
     }
 
     /**
-     * 获取有效的活动详情
+     * 获取优惠活动详情（加了缓存）
      * @param id
      * @return
      */
     public CouponActivityPo getActivityById(long id){
-        return couponActivityPoMapper.selectByPrimaryKey(id);
+        var x = redisTemplate.boundHashOps("coupon-activity").get(id);
+        if(x != null){
+            return (CouponActivityPo)x;
+        }else{
+            var res = couponActivityPoMapper.selectByPrimaryKey(id);
+            if (res != null){
+                redisTemplate.boundHashOps("coupon-activity").put(id, res);
+            }
+            return res;
+        }
     }
 
     public Long addSpuToActivity(long activityId,long skuId){

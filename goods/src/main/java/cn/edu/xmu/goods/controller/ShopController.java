@@ -1,6 +1,7 @@
 package cn.edu.xmu.goods.controller;
 
 import ch.qos.logback.classic.Logger;
+import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.vo.ShopConclusionVo;
 import cn.edu.xmu.goods.model.vo.ShopVo;
 import cn.edu.xmu.goods.service.ShopService;
@@ -68,9 +69,12 @@ public class ShopController {
         if (null != obj) {
             return obj;
         }
-
-        ReturnObject ret=shopService.newShop(shopvo);
-        return Common.decorateReturnObject(ret);
+        if(did == -1)
+        {
+            ReturnObject ret=shopService.newShop(shopvo);
+            return Common.decorateReturnObject(ret);
+        }
+        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "不能重复申请店铺"));
     }
 
     /**
@@ -117,7 +121,7 @@ public class ShopController {
     })
     @DeleteMapping(value = "/shops/{id}")
     public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
-        if(shopService.getShopByShopId(id).getData().getState()==4)
+        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()||shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
         {
             ReturnObject ret=shopService.deleteShopById(id);
             return Common.decorateReturnObject(ret);
@@ -191,7 +195,7 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{id}/offshelves")
     public Object shopsIdOffshelvesPut(@PathVariable("id") long id){
-        if(shopService.getShopByShopId(id).getData().getState()==4)
+        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
         {
             ReturnObject ret=shopService.offShelfShop(id);
             return Common.decorateReturnObject(ret);

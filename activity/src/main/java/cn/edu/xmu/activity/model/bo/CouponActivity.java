@@ -9,8 +9,9 @@ import java.util.Map;
 public class CouponActivity {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum CouponStatus {
-        NORMAL((byte)0,"正常"),
-        CANCELED((byte)1,"已取消");
+        OFFLINE((byte)0,"已下线"),
+        ONLINE((byte)1,"已上线"),
+        DELETE((byte)2,"已删除");
 
         private static final Map<Byte, CouponStatus> typeMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值

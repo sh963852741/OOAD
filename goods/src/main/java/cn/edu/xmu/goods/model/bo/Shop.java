@@ -19,10 +19,10 @@ import java.util.Map;
 public class Shop implements VoObject {
     public enum State {
         FORBID(3, "关闭"),
-        ONLINE(4, "上线"),
-        OFFLINE(5,"未上线"),
-        NOTPASS(6,"审核未通过"),
-        EXAME(7,"未审核");
+        ONLINE(2, "上线"),
+        OFFLINE(1,"未上线"),
+        NOTPASS(4,"审核未通过"),
+        EXAME(0,"未审核");
         private static final Map<Integer, Shop.State> stateMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
             stateMap = new HashMap();

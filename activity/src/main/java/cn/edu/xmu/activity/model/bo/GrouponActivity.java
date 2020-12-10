@@ -14,10 +14,9 @@ import java.util.Map;
 public class GrouponActivity implements VoObject {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum GrouponStatus {
-        NORMAL((byte)0,"正常运行"),
-        CANCELED((byte)1,"已取消"),
-        SUCCESS((byte)2,"已成团"),
-        FAILURE((byte)3,"未成团");
+        OFFLINE((byte)0,"已下线"),
+        ONLINE((byte)1,"已上线"),
+        DELETE((byte)2,"被删除");
 
         private static final Map<Byte, GrouponStatus> typeMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值

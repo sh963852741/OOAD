@@ -58,7 +58,7 @@ UNLOCK TABLES;
 -- Dumping data for table `coupon_spu`
 --
 
-LOCK TABLES `coupon_spu` WRITE;
+LOCK TABLES `coupon_sku` WRITE;
 /*!40000 ALTER TABLE `coupon_spu` DISABLE KEYS */;
 /*!40000 ALTER TABLE `coupon_spu` ENABLE KEYS */;
 UNLOCK TABLES;

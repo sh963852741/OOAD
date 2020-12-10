@@ -1,9 +1,9 @@
 package cn.edu.xmu.flashsale.model.bo;
 
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
-import cn.edu.xmu.flashsale.model.po.SKUPo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleItemRetVo;
 import cn.edu.xmu.flashsale.model.vo.ProductRetVo;
+import cn.edu.xmu.goods.client.dubbo.SkuDTO;
 import cn.edu.xmu.ooad.model.VoObject;
 import lombok.Data;
 
@@ -35,9 +35,9 @@ public  class FlashSaleItem implements VoObject, Serializable  {
         super();
     }
 
-    public FlashSaleItem(FlashSaleItemPo itemPo, SKUPo skuPo) {
-        this.id = skuPo.getId();
-        this.product = new Product(skuPo);
+    public FlashSaleItem(FlashSaleItemPo itemPo, SkuDTO skuDTO) {
+        this.id = itemPo.getId();
+        this.product = new Product(skuDTO);
         this.price = itemPo.getPrice();
         this.saleId = itemPo.getSaleId();
         this.quantity = itemPo.getQuantity();

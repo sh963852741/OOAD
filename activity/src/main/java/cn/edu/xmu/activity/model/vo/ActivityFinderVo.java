@@ -30,4 +30,6 @@ public class ActivityFinderVo {
 
     @ApiModelProperty(value = "结束时间")
     LocalDateTime endTime;
+
+    Long skuId;
 }
