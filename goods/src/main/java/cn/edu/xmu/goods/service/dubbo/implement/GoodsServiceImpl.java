@@ -8,6 +8,7 @@ import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.bo.*;
+import cn.edu.xmu.goods.model.po.SPUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@DubboService(version = "0.0.1-SNAPSHOT")
+@DubboService(version = "0.0.3-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
 
 //    @DubboReference(version = "0.0.1-SNAPSHOT")
@@ -179,5 +180,48 @@ public class GoodsServiceImpl implements IGoodsService {
         ShopDTO shopDTO =shop.createDTO();
         log.debug("shopDTO:" + shopDTO);
         return shopDTO;
+    }
+
+    @Override
+    public Long getGoodWeightBySku(Long skuId) {
+        ReturnObject<Sku> ret = goodsDao.getSkuById(skuId);
+        if(ret.getCode() != ResponseCode.OK){
+            return null;
+        }
+        Long weight = ret.getData().getWeight();
+        return weight;
+    }
+
+    @Override
+    public Long getFreightModelIdBySku(Long skuId) {
+        ReturnObject<Sku> ret = goodsDao.getSkuById(skuId);
+        if(ret.getCode() != ResponseCode.OK){
+            return null;
+        }
+        ReturnObject<SPUPo> spuRet = goodsDao.getSpuById(ret.getData().getGoodsSpuId());
+        if(spuRet.getCode() != ResponseCode.OK){
+            return null;
+        }
+        return spuRet.getData().getFreightId();
+    }
+
+    @Override
+    public Boolean deleteFreightModelIdBySku(Long modelId, Long shopId) {
+        List<SPUPo> list = goodsDao.getSpusByShopId(shopId);
+        if(list.size() ==0){
+            return true;
+        }
+        for(SPUPo po : list){
+            if(po.getDisabled() == 0 && po.getFreightId() == modelId){
+                Spu spu = new Spu();
+                spu.setId(po.getId());
+                spu.setFreightId(null);
+                ReturnObject ret = goodsDao.updateSpu(spu);
+                if(ret.getCode() != ResponseCode.OK){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

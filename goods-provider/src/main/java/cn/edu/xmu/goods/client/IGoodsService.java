@@ -52,4 +52,10 @@ public interface IGoodsService {
 	 * @return
 	 */
 	ShopDTO getShopBySKUId(Long skuId);
+
+	Long getGoodWeightBySku(Long skuId);
+
+	Long getFreightModelIdBySku(Long skuID);
+
+	Boolean deleteFreightModelIdBySku(Long modelId, Long shopId);
 }

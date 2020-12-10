@@ -1,6 +1,7 @@
 package cn.edu.xmu.goods.client;
 
 import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
+import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -47,4 +48,7 @@ public interface IActivityService {
 	 * @Return: Map<String, Long> key为prePrice 和 finalPrice
 	 */
 	Map<String, Long> getPrePrice(Long skuId);
+
+	// type表示类型 团购或者预售 如果priceDto里预售款是null 则尾款表示是团购活动的价格
+	List<PriceDTO> getPriceAndName(List<OrderItemDTO> list , Integer type);
 }
