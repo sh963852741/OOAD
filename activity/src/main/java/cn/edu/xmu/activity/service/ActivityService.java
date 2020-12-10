@@ -640,6 +640,7 @@ public class ActivityService {
     public ReturnObject claimCouponQuickly(Long activityId, Long userId){
         /* 从Redis里面获取活动数据，验证优惠活动的有效性 */
         CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
+        ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
         if (couponActivityPo == null) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动不存在");
         } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
@@ -653,6 +654,7 @@ public class ActivityService {
             return new ReturnObject(ResponseCode.COUPON_FINISH, "你已经领取过本活动的优惠券了");
         }
         /* 构造优惠券对象 */
+        List<CouponVo> retList = new ArrayList<>();
         CouponPo po = new CouponPo();
 
         po.setCouponSn(Common.genSeqNum());
@@ -672,13 +674,14 @@ public class ActivityService {
                     );
                 }
                 couponDao.addCoupon(po, activityId, userId);
+                retList.add(new CouponVo(po,activityInCouponVo));
             }
         } else if (couponActivityPo.getQuantitiyType() == 1) {
             // 总数控制，每人领取一张
-            if (couponActivityPo.getQuantity() > 0) {
-                couponActivityPo.setQuantity(couponActivityPo.getQuantity() - 1);
-                couponActivityDao.updateActivity(couponActivityPo, couponActivityPo.getId(),couponActivityPo.getShopId());
-            } else {
+            Long res = redisTemplate.boundValueOps("CouponCount" + couponActivityPo.getId().toString()).decrement();
+            if (res == null){
+                new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "找不到优惠券数量");
+            }else if(res < 0){
                 return new ReturnObject(ResponseCode.COUPON_FINISH, "优惠券已售罄");
             }
 
@@ -693,10 +696,10 @@ public class ActivityService {
                 );
             }
             couponDao.addCoupon(po, activityId, userId);
+            retList.add(new CouponVo(po,activityInCouponVo));
         }
 
         /* 构造返回值 */
-        ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
         CouponVo couponVo = new CouponVo(po,activityInCouponVo);
         return new ReturnObject(couponVo);
     }
