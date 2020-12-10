@@ -119,7 +119,7 @@ public class ShopService {
         Shop shop=new Shop();
         shop.setId(id);
         shop.setState(Shop.State.ONLINE.getCode().byteValue());
-        if(getShopByShopId(id).getData().getState()==5) {
+        if(getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()) {
             ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
         }

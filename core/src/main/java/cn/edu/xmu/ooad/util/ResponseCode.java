@@ -97,7 +97,8 @@ public enum ResponseCode {
     SHUTSHOP_ERROR(180,"该店铺无法被执行关闭操作"),
     ONLINESHOP_ERROR(160,"该店铺无法上线"),
     PASSSHOP_ERROR(150,"该店铺不是待审核状态"),
-    OFFLINESHOP_ERROR(170,"该店铺无法下线");
+    OFFLINESHOP_ERROR(170,"该店铺无法下线"),
+    APPLYAGAIN_ERROR(190,"您已拥有店铺，无法重新申请店铺");
 
     private int code;
     private String message;
