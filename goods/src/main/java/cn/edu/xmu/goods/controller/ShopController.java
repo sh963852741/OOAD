@@ -68,9 +68,12 @@ public class ShopController {
         if (null != obj) {
             return obj;
         }
-
-        ReturnObject ret=shopService.newShop(shopvo);
-        return Common.decorateReturnObject(ret);
+        if(did==-1)
+        {
+            ReturnObject ret=shopService.newShop(shopvo);
+            return Common.decorateReturnObject(ret);
+        }
+        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR));
     }
 
     /**
