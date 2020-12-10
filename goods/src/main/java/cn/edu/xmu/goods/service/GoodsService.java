@@ -9,22 +9,25 @@ import cn.edu.xmu.goods.model.bo.Category;
 import cn.edu.xmu.goods.model.bo.FloatPrice;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
-import cn.edu.xmu.goods.model.po.FloatPricePo;
-import cn.edu.xmu.goods.model.po.SKUPo;
-import cn.edu.xmu.goods.model.po.SPUPo;
+import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.utility.OrderAdapter;
 import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
+import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
 import cn.edu.xmu.oomall.dto.FreightModelDto;
 import cn.edu.xmu.oomall.service.IFreightService;
+import com.google.common.hash.Funnels;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -43,7 +46,7 @@ import java.util.List;
  */
 
 @Service
-public class GoodsService {
+public class GoodsService implements InitializingBean {
 
     private  static  final Logger logger = LoggerFactory.getLogger(GoodsService.class);
 
@@ -70,6 +73,35 @@ public class GoodsService {
 
     @Value("${goodsservice.webdav.baseUrl}")
     private String baseUrl;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private BloomFilterHelper bloomFilterHelper;
+
+    private RedisBloomFilter redisBloomFilter;
+
+    private String skuBloomFilter = "SkuBloomFilter";
+
+    private String spuBloomFilter = "SpuBloomFilter";
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.bloomFilterHelper =  new BloomFilterHelper<>(
+                Funnels.longFunnel(),
+                5000, 0.03);
+        this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
+        SKUPoExample example = new SKUPoExample();
+        List<SKUPo> skuPoList = goodsDao.getSkuList();
+        for(SKUPo skuPo : skuPoList){
+            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
+        }
+        SPUPoExample example1 = new SPUPoExample();
+        List<SPUPo> spuPoList = goodsDao.getSpuList();
+        for(SPUPo spuPo : spuPoList){
+            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
+        }
+    }
 
     /**
      * 功能描述: 获取商品的所有状态
@@ -111,6 +143,9 @@ public class GoodsService {
         if(vo.getSpuId() == null){
             return goodsDao.getAllSkus(vo, page, pageSize);
         }
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter, vo.getSpuId())){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         //spuId不为空 且shopId也不空 检查这个spuId是否是这个shopId的 如果不是 直接返回错误
         if(vo.getShopId() != null){
             ReturnObject shopIdRet = goodsDao.getShopIdBySpuId(vo.getSpuId());
@@ -134,6 +169,9 @@ public class GoodsService {
      * @Date: 2020/11/28 10:03
      */
     public ReturnObject getSkuDetails(Long skuId){
+        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter, skuId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         ReturnObject ret=goodsDao.getSkuById(skuId);
         if(ret.getCode()!=ResponseCode.OK){
             return ret;
@@ -157,7 +195,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject upLoadSkuImg(MultipartFile multipartFile, Integer shopId, Integer id) {
-
+        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         //判断是否是属于自己商铺的SKU
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
@@ -223,6 +263,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject deleteSkuById(Integer shopId, Integer id) {
+        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
@@ -248,6 +291,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject updateSku(Integer shopId, Integer id, SkuChangeVo skuChangeVo) {
+        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
@@ -334,7 +380,9 @@ public class GoodsService {
      * @Date: 2020/11/27 17:58
      */
     public ReturnObject upLoadSpuImg(MultipartFile multipartFile, Integer shopId, Integer id) {
-
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         //判断是否是属于自己商铺的Spu
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
@@ -400,6 +448,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject updateSpu(Integer id, Integer shopId, SpuVo spuVo) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId != 0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
@@ -427,6 +478,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject deleteSpuById(Integer id, Integer shopId) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
@@ -453,6 +507,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject onShelfSku(Long id, Long shopId) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
@@ -479,6 +536,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject offShelfSku(Long id, Long shopId) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId != 0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id);
             if(check.getCode()!=ResponseCode.OK){
@@ -505,6 +565,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject newFloatPrice(Long id, Long shopId, FloatPriceVo floatPriceVo ,Long userId) {
+        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId != 0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
@@ -571,6 +634,9 @@ public class GoodsService {
         if(skuId == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
+        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,skuId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         ReturnObject ret = goodsDao.getActivityPrice(skuId);
         if(ret.getCode() != ResponseCode.OK){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -587,6 +653,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject addSpuToCategory(Long shopId, Long spuId, Long id) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode()!=ResponseCode.OK){
@@ -620,6 +689,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject removeSpuFromCategory(Long shopId, Long spuId, Long id) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId != 0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode() != ResponseCode.OK){
@@ -645,6 +717,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject addSpuToBrand(Long shopId, Long spuId, Long id) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check = goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode()!=ResponseCode.OK){
@@ -670,6 +745,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject removeSpuFromBrand(Long shopId, Long spuId, Long id) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check=goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode()!=ResponseCode.OK){
@@ -695,6 +773,9 @@ public class GoodsService {
      */
     @Transactional
     public ReturnObject addSkuToSpu(Long shopId, Long id, SkuVo skuVo) {
+        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(shopId!=0){
             ReturnObject<Long> check = goodsDao.getShopIdBySpuId(id);
             if(check.getCode() != ResponseCode.OK){

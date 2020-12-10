@@ -16,11 +16,16 @@ import cn.edu.xmu.goods.model.vo.SkuSimpleRetVo;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
+import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.hash.Funnels;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -43,6 +48,18 @@ public class GoodsDao {
     FloatPricePoMapper floatPricePoMapper;
     @Autowired
     CategoryPoMapper categoryPoMapper;
+
+    public List<SKUPo> getSkuList(){
+        SKUPoExample example = new SKUPoExample();
+        List<SKUPo> skuPoList = skuPoMapper.selectByExample(example);
+        return skuPoList;
+    }
+
+    public List<SPUPo> getSpuList(){
+        SPUPoExample example = new SPUPoExample();
+        List<SPUPo> spuPoList = spuPoMapper.selectByExample(example);
+        return spuPoList;
+    }
 
     /**
      * 功能描述: 获取商品的所有状态
@@ -580,6 +597,5 @@ public class GoodsDao {
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
     }
-
 
 }
