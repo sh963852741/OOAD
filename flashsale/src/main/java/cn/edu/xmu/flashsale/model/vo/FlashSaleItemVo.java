@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(value = "秒杀活动")
-public class FlashsaleVo {
+public class FlashSaleItemVo {
 
     @ApiModelProperty(value = "秒杀的skuId")
     private Long skuId;

@@ -25,6 +25,13 @@ spring:
           filters:
             - PrefixPath=/presale
 
+        - id: shop
+          uri: http://localhost:8907/
+          predicates:
+            - Path=/shops/states,/shops,/shops/{id},/shops/{shopId}/newshops/{id}/audit,/shops/{id}/onshelves,/shops/{id}/offshelves
+          filters:
+            - PrefixPath=/shop
+
 #        - id: adminusers
 #          uri: http://localhost:9999/
 #          predicates:
