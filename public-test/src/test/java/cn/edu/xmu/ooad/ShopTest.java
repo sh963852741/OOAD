@@ -2,15 +2,14 @@ package cn.edu.xmu.ooad;
 
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.Depart;
-import cn.edu.xmu.ooad.util.Common;
-import cn.edu.xmu.ooad.util.JwtHelper;
-import cn.edu.xmu.ooad.util.ResponseCode;
-import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.ooad.util.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,23 +25,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class ShopTest {
 
-    private WebTestClient webClient;
+//    @Value("${public-test.managementgate}")
+    private String managementGate = "http://localhost:8080";
 
-    private static String adminToken;
-    private static String shopToken;
+    @Value("${public-test.mallgate}")
+    private String mallGate;
 
-    public ShopTest() {
-        this.webClient = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:8080")
+    private WebTestClient manageClient;
+
+    private WebTestClient mallClient;
+
+    public ShopTest(){
+        this.manageClient = WebTestClient.bindToServer()
+                .baseUrl(managementGate)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
+                .build();
+
+        this.mallClient = WebTestClient.bindToServer()
+                .baseUrl(mallGate)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
     }
 
+    private static String adminToken;
+    private static String shopToken;
+    private static String noShopToken;
+
     @BeforeAll
-    private static void login() {
+    private static void login(){
         JwtHelper jwtHelper = new JwtHelper();
-        adminToken = jwtHelper.createToken(1L, 0L, 3600);
-        shopToken = jwtHelper.createToken(59L, 1L, 3600);
+        adminToken =jwtHelper.createToken(1L,0L, 3600);
+        shopToken =jwtHelper.createToken(59L,1L, 3600);
+        noShopToken =jwtHelper.createToken(59L,-1L, 3600);
     }
 
     /**
@@ -51,12 +65,14 @@ public class ShopTest {
     @Test
     public void getAllState() {
         byte[] responseBuffer = null;
-        WebTestClient.RequestHeadersSpec res = webClient.get().uri("/shop/shops/states");
+        WebTestClient.RequestHeadersSpec res = manageClient.get().uri("/shops/states");
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
                 .jsonPath("$.data").isArray()
+                .jsonPath("$.data[0].code").isNotEmpty()
+                .jsonPath("$.data[0].name").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
     }
@@ -68,15 +84,19 @@ public class ShopTest {
     public void applyShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"张三商铺\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shop/shops")
-                .header("authorization", shopToken)
+        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/shops")
+                .header("authorization", noShopToken)
                 .bodyValue(requestJson);
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.data.id").isNumber()
+                .jsonPath("$.data.name").isEqualTo("张三商铺")
+                .jsonPath("$.data.state").isEqualTo(0)
+                .jsonPath("$.data.gmtCreate").isNotEmpty()
+                .jsonPath("$.data.gmtModified").isEmpty()
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -93,7 +113,7 @@ public class ShopTest {
     public void applyShop_null() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"    \"}";
-        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shop/shops")
+        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/shop/shops")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -118,7 +138,7 @@ public class ShopTest {
     public void applyShop_again() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"张三商铺\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shop/shops")
+        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/shop/shops")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -144,7 +164,7 @@ public class ShopTest {
     public void modifyShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"已经改了哈\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -169,7 +189,7 @@ public class ShopTest {
     public void modifyShop_unaudit() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"它应该没通过审核吧\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/2")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/2")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -194,7 +214,7 @@ public class ShopTest {
     public void modifyShop_null() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -219,7 +239,7 @@ public class ShopTest {
     public void modifyShop_ID() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"这个想改ID\",\"id\":\"123\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -245,7 +265,7 @@ public class ShopTest {
     public void modifyShop_STATE() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"这个想改state\",\"state\":\"3\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -270,7 +290,7 @@ public class ShopTest {
     public void auditShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": true}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/0/newshops/1/audit")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/0/newshops/1/audit")
                 .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
@@ -295,7 +315,7 @@ public class ShopTest {
     public void auditShop_abnormal() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": 1223}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/0/newshops/1/audit")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/0/newshops/1/audit")
                 .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
@@ -320,7 +340,7 @@ public class ShopTest {
     public void onshelfShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": true}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/1/onshelves")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1/onshelves")
                 .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
@@ -345,9 +365,14 @@ public class ShopTest {
     public void offshelfShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": true}";
-        WebTestClient.RequestHeadersSpec res = webClient.put().uri("/shop/shops/1/offshelves")
-                .header("authorization", adminToken)
-                .bodyValue(requestJson);
+        WebTestClient.RequestHeadersSpec res = null;
+        try {
+            res = manageClient.put().uri("/shop/shops/1/offshelves")
+                    .header("authorization", adminToken)
+                    .bodyValue(requestJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -369,8 +394,13 @@ public class ShopTest {
     @Test
     public void deleteShop() {
         byte[] responseBuffer = null;
-        WebTestClient.RequestHeadersSpec res = webClient.delete().uri("/shop/shops/1/offshelves")
-                .header("authorization", adminToken);
+        WebTestClient.RequestHeadersSpec res = null;
+        try {
+            res = manageClient.delete().uri("/shop/shops/1/offshelves")
+                    .header("authorization", adminToken);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
@@ -385,5 +415,31 @@ public class ShopTest {
         }
     }
 
+    private String adminLogin(String userName, String password) throws Exception {
+        String requireJson = "{\"userName\":\""+ userName +"\",\"password\":\""+ password +"\"}";
 
+        byte[] ret = manageClient.post().uri("/privileges/login").bodyValue(requireJson).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+        return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
+
+    }
+
+    private String adminLogin() throws Exception {
+        String requireJson = "{\"userName\":\"13088admin\",\"password\":\"123456\"}";
+
+        byte[] ret = manageClient.post().uri("/privileges/login").bodyValue(requireJson).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+        return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
+
+    }
 }

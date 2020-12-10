@@ -69,12 +69,12 @@ public class ShopController {
         if (null != obj) {
             return obj;
         }
-        if(did==-1)
+        if(did == -1)
         {
             ReturnObject ret=shopService.newShop(shopvo);
             return Common.decorateReturnObject(ret);
         }
-        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR));
+        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "不能重复申请店铺"));
     }
 
     /**

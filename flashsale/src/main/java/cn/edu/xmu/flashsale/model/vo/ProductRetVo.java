@@ -15,5 +15,5 @@ public class ProductRetVo {
     private Integer inventory;
     private Long originalPrice;
     private Long price;
-    private Boolean disable;
+    private Byte disable;
 }

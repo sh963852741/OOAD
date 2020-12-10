@@ -149,7 +149,7 @@ public class CouponController {
     public Object getSpuInCouponActivity(@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,
                                          @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,
                                          @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
-        ReturnObject ret = activityService.getSKUInCouponActivity(id,page,pageSize);
+        ReturnObject<PageInfo<VoObject>> ret = activityService.getSKUInCouponActivity(id,page,pageSize);
 
         return Common.getPageRetObject(ret);
     }

@@ -1,0 +1,3 @@
+public-test:
+  managementgate: localhost:8080
+  mallgate: localhost:8080
