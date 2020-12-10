@@ -19,12 +19,17 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IGoodsService;
 import cn.edu.xmu.goods.client.IShopService;
+import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
+import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
 import com.github.pagehelper.PageInfo;
+import com.google.common.hash.Funnels;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +47,11 @@ public class ActivityService {
     CouponActivityDao couponActivityDao;
     @Autowired
     CouponDao couponDao;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+    RedisBloomFilter redisBloomFilter =  new RedisBloomFilter<>(redisTemplate,
+            new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
 
     @DubboReference(version = "0.0.1-SNAPSHOT")
     IGoodsService goodsService;
@@ -625,6 +635,70 @@ public class ActivityService {
         } else {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
+    }
+
+    public ReturnObject claimCouponQuickly(Long activityId, Long userId){
+        /* 从Redis里面获取活动数据，验证优惠活动的有效性 */
+        CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
+        if (couponActivityPo == null) {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动不存在");
+        } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
+                || couponActivityPo.getEndTime().isBefore(LocalDateTime.now())) {
+            return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动已结束或者未开始");
+        } else if (couponActivityPo.getState() != CouponActivity.CouponStatus.OFFLINE.getCode()) {
+            return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
+        }
+        /* 从布隆过滤器里面查看用户是否已经领取了此优惠券 */
+        if(redisBloomFilter.includeByBloomFilter("Claimed" + activityId.toString(), activityId.toString() + userId.toString())){
+            return new ReturnObject(ResponseCode.COUPON_FINISH, "你已经领取过本活动的优惠券了");
+        }
+        /* 构造优惠券对象 */
+        CouponPo po = new CouponPo();
+
+        po.setCouponSn(Common.genSeqNum());
+        /* 异步要求RocketMQ写入 */
+        if (couponActivityPo.getQuantitiyType() == 0) {
+            // 每人限领取一定数量，生成quantity张
+            for (int i = 0; i < couponActivityPo.getQuantity(); ++i) {
+
+                if (couponActivityPo.getValidTerm() == 0) {
+                    po.setBeginTime(couponActivityPo.getCouponTime());
+                    po.setEndTime(couponActivityPo.getEndTime());
+                } else if (couponActivityPo.getValidTerm() > 0) {
+                    po.setBeginTime(LocalDateTime.now());
+                    po.setEndTime(
+                            LocalDateTime.now().plusDays(couponActivityPo.getValidTerm()).isAfter(couponActivityPo.getEndTime()) ?
+                                    couponActivityPo.getEndTime() : LocalDateTime.now().plusDays(couponActivityPo.getValidTerm())
+                    );
+                }
+                couponDao.addCoupon(po, activityId, userId);
+            }
+        } else if (couponActivityPo.getQuantitiyType() == 1) {
+            // 总数控制，每人领取一张
+            if (couponActivityPo.getQuantity() > 0) {
+                couponActivityPo.setQuantity(couponActivityPo.getQuantity() - 1);
+                couponActivityDao.updateActivity(couponActivityPo, couponActivityPo.getId(),couponActivityPo.getShopId());
+            } else {
+                return new ReturnObject(ResponseCode.COUPON_FINISH, "优惠券已售罄");
+            }
+
+            if (couponActivityPo.getValidTerm() == 0) {
+                po.setBeginTime(couponActivityPo.getCouponTime());
+                po.setEndTime(couponActivityPo.getEndTime());
+            } else if (couponActivityPo.getValidTerm() > 0) {
+                po.setBeginTime(LocalDateTime.now());
+                po.setEndTime(
+                        LocalDateTime.now().plusDays(couponActivityPo.getValidTerm()).isAfter(couponActivityPo.getEndTime()) ?
+                                couponActivityPo.getEndTime() : LocalDateTime.now().plusDays(couponActivityPo.getValidTerm())
+                );
+            }
+            couponDao.addCoupon(po, activityId, userId);
+        }
+
+        /* 构造返回值 */
+        ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
+        CouponVo couponVo = new CouponVo(po,activityInCouponVo);
+        return new ReturnObject(couponVo);
     }
 
     /**
