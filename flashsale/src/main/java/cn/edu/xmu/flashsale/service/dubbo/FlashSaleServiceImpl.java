@@ -18,17 +18,18 @@ public class FlashSaleServiceImpl implements IFlashSaleService {
 
     @Override
     public Long getSeckillId(Long skuId) {
-        String hashKey ="FlashSaleSKU" + LocalDate.now().toString();
-        RedisFlash redisFlash = redisTemplate.boundHashOps(hashKey).get(skuId);
-        if (redisFlash == null){
-            return -1L;
-        }
-
-        if (redisFlash.getBeginTime().isBefore(LocalTime.now())
-        && redisFlash.getEndTime().isAfter(LocalTime.now())){
-            return redisFlash.getPrice();
-        }
-        return -1L;
+//        String hashKey ="FlashSaleSKU" + LocalDate.now().toString();
+//        RedisFlash redisFlash = redisTemplate.boundHashOps(hashKey).get(skuId);
+//        if (redisFlash == null){
+//            return -1L;
+//        }
+//
+//        if (redisFlash.getBeginTime().isBefore(LocalTime.now())
+//        && redisFlash.getEndTime().isAfter(LocalTime.now())){
+//            return redisFlash.getPrice();
+//        }
+//        return -1L;
+        return null;
     }
 
     @Override

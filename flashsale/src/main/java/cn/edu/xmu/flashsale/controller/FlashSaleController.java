@@ -3,9 +3,11 @@ package cn.edu.xmu.flashsale.controller;
 import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleItemVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
 import cn.edu.xmu.ooad.util.Common;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Flux;
  **/
 @Api(value = "秒杀服务", tags = "flashsale")
 @RestController /*Restful的Controller对象*/
+@Slf4j
 @RequestMapping(value = "/flashsale", produces = "application/json;charset=UTF-8")
 public class FlashSaleController {
 
@@ -57,7 +60,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("timesegments/{id}/flashsales")
-    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleRetVo flashDate){
+    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate){
         var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
 
         return Common.decorateReturnObject(ret);
@@ -79,7 +82,11 @@ public class FlashSaleController {
     })
     @GetMapping("flashsales/current")
     public Flux<FlashSaleItem> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
-        return flashSaleService.getFlashSale(1L);
+        log.debug("flashsales/current");
+        return flashSaleService.getFlashSale(1L).map(x->{
+            log.debug(x.toString());
+            return x;
+        });
     }
 
     /**

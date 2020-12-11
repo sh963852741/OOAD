@@ -2,9 +2,16 @@ package cn.edu.xmu.activity.service.dubbo;
 
 import cn.edu.xmu.activity.dao.CouponActivityDao;
 import cn.edu.xmu.activity.dao.CouponDao;
+import cn.edu.xmu.activity.dao.GrouponActivityDao;
+import cn.edu.xmu.activity.dao.PresaleActivityDao;
+import cn.edu.xmu.activity.model.Timeline;
 import cn.edu.xmu.activity.model.bo.Coupon;
 import cn.edu.xmu.activity.model.po.CouponPo;
 import cn.edu.xmu.activity.model.po.CouponSKUPo;
+import cn.edu.xmu.goods.client.IGoodsService;
+import cn.edu.xmu.goods.client.dubbo.PriceDTO;
+import cn.edu.xmu.goods.client.dubbo.SkuDTO;
+import cn.edu.xmu.goods.client.dubbo.SpuDTO;
 import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -18,11 +25,16 @@ import java.util.*;
 
 @DubboService(version = "0.0.1-SNAPSHOT")
 public class ActivityServiceImpl implements IActivityService {
-
+    @Autowired
+    GrouponActivityDao grouponActivityDao;
+    @Autowired
+    PresaleActivityDao presaleActivityDao;
     @Autowired
     CouponActivityDao couponActivityDao;
     @Autowired
     CouponDao couponDao;
+    @Autowired
+    IGoodsService goodsService;
 
     @Override
     public Map<Long, Long> validateActivity(List<OrderItemDTO> orderItemDTOS, Long couponId){
@@ -32,7 +44,7 @@ public class ActivityServiceImpl implements IActivityService {
             return new HashMap<>();
         }
         Map<Long, Long> map = new HashMap<>();
-        // 考虑增加缓存，缓存活动适用的SPU
+        // 考虑增加缓存，缓存活动适用的SKU
         Long activityId = couponPo.getActivityId();
         List<CouponSKUPo> couponSPUPoList = couponActivityDao.getSKUsInActivity(activityId);
         Set<Long> spuSet = new HashSet<>();
@@ -60,16 +72,20 @@ public class ActivityServiceImpl implements IActivityService {
      */
     public Boolean useCoupon(Long couponId){
         CouponPo couponToUse = couponDao.getCoupon(couponId);
+        if(couponToUse == null){
+//            new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "您使用的优惠券不存在");
+            return false;
+        }
         if(couponToUse.getBeginTime().isAfter(LocalDateTime.now())
                 ||couponToUse.getEndTime().isBefore(LocalDateTime.now())){
-            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
+//            new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
+            return false;
         }
-        if(couponToUse.getState() != Coupon.CouponStatus.NORMAL.getCode()){
-            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
+        if(!couponToUse.getState().equals(Coupon.CouponStatus.NORMAL.getCode())){
+            new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
+            return false;
         }
-        if(couponToUse == null){
-            new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "您使用的优惠券不存在");
-        }
+
 
         CouponPo po = new CouponPo();
         po.setId(couponToUse.getId());
@@ -84,12 +100,28 @@ public class ActivityServiceImpl implements IActivityService {
 
     @Override
     public Long getGrouponId(Long skuId) {
-        return null;
+        SkuDTO skuDTO = goodsService.getSku(skuId);
+        if(skuDTO == null){
+            return null;
+        }
+        SpuDTO spuDTO = goodsService.getSimpleSpuById(skuDTO.getGoodsSpuId());
+        long spuId = spuDTO.getId();
+        var f = grouponActivityDao.getActivitiesBySPUId(1,1,spuId, (byte)Timeline.RUNNING.ordinal());
+        if(f.getList().isEmpty()){
+            return null;
+        } else {
+            return f.getList().get(0).getId();
+        }
     }
 
     @Override
     public Long getPreSale(Long skuId) {
-        return null;
+        var f = presaleActivityDao.getActivitiesBySKUId(1,1,skuId,(byte)Timeline.RUNNING.ordinal());
+        if(f.getList().isEmpty()){
+            return null;
+        } else {
+            return f.getList().get(0).getId();
+        }
     }
 
     @Override

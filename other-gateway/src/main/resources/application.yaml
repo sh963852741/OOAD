@@ -32,6 +32,14 @@ spring:
           filters:
             - PrefixPath=/shop
 
+        - id: falshsale
+          uri: http://localhost:8188/
+          predicates:
+            - Path=/timesegments/{id}/flashsales,/flashsales/current,/flashsales/{id},/flashsales/{id}/flashitems,/flashsales/{fid}/flashitems/{id}
+          filters:
+            - PrefixPath=/flashsale
+
+
 #        - id: adminusers
 #          uri: http://localhost:9999/
 #          predicates:

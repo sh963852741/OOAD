@@ -1,6 +1,7 @@
 package cn.edu.xmu.activity.dao;
 
 import cn.edu.xmu.activity.mapper.GrouponActivityPoMapper;
+import cn.edu.xmu.activity.model.Timeline;
 import cn.edu.xmu.activity.model.bo.GrouponActivity;
 import cn.edu.xmu.activity.model.bo.PresaleActivity;
 import cn.edu.xmu.activity.model.po.GrouponActivityPo;
@@ -40,18 +41,18 @@ public class GrouponActivityDao {
         criteria.andGoodsSpuIdEqualTo(spuId);
 
         if(timeline != null) {
-            if (timeline == 0) {
+            if (timeline == Timeline.PENDING.ordinal()) {
                 /* 获取未开始的活动 */
                 criteria.andBeginTimeGreaterThan(LocalDateTime.now());
-            } else if (timeline == 1) {
+            } else if (timeline == Timeline.TOMORROW.ordinal()) {
                 /* 获取明天开始的活动 */
                 criteria.andBeginTimeGreaterThan(LocalDateTime.now());
                 criteria.andBeginTimeLessThan(LocalDateTime.now().plusDays(1));
-            } else if (timeline == 2) {
+            } else if (timeline == Timeline.RUNNING.ordinal()) {
                 /* 获取正在进行中的活动 */
                 criteria.andBeginTimeLessThan(LocalDateTime.now());
                 criteria.andEndTimeGreaterThan(LocalDateTime.now());
-            } else if (timeline == 3) {
+            } else if (timeline == Timeline.FINISHED.ordinal()) {
                 criteria.andEndTimeLessThan(LocalDateTime.now());
             }
         }

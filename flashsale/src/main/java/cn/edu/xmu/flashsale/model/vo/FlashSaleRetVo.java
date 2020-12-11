@@ -3,6 +3,7 @@ package cn.edu.xmu.flashsale.model.vo;
 import cn.edu.xmu.flashsale.model.bo.TimeSegment;
 import cn.edu.xmu.flashsale.model.po.FlashSalePo;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class FlashSaleRetVo {
     private Long id;
+
     private LocalDate flashDate;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
