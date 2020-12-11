@@ -125,12 +125,44 @@ public class ActivityServiceImpl implements IActivityService {
     }
 
     @Override
-    public Map<String, Long> getPrePrice(Long skuId) {
-        return null;
+    public Map<String, Long> getPrePrice(Long avtivityId) {
+        var activity = presaleActivityDao.getActivityById(avtivityId);
+        Map<String, Long> ret = new HashMap<>();
+        ret.put("prePrice", activity.getAdvancePayPrice());
+        ret.put("finalPrice", activity.getRestPayPrice());
+        return ret;
     }
 
     @Override
     public List<PriceDTO> getPriceAndName(List<OrderItemDTO> list, Integer type) {
-        return null;
+        List<PriceDTO> retList = new ArrayList<>();
+        if(type.equals(1)){
+            // 团购活动
+            for(OrderItemDTO dto:list){
+                var sku = goodsService.getSku(dto.getSkuId());
+                if(sku == null)continue;
+                PriceDTO priceDTO =new PriceDTO();
+                priceDTO.setName(sku.getName());
+                priceDTO.setSkuId(sku.getId());
+                priceDTO.setPrePrice(sku.getOriginalPrice());
+                priceDTO.setFinalPrice(null);
+                retList.add(priceDTO);
+            }
+        }else if(type.equals(2)){
+            // 预售活动
+            for(OrderItemDTO dto:list){
+                var sku = goodsService.getSku(dto.getSkuId());
+                var p = presaleActivityDao.getActivitiesBySKUId(1,1,sku.getId(),(byte)Timeline.RUNNING.ordinal());
+                var activity = p.getList();
+                if(activity.isEmpty())continue;
+                PriceDTO priceDTO =new PriceDTO();
+                priceDTO.setName(sku.getName());
+                priceDTO.setSkuId(sku.getId());
+                priceDTO.setPrePrice(activity.get(0).getAdvancePayPrice());
+                priceDTO.setFinalPrice(activity.get(0).getRestPayPrice());
+                retList.add(priceDTO);
+            }
+        }
+        return retList;
     }
 }

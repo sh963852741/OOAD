@@ -5,17 +5,24 @@ import cn.edu.xmu.activity.model.bo.Coupon;
 import cn.edu.xmu.activity.model.po.CouponPo;
 import cn.edu.xmu.activity.model.po.CouponPoExample;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.JacksonUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 @Repository
 public class CouponDao {
     @Autowired
     CouponPoMapper couponPoMapper;
+    @Resource
+    private RocketMQTemplate rocketMQTemplate;
 
     public int addCoupon(CouponPo couponPo, long activityId, long customerId){
         couponPo.setActivityId(activityId);
@@ -23,8 +30,21 @@ public class CouponDao {
         couponPo.setState(Coupon.CouponStatus.NORMAL.getCode());
         couponPo.setCouponSn(Common.genSeqNum());
         couponPo.setGmtCreate(LocalDateTime.now());
+
+        String json = JacksonUtil.toJson(couponPo);
+        Message message = MessageBuilder.withPayload(json).build();
+        rocketMQTemplate.sendOneWay("coupon-topic", message);
         return couponPoMapper.insert(couponPo);
     }
+
+//    public int addCoupon(CouponPo couponPo, long activityId, long customerId){
+//        couponPo.setActivityId(activityId);
+//        couponPo.setCustomerId(customerId);
+//        couponPo.setState(Coupon.CouponStatus.NORMAL.getCode());
+//        couponPo.setCouponSn(Common.genSeqNum());
+//        couponPo.setGmtCreate(LocalDateTime.now());
+//        return couponPoMapper.insert(couponPo);
+//    }
 
     public int cancelCoupon(long activityId){
         CouponPoExample example = new CouponPoExample();

@@ -24,6 +24,7 @@ import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
 import com.github.pagehelper.PageInfo;
 import com.google.common.hash.Funnels;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class ActivityService {
+public class ActivityService implements InitializingBean {
     @Autowired
     PresaleActivityDao presaleActivityDao;
     @Autowired
@@ -640,7 +641,6 @@ public class ActivityService {
     public ReturnObject claimCouponQuickly(Long activityId, Long userId){
         /* 从Redis里面获取活动数据，验证优惠活动的有效性 */
         CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
-        ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
         if (couponActivityPo == null) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动不存在");
         } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
@@ -649,6 +649,7 @@ public class ActivityService {
         } else if (couponActivityPo.getState() != CouponActivity.CouponStatus.OFFLINE.getCode()) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
         }
+        ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
         /* 从布隆过滤器里面查看用户是否已经领取了此优惠券 */
         if(redisBloomFilter.includeByBloomFilter("Claimed" + activityId.toString(), activityId.toString() + userId.toString())){
             return new ReturnObject(ResponseCode.COUPON_FINISH, "你已经领取过本活动的优惠券了");
@@ -718,7 +719,7 @@ public class ActivityService {
         } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
                 || couponActivityPo.getEndTime().isBefore(LocalDateTime.now())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动已结束或者未开始");
-        } else if (couponActivityPo.getState() != CouponActivity.CouponStatus.OFFLINE.getCode()) {
+        } else if (!couponActivityPo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
         }
 
@@ -771,6 +772,12 @@ public class ActivityService {
         ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
         CouponVo couponVo = new CouponVo(po,activityInCouponVo);
         return new ReturnObject(couponVo);
+    }
+
+    // 初始化布隆过滤器和Redis
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
     }
     //endregion
 }

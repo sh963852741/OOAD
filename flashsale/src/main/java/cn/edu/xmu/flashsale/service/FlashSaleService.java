@@ -96,6 +96,9 @@ public class FlashSaleService implements InitializingBean {
     }
 
     public ReturnObject modifyFlashSale(long id, LocalDateTime date){
+        if(date.minusHours(24).isBefore(LocalDateTime.now())){
+            return new ReturnObject(ResponseCode.FIELD_NOTVALID, "不能修改24小时内开始的活动");
+        }
         if(flashSaleDao.setFlashSaleDate(id, date) == 1){
             return new ReturnObject();
         }else{
@@ -150,13 +153,17 @@ public class FlashSaleService implements InitializingBean {
         log.debug("SetKey: " + setKey);
         log.debug("HashKey: " + hashKey);
 
-        Set<Object> skus = Objects.requireNonNull(redisTemplate.opsForSet().members(setKey)).stream().map(x -> (Long)x).collect(Collectors.toSet());
-
+        Set<Object> skus = Objects.requireNonNull(redisTemplate.opsForSet().members(setKey)).stream().map(x -> x.toString()).collect(Collectors.toSet());
+        log.debug("skus:" + skus);
         return reactiveRedisTemplate.opsForHash().multiGet(hashKey, skus).map(y ->{
-            log.debug("y:" + ((RedisFlash)y).toString());
-            var dto = goodsService.getSku(((RedisFlash)y).getSkuId());
-            log.debug("SkuDTO:" + dto.toString());
-            return new FlashSaleItem((FlashSaleItemPo) y,dto);
+            List<FlashSaleItem> ret = new ArrayList<>();
+            log.debug("y:" + ((List)y).toString());
+            for(Object r:y){
+                var dto = goodsService.getSku(((RedisFlash)r).getSkuId());
+                log.debug("SkuDTO:" + dto.toString());
+                ret.add(new FlashSaleItem((RedisFlash)r,dto));
+            }
+            return ret;
         });
     }
 
