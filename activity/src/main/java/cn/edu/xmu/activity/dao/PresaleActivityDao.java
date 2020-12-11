@@ -18,10 +18,10 @@ public class PresaleActivityDao {
     @Autowired
     PresaleActivityPoMapper presaleActivityPoMapper;
 
-    public List<PresaleActivityPo> getAllActivityBySPUId(byte state, long spuId){
+    public List<PresaleActivityPo> getAllActivityBySKUId(byte state, long skuId){
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSkuIdEqualTo(spuId);
+        criteria.andGoodsSkuIdEqualTo(skuId);
         criteria.andStateEqualTo(state);
 
         return presaleActivityPoMapper.selectByExample(example);

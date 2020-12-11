@@ -40,6 +40,7 @@ public class CouponDao {
     }
 
     public int modifyCoupon(CouponPo couponPo){
+        couponPo.setGmtModified(LocalDateTime.now());
         return couponPoMapper.updateByPrimaryKeySelective(couponPo);
     }
 
