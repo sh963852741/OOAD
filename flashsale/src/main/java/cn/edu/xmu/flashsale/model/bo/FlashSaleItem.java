@@ -45,6 +45,16 @@ public  class FlashSaleItem implements VoObject, Serializable  {
         this.gmtModified = itemPo.getGmtModified();
     }
 
+    public FlashSaleItem(RedisFlash itemPo, SkuDTO skuDTO) {
+        this.id = itemPo.getId();
+        this.product = new Product(skuDTO);
+        this.price = itemPo.getPrice();
+        this.saleId = itemPo.getActivityId();
+        this.quantity = itemPo.getQuantity();
+        this.gmtCreate = itemPo.getGmtCreate();
+        this.gmtModified = itemPo.getGmtModified();
+    }
+
     @Override
     public Object createVo() {
         FlashSaleItemRetVo retVo = new FlashSaleItemRetVo();

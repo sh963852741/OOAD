@@ -27,13 +27,12 @@ import javax.annotation.Resource;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cn.edu.xmu.goods.client.IGoodsService;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Ming Qiu
@@ -135,7 +134,7 @@ public class FlashSaleService implements InitializingBean {
             // 需要更新缓存
             redisTemplate.opsForSet().remove(
                     "FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId(),
-                    flashSalePo);
+                    flashSaleItemId);
         }
 
         if(flashSaleDao.deleteFlashSaleItem(flashSaleItemId) == 1){
@@ -145,16 +144,20 @@ public class FlashSaleService implements InitializingBean {
         }
     }
 
-    public Flux<FlashSaleItem> getFlashSale(Long timeSegId) {
-        log.debug("RedisKey: FlashSale" + LocalDate.now().toString() + timeSegId.toString());
-        return reactiveRedisTemplate.opsForSet()
-                .members("FlashSale" + LocalDate.now().toString() + timeSegId.toString())
-                .map(x -> {
-                    log.debug(((FlashSaleItemPo)x).getGoodsSkuId().toString());
-                    var dto = goodsService.getSku(((FlashSaleItemPo)x).getGoodsSkuId());
-                    log.debug("SkuDTO:" + dto.toString());
-                    return new FlashSaleItem((FlashSaleItemPo) x,dto);
-                });
+    public Mono<Object> getFlashSale(Long timeSegId) {
+        String setKey ="FlashSale" + LocalDate.now().toString() + timeSegId.toString();
+        String hashKey ="FlashSaleSKU" + LocalDate.now().toString();
+        log.debug("SetKey: " + setKey);
+        log.debug("HashKey: " + hashKey);
+
+        Set<Object> skus = Objects.requireNonNull(redisTemplate.opsForSet().members(setKey)).stream().map(x -> (Long)x).collect(Collectors.toSet());
+
+        return reactiveRedisTemplate.opsForHash().multiGet(hashKey, skus).map(y ->{
+            log.debug("y:" + ((RedisFlash)y).toString());
+            var dto = goodsService.getSku(((RedisFlash)y).getSkuId());
+            log.debug("SkuDTO:" + dto.toString());
+            return new FlashSaleItem((FlashSaleItemPo) y,dto);
+        });
     }
 
     /* 加载今日秒杀，不允许同时加载 */
@@ -193,10 +196,10 @@ public class FlashSaleService implements InitializingBean {
             String setKey ="FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId();
             String hashKey ="FlashSaleSKU" + flashSalePo.getFlashDate().toLocalDate().toString();
             for(FlashSaleItemPo po:flashSaleItemPos){
-                redisTemplate.boundSetOps(setKey).add(po); // 时段与SKU ID对应
+                redisTemplate.boundSetOps(setKey).add(po.getGoodsSkuId().toString()); // 时段与SKU ID对应
                 TimeSegment time =segmentMap.get(flashSalePo.getTimeSegId());
-                RedisFlash redisFlash = new RedisFlash(po, time.getStartTime(),time.getEndTime());
-//                redisTemplate.boundHashOps(hashKey).put(po.getGoodsSkuId(), redisFlash); // SKU ID与秒杀Items对应
+                RedisFlash redisFlash = new RedisFlash(po, time.getStartTime(),time.getEndTime(),flashSalePo);
+                redisTemplate.boundHashOps(hashKey).put(po.getGoodsSkuId().toString(), redisFlash); // SKU ID与秒杀Items对应
             }
         }
 
