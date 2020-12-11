@@ -102,6 +102,10 @@ public class FlashSaleTest {
         String response = new String(responseBuffer, "utf-8");
     }
 
+    /**
+     * 获取秒杀活动
+     * @throws Exception
+     */
     @Test
     public void getFlashSaleActivity1()throws Exception {
         byte[] responseBuffer = null;
@@ -115,5 +119,60 @@ public class FlashSaleTest {
                 .getResponseBodyContent();
 
         String response = new String(responseBuffer, "utf-8");
+    }
+
+    /**
+     * 向秒杀活动中加入SKU、删除SKU
+     * @throws Exception
+     */
+    @Test
+    public void addSKUToActivity()throws Exception {
+        LocalDate dateTime = LocalDate.now().plusDays(3);
+
+        String requestJson = "{\"flashDate\":\"" + dateTime + "\"}";
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/timesegments/0/flashsales").bodyValue(requestJson);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").isMap()
+                .returnResult()
+                .getResponseBodyContent();
+
+        String response = new String(responseBuffer, "utf-8");
+
+        JsonNode jsonNode = mObjectMapper.readTree(response).findPath("data").get("id");
+        int insertActivityId = jsonNode.asInt();
+
+        requestJson = "{\"skuId\": 280,\"price\": 2365,\"quantity\": 36}";
+        responseBuffer = webClient.post().uri("flashsales/" + insertActivityId + "/flashitems").bodyValue(requestJson).exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").isMap()
+                .returnResult()
+                .getResponseBodyContent();
+
+        jsonNode = mObjectMapper.readTree(response).findPath("data").get("id");
+        int insertItemId = jsonNode.asInt();
+
+        /* 重复加入 */
+//        requestJson = "{\"skuId\": 280,\"price\": 2365,\"quantity\": 36}";
+//        responseBuffer =webClient.post().uri("flashsales/" + insertId + "/flashitems").bodyValue(requestJson).exchange().expectHeader().contentType("application/json;charset=UTF-8")
+//                .expectBody()
+//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+//                .jsonPath("$.errmsg").isEqualTo("成功")
+//                .jsonPath("$.data").isMap()
+//                .returnResult()
+//                .getResponseBodyContent();
+
+        webClient.delete().uri("flashsales/"+ insertActivityId +"/flashitems/"+ insertItemId).exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").doesNotExist()
+                .returnResult()
+                .getResponseBodyContent();
     }
 }

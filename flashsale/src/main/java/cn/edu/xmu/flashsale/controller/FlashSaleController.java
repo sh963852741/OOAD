@@ -186,7 +186,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("flashsales/{fid}/flashitems/{id}")
-    public Object deleteFlashitems(@PathVariable Long flashSaleId, @PathVariable Long itemId){
+    public Object deleteFlashitems(@PathVariable("fid") Long flashSaleId, @PathVariable("id") Long itemId){
         var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
         return Common.decorateReturnObject(ret);
     }
