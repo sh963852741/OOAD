@@ -19,4 +19,9 @@ public class PriceDTO implements Serializable {
     //尾款
     private Long finalPrice;
 
+    PriceDTO(SkuDTO dto){
+        this.setName(dto.getName());
+        this.setSkuId(dto.getId());
+        this.setPrePrice(dto.getPrice());
+    }
 }

@@ -14,12 +14,14 @@ import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.client.IGoodsService;
+import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,17 +44,8 @@ public class GoodsServiceImpl implements IGoodsService {
     @Autowired
     private GoodsDao goodsDao;
 
-    @Override
-    public Long getPrice(Long skuId) {
-        if(skuId == null){
-            return null;
-        }
-        ReturnObject<Long> ret = goodsService.getActicityPrice(skuId);
-        if(ret.getCode() != ResponseCode.OK){
-            return null;
-        }
-        return ret.getData();
-    }
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Override
     public Map<ShopDTO, List<OrderItemDTO>> classifySku(List<OrderItemDTO> orderItemDTOS) {
@@ -87,9 +80,14 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
+//        if(redisTemplate.hasKey("sku_"+skuId)){
+//            SkuDTO dto = (SkuDTO) redisTemplate.opsForValue().get("sku_"+skuId);
+//            return dto;
+//        }
+//        redisTemplate.delete("sku_"+skuId);
         ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
-            return new SkuDTO();
+            return null;
         }
         SkuDTO skuDTO =new SkuDTO();
         Sku sku=skuRet.getData();
@@ -107,39 +105,11 @@ public class GoodsServiceImpl implements IGoodsService {
         skuDTO.setDetail(sku.getDetail());
         skuDTO.setGoodsSpuId(sku.getGoodsSpuId());
         skuDTO.setPrice(sku.getPrice());
+        //String json = JacksonUtil.toJson(skuDTO);
+        //redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
         return skuDTO;
     }
 
-    @Override
-    public PriceDTO getSkuPriceAndName(Long skuId, Integer type) {
-        if(skuId == null){
-            return null;
-        }
-        ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
-        if(skuRet.getCode()!=ResponseCode.OK){
-            return new PriceDTO();
-        }
-        PriceDTO priceDTO =new PriceDTO();
-        Sku sku=skuRet.getData();
-        switch(type){
-            case 1:
-            case 2:
-                priceDTO.setSkuId(skuId);
-                priceDTO.setName(sku.getName());
-                priceDTO.setPrePrice(sku.getPrice());
-                priceDTO.setFinalPrice(null);
-                return priceDTO;
-            case 3:
-                Map<String, Long> price = activityService.getPrePrice(skuId);
-                priceDTO.setName(sku.getName());
-                priceDTO.setSkuId(skuId);
-                priceDTO.setPrePrice(price.get("prePrice"));
-                priceDTO.setFinalPrice(price.get("finalPrice"));
-                return priceDTO;
-            default:
-                return null;
-        }
-    }
 
     @Override
     public SpuDTO getSimpleSpuById(Long spuId) {
@@ -223,5 +193,23 @@ public class GoodsServiceImpl implements IGoodsService {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<PriceDTO> getPriceAndName(List<OrderItemDTO> orderItemDTOS) {
+        List<PriceDTO> retData = new ArrayList<>();
+        for(OrderItemDTO dto : orderItemDTOS){
+            SkuDTO sku = this.getSku(dto.getSkuId());
+            if(sku == null){
+                return null;
+            }
+            PriceDTO priceDTO = new PriceDTO();
+            priceDTO.setSkuId(sku.getId());
+            priceDTO.setName(sku.getName());
+            priceDTO.setPrePrice(sku.getOriginalPrice());
+            priceDTO.setFinalPrice(null);
+            retData.add(priceDTO);
+        }
+        return retData;
     }
 }

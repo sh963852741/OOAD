@@ -12,6 +12,7 @@ import cn.edu.xmu.goods.client.IGoodsService;
 import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 import cn.edu.xmu.goods.client.dubbo.SkuDTO;
 import cn.edu.xmu.goods.client.dubbo.SpuDTO;
+import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IActivityService;
