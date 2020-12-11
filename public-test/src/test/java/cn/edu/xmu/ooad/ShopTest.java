@@ -119,7 +119,7 @@ public class ShopTest {
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
-                .jsonPath("$.errmsg").isEqualTo("商铺名称输入不合法")
+                .jsonPath("$.errmsg").isEqualTo("字段不合法")
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -143,7 +143,7 @@ public class ShopTest {
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.USER_HASSHOP.getCode())
-                .jsonPath("$.errmsg").isEqualTo("您已经拥有店铺，无法重新申请")
+                .jsonPath("$.errmsg").isEqualTo("用户已经有店铺")
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -169,7 +169,10 @@ public class ShopTest {
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.data.id").isNumber()
+                .jsonPath("$.data.name").isEqualTo("已经改了哈")
+                .jsonPath("$.data.gmtCreate").isNotEmpty()
+                .jsonPath("$.data.gmtModified").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -192,8 +195,8 @@ public class ShopTest {
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.errno").isEqualTo(ResponseCode.MODIFYSHOP_ERROR.getCode())
+                .jsonPath("$.errmsg").isEqualTo("该店铺无法修改")
                 .jsonPath("$.data").isArray()
                 .returnResult()
                 .getResponseBodyContent();
@@ -217,8 +220,8 @@ public class ShopTest {
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("字段不合法")
                 .jsonPath("$.data").isArray()
                 .returnResult()
                 .getResponseBodyContent();
@@ -295,7 +298,11 @@ public class ShopTest {
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.data.name").isNotEmpty()
+                .jsonPath("$.data.id").isNumber()
+                .jsonPath("$.data.state").isEqualTo(1)
+                .jsonPath("$.data.gmtCreate").isNotEmpty()
+                .jsonPath("$.data.gmtModified").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -318,8 +325,8 @@ public class ShopTest {
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("字段不合法")
                 .jsonPath("$.data").isArray()
                 .returnResult()
                 .getResponseBodyContent();
@@ -345,7 +352,11 @@ public class ShopTest {
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.data.name").isNotEmpty()
+                .jsonPath("$.data.id").isNumber()
+                .jsonPath("$.data.state").isEqualTo(2)
+                .jsonPath("$.data.gmtCreate").isNotEmpty()
+                .jsonPath("$.data.gmtModified").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -375,9 +386,14 @@ public class ShopTest {
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.data.name").isNotEmpty()
+                .jsonPath("$.data.id").isNumber()
+                .jsonPath("$.data.state").isEqualTo(1)
+                .jsonPath("$.data.gmtCreate").isNotEmpty()
+                .jsonPath("$.data.gmtModified").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
+
         try {
             String response = new String(responseBuffer, "utf-8");
         } catch (UnsupportedEncodingException e) {
@@ -402,41 +418,18 @@ public class ShopTest {
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
-                .jsonPath("$.data").isArray()
+                .jsonPath("$.data.name").isNotEmpty()
+                .jsonPath("$.data.id").isNumber()
+                .jsonPath("$.data.state").isEqualTo(3)
+                .jsonPath("$.data.gmtCreate").isNotEmpty()
+                .jsonPath("$.data.gmtModified").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
+
         try {
             String response = new String(responseBuffer, "utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-    }
-
-    private String adminLogin(String userName, String password) throws Exception {
-        String requireJson = "{\"userName\":\""+ userName +"\",\"password\":\""+ password +"\"}";
-
-        byte[] ret = manageClient.post().uri("/privileges/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
-                .returnResult()
-                .getResponseBodyContent();
-        return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
-
-    }
-
-    private String adminLogin() throws Exception {
-        String requireJson = "{\"userName\":\"13088admin\",\"password\":\"123456\"}";
-
-        byte[] ret = manageClient.post().uri("/privileges/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
-                .returnResult()
-                .getResponseBodyContent();
-        return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
-
     }
 }
