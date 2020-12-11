@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * 秒杀控制器
@@ -41,8 +42,8 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping(value= "/timesegments/{id}/flashsales")
-    public Flux<Object> getFlashSales(@PathVariable long id){
-            return flashSaleService.getFlashSale(id).map(FlashSaleItem::createVo);
+    public Mono<Object> getFlashSales(@PathVariable long id){
+            return flashSaleService.getFlashSale(id).map(x -> x);
     }
 
     /**
@@ -81,7 +82,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("flashsales/current")
-    public Flux<FlashSaleItem> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
+    public Mono<Object> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
         log.debug("flashsales/current");
         return flashSaleService.getFlashSale(1L).map(x->{
             log.debug(x.toString());
@@ -188,7 +189,4 @@ public class FlashSaleController {
         var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
         return Common.decorateReturnObject(ret);
     }
-
-
-
 }
