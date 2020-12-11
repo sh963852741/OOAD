@@ -6,7 +6,6 @@ import cn.edu.xmu.flashsale.model.bo.RedisFlash;
 import cn.edu.xmu.flashsale.model.bo.TimeSegment;
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
 import cn.edu.xmu.flashsale.model.po.FlashSalePo;
-import cn.edu.xmu.flashsale.model.vo.FlashSaleItemRetVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleItemVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
 import cn.edu.xmu.flashsale.service.dubbo.ITimeSegmentService;
@@ -14,6 +13,7 @@ import cn.edu.xmu.goods.client.dubbo.SkuDTO;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
@@ -51,7 +51,7 @@ public class FlashSaleService implements InitializingBean {
     @Resource
     private RedisTemplate<String, Serializable> redisTemplate;
 
-    @Autowired
+    @DubboReference(version = "0.0.3-SNAPSHOT")
     IGoodsService goodsService;
     @Autowired
     ITimeSegmentService timeSegmentService;
@@ -83,7 +83,7 @@ public class FlashSaleService implements InitializingBean {
     public ReturnObject delFlashSale(long id){
         FlashSalePo flashSalePo = flashSaleDao.getFlashSale(id);
         if (flashSalePo == null){
-            return new ReturnObject("秒杀活动不存在");
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST,"秒杀活动不存在");
         }
 
         redisTemplate.delete("FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId());
@@ -150,8 +150,7 @@ public class FlashSaleService implements InitializingBean {
                 .members("FlashSale" + LocalDate.now().toString() + timeSegId.toString())
                 .map(x -> {
                     var dto = goodsService.getSku(((FlashSaleItemPo)x).getGoodsSkuId());
-                    SkuDTO skuDTO =new SkuDTO();
-                    return new FlashSaleItem((FlashSaleItemPo) x,skuDTO);
+                    return new FlashSaleItem((FlashSaleItemPo) x,dto);
                 });
     }
 

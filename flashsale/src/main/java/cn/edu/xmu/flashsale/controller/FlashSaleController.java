@@ -3,6 +3,7 @@ package cn.edu.xmu.flashsale.controller;
 import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleItemVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
 import cn.edu.xmu.ooad.util.Common;
 import io.swagger.annotations.*;
@@ -57,7 +58,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("timesegments/{id}/flashsales")
-    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleRetVo flashDate){
+    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate){
         var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
 
         return Common.decorateReturnObject(ret);
