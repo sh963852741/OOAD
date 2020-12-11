@@ -68,6 +68,7 @@ public class RedisConfig  {
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
         // 解决jackson2无法反序列化LocalDateTime的问题
         om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

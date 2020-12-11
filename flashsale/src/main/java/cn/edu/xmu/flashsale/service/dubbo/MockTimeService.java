@@ -16,12 +16,12 @@ public class MockTimeService implements ITimeSegmentService {
         /* 假数据 */
         List<TimeSegment> list = new ArrayList<>();
         TimeSegment timeSegment1 = new TimeSegment();
-        timeSegment1.setId(1L);
+        timeSegment1.setId(0L);
         timeSegment1.setStartTime(LocalTime.MIDNIGHT);
         timeSegment1.setEndTime(LocalTime.NOON);
         TimeSegment timeSegment2 = new TimeSegment();
         list.add(timeSegment1);
-        timeSegment2.setId(2L);
+        timeSegment2.setId(1L);
         timeSegment2.setStartTime(LocalTime.NOON);
         timeSegment2.setEndTime(LocalTime.MIDNIGHT);
         list.add(timeSegment2);

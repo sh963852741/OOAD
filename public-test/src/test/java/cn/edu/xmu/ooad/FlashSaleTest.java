@@ -101,4 +101,19 @@ public class FlashSaleTest {
 
         String response = new String(responseBuffer, "utf-8");
     }
+
+    @Test
+    public void getFlashSaleActivity1()throws Exception {
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.get().uri("/flashsales/current?page=1&pageSize=10");
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8").expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$").isArray()
+                .jsonPath("$[?(@.id == 4)].product.id").isEqualTo(275)
+                .jsonPath("$[?(@.id == 3)].product.id").isEqualTo(290)
+                .returnResult()
+                .getResponseBodyContent();
+
+        String response = new String(responseBuffer, "utf-8");
+    }
 }

@@ -46,9 +46,9 @@ public class FlashSaleService implements InitializingBean {
     @Value("${flashsale.loadtime}")
     private Integer loadTime;
 
-    @Resource
+    @Autowired
     private ReactiveRedisTemplate<String, Serializable> reactiveRedisTemplate;
-    @Resource
+    @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
     @DubboReference(version = "0.0.3-SNAPSHOT")
@@ -146,10 +146,13 @@ public class FlashSaleService implements InitializingBean {
     }
 
     public Flux<FlashSaleItem> getFlashSale(Long timeSegId) {
+        log.debug("RedisKey: FlashSale" + LocalDate.now().toString() + timeSegId.toString());
         return reactiveRedisTemplate.opsForSet()
                 .members("FlashSale" + LocalDate.now().toString() + timeSegId.toString())
                 .map(x -> {
+                    log.debug(((FlashSaleItemPo)x).getGoodsSkuId().toString());
                     var dto = goodsService.getSku(((FlashSaleItemPo)x).getGoodsSkuId());
+                    log.debug("SkuDTO:" + dto.toString());
                     return new FlashSaleItem((FlashSaleItemPo) x,dto);
                 });
     }
@@ -171,6 +174,8 @@ public class FlashSaleService implements InitializingBean {
                 timeSegmentsForToday.add(timeSegment);
             }
         }
+        log.debug("TimeSegmentsForToday:" + timeSegmentsForToday.toString());
+        log.debug("TimeSegmentsForTomorrow:" + timeSegmentsForTomorrow.toString());
         log.debug(timeSegments.toString());
         /* 获取了所有的秒杀活动 */
         List<FlashSalePo> effectFlashSaleToLoad = new ArrayList<>();
@@ -182,7 +187,7 @@ public class FlashSaleService implements InitializingBean {
                 LocalDate.now().plusDays(1),
                 timeSegmentsForTomorrow.stream().map(TimeSegment::getId).collect(Collectors.toList())
         ));
-
+        log.debug("EffectFlashSaleToLoad:" + effectFlashSaleToLoad.toString());
         for (FlashSalePo flashSalePo : effectFlashSaleToLoad) {
             List<FlashSaleItemPo> flashSaleItemPos = flashSaleDao.getFlashSaleItemByFlashSaleId(flashSalePo.getId());
             String setKey ="FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId();
