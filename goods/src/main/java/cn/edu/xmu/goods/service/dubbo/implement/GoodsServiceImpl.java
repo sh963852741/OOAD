@@ -42,17 +42,6 @@ public class GoodsServiceImpl implements IGoodsService {
     @Autowired
     private GoodsDao goodsDao;
 
-    @Override
-    public Long getPrice(Long skuId) {
-        if(skuId == null){
-            return null;
-        }
-        ReturnObject<Long> ret = goodsService.getActicityPrice(skuId);
-        if(ret.getCode() != ResponseCode.OK){
-            return null;
-        }
-        return ret.getData();
-    }
 
     @Override
     public Map<ShopDTO, List<OrderItemDTO>> classifySku(List<OrderItemDTO> orderItemDTOS) {
@@ -110,36 +99,6 @@ public class GoodsServiceImpl implements IGoodsService {
         return skuDTO;
     }
 
-    @Override
-    public PriceDTO getSkuPriceAndName(Long skuId, Integer type) {
-        if(skuId == null){
-            return null;
-        }
-        ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
-        if(skuRet.getCode()!=ResponseCode.OK){
-            return new PriceDTO();
-        }
-        PriceDTO priceDTO =new PriceDTO();
-        Sku sku=skuRet.getData();
-        switch(type){
-            case 1:
-            case 2:
-                priceDTO.setSkuId(skuId);
-                priceDTO.setName(sku.getName());
-                priceDTO.setPrePrice(sku.getPrice());
-                priceDTO.setFinalPrice(null);
-                return priceDTO;
-            case 3:
-                Map<String, Long> price = activityService.getPrePrice(skuId);
-                priceDTO.setName(sku.getName());
-                priceDTO.setSkuId(skuId);
-                priceDTO.setPrePrice(price.get("prePrice"));
-                priceDTO.setFinalPrice(price.get("finalPrice"));
-                return priceDTO;
-            default:
-                return null;
-        }
-    }
 
     @Override
     public SpuDTO getSimpleSpuById(Long spuId) {
@@ -223,5 +182,11 @@ public class GoodsServiceImpl implements IGoodsService {
             }
         }
         return true;
+    }
+
+    //TODO 新增获得普通商品的name和price
+    @Override
+    public List<PriceDTO> getPriceAndName(List<OrderItemDTO> orderItemDTOS) {
+        return null;
     }
 }

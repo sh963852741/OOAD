@@ -14,13 +14,6 @@ import java.util.Map;
 public interface IGoodsService {
 
 	/**
-	 * 获取价格
-	 * @param skuId
-	 * @return
-	 */
-	Long getPrice(Long skuId);
-
-	/**
 	 * 根据sku所属商铺划分orderItem
 	 * 返回的OrderItem需要skuId, name, quantity, price
 	 * @param orderItemDTOS
@@ -36,8 +29,6 @@ public interface IGoodsService {
 	 * @Date: 2020/12/6 14:46
 	 */
 	SkuDTO getSku(Long skuId);
-
-	PriceDTO getSkuPriceAndName(Long skuId, Integer type);
 
 	/**
 	 * 根据SPU ID返回SPU的DTO
@@ -58,4 +49,8 @@ public interface IGoodsService {
 	Long getFreightModelIdBySku(Long skuID);
 
 	Boolean deleteFreightModelIdBySku(Long modelId, Long shopId);
+
+	//下单获取名字和价格 用户普通订单
+	List<PriceDTO> getPriceAndName(List<OrderItemDTO> orderItemDTOS);
+
 }

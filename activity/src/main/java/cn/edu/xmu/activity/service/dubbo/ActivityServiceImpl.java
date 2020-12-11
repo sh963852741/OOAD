@@ -5,6 +5,7 @@ import cn.edu.xmu.activity.dao.CouponDao;
 import cn.edu.xmu.activity.model.bo.Coupon;
 import cn.edu.xmu.activity.model.po.CouponPo;
 import cn.edu.xmu.activity.model.po.CouponSKUPo;
+import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IActivityService;
@@ -93,6 +94,11 @@ public class ActivityServiceImpl implements IActivityService {
 
     @Override
     public Map<String, Long> getPrePrice(Long skuId) {
+        return null;
+    }
+
+    @Override
+    public List<PriceDTO> getPriceAndName(List<OrderItemDTO> list, Integer type) {
         return null;
     }
 }
