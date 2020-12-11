@@ -3,6 +3,9 @@ package cn.edu.xmu.flashsale.model.bo;
 import cn.edu.xmu.flashsale.model.vo.ProductRetVo;
 import cn.edu.xmu.goods.client.dubbo.SkuDTO;
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.ooad.order.discount.JsonSerializable;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -11,6 +14,7 @@ import java.time.LocalDateTime;
  * @author Ming Qiu
  * @date Created in 2020/11/22 13:32
  **/
+@Data
 public class Product implements VoObject, Serializable{
     private Long id;
     private String name;

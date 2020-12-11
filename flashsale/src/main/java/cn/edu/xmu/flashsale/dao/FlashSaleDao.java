@@ -63,8 +63,8 @@ public class FlashSaleDao {
         log.debug(segmentIds.toString());
         FlashSalePoExample example = new FlashSalePoExample();
         FlashSalePoExample.Criteria criteria = example.createCriteria();
-        criteria.andFlashDateGreaterThan(date.atStartOfDay());
-        criteria.andFlashDateLessThan(date.atStartOfDay().plusDays(1));
+        criteria.andFlashDateGreaterThanOrEqualTo(date.atStartOfDay());
+        criteria.andFlashDateLessThanOrEqualTo(date.atStartOfDay().plusDays(1));
         criteria.andTimeSegIdIn(segmentIds);
 
         return flashSalePoMapper.selectByExample(example);
