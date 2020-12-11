@@ -14,12 +14,14 @@ import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.client.IGoodsService;
+import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +44,8 @@ public class GoodsServiceImpl implements IGoodsService {
     @Autowired
     private GoodsDao goodsDao;
 
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Override
     public Map<ShopDTO, List<OrderItemDTO>> classifySku(List<OrderItemDTO> orderItemDTOS) {
@@ -76,9 +80,14 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
+//        if(redisTemplate.hasKey("sku_"+skuId)){
+//            SkuDTO dto = (SkuDTO) redisTemplate.opsForValue().get("sku_"+skuId);
+//            return dto;
+//        }
+//        redisTemplate.delete("sku_"+skuId);
         ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
-            return new SkuDTO();
+            return null;
         }
         SkuDTO skuDTO =new SkuDTO();
         Sku sku=skuRet.getData();
@@ -96,6 +105,8 @@ public class GoodsServiceImpl implements IGoodsService {
         skuDTO.setDetail(sku.getDetail());
         skuDTO.setGoodsSpuId(sku.getGoodsSpuId());
         skuDTO.setPrice(sku.getPrice());
+        //String json = JacksonUtil.toJson(skuDTO);
+        //redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
         return skuDTO;
     }
 
@@ -184,9 +195,21 @@ public class GoodsServiceImpl implements IGoodsService {
         return true;
     }
 
-    //TODO 新增获得普通商品的name和price
     @Override
     public List<PriceDTO> getPriceAndName(List<OrderItemDTO> orderItemDTOS) {
-        return null;
+        List<PriceDTO> retData = new ArrayList<>();
+        for(OrderItemDTO dto : orderItemDTOS){
+            SkuDTO sku = this.getSku(dto.getSkuId());
+            if(sku == null){
+                return null;
+            }
+            PriceDTO priceDTO = new PriceDTO();
+            priceDTO.setSkuId(sku.getId());
+            priceDTO.setName(sku.getName());
+            priceDTO.setPrePrice(sku.getOriginalPrice());
+            priceDTO.setFinalPrice(null);
+            retData.add(priceDTO);
+        }
+        return retData;
     }
 }
