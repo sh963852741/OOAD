@@ -145,10 +145,10 @@ public class CouponController {
     @ApiOperation(value = "查看优惠活动中的商品", nickname = "couponactivitiesIdSpusGet", notes = "", tags={ "coupon", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @GetMapping(value = "/couponactivities/{id}/spus")
+    @GetMapping(value = "/couponactivities/{id}/skus")
     public Object getSpuInCouponActivity(@ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,
-                                         @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,
-                                         @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
+                                         @ApiParam(value = "页码") @Valid @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                         @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
         ReturnObject<PageInfo<VoObject>> ret = activityService.getSKUInCouponActivity(id,page,pageSize);
 
         return Common.getPageRetObject(ret);

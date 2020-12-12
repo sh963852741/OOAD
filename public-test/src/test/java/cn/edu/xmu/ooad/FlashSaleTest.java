@@ -242,8 +242,8 @@ public class FlashSaleTest {
                     .getResponseBodyContent();
         }
 
-        /**
-         * 继续删，应当报错
+        /*
+          继续删，应当报错
          */
         webClient.delete().uri("flashsales/0").exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()

@@ -23,6 +23,7 @@ import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
 import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
 import com.github.pagehelper.PageInfo;
 import com.google.common.hash.Funnels;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ActivityService implements InitializingBean {
     @Autowired
@@ -54,11 +56,12 @@ public class ActivityService implements InitializingBean {
     RedisBloomFilter redisBloomFilter =  new RedisBloomFilter<>(redisTemplate,
             new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
 
-    @DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.3-SNAPSHOT")
     IGoodsService goodsService;
     @DubboReference(version = "0.0.1-SNAPSHOT")
     IShopService shopService;
-    @Autowired
+
+//    @Autowired
     IUserService userService;
 
     //region 预售活动部分
@@ -516,7 +519,9 @@ public class ActivityService implements InitializingBean {
         PageInfo<CouponSKUPo> couponSPUPoPageInfo = couponActivityDao.getSKUsInActivity(activityId, page, pageSize);
         List<VoObject> simpleSkuList = new ArrayList<>();
         for(CouponSKUPo couponSPUPo:couponSPUPoPageInfo.getList()){
-            SkuDTO skuDTO = goodsService.getSku(couponSPUPo.getId());
+            log.debug(couponSPUPo.getSkuId().toString());
+            SkuDTO skuDTO = goodsService.getSku(couponSPUPo.getSkuId());
+            log.debug(skuDTO.toString());
             simpleSkuList.add(new SKUInActivityVo(skuDTO));
         }
 
