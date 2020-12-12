@@ -58,7 +58,7 @@ public class PresaleActivityVo implements VoObject {
     private Byte state;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
-    public HashMap<String, Object> goodsSpu = new HashMap<>();
+    public HashMap<String, Object> goodsSku = new HashMap<>();
     public HashMap<String, Object> shop = new HashMap<>();
 
 

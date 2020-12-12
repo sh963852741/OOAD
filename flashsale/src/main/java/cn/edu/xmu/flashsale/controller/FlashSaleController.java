@@ -1,12 +1,17 @@
 package cn.edu.xmu.flashsale.controller;
 
 import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
-import cn.edu.xmu.flashsale.model.vo.FlashSaleItemRetVo;
-import cn.edu.xmu.flashsale.model.vo.FlashsaleVo;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleItemVo;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
+import cn.edu.xmu.flashsale.model.vo.FlashSaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
+import cn.edu.xmu.ooad.util.Common;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * 秒杀控制器
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
  **/
 @Api(value = "秒杀服务", tags = "flashsale")
 @RestController /*Restful的Controller对象*/
+@Slf4j
 @RequestMapping(value = "/flashsale", produces = "application/json;charset=UTF-8")
 public class FlashSaleController {
 
@@ -36,8 +42,8 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping(value= "/timesegments/{id}/flashsales")
-    public Object getFlashSales(@PathVariable long id){
-            return flashSaleService.getFlashSale(id).map(FlashSaleItem::createVo);
+    public Mono<Object> getFlashSales(@PathVariable long id){
+            return flashSaleService.getFlashSale(id).map(x -> x);
     }
 
     /**
@@ -55,8 +61,10 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("timesegments/{id}/flashsales")
-    public Object creatFlashsale(@PathVariable long id, @RequestBody String flashDate){
-        return null;
+    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate){
+        var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
+
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -74,8 +82,12 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("flashsales/current")
-    public Object getCurrentFlashsales(@RequestParam Integer page,@RequestParam Integer pageSize){
-        return null;
+    public Mono<Object> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
+        log.debug("flashsales/current");
+        return flashSaleService.getFlashSale(1L).map(x->{
+            log.debug(x.toString());
+            return x;
+        });
     }
 
     /**
@@ -94,7 +106,8 @@ public class FlashSaleController {
     })
     @DeleteMapping("flashsales/{id}")
     public Object deleteFlashsale(@PathVariable Integer id){
-        return null;
+        var ret = flashSaleService.delFlashSale(id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -113,8 +126,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("flashsales/{id}")
-    public Object changeFlashsale(@PathVariable Integer id,@RequestBody String flashDate){
-        return null;
+    public Object changeFlashsale(@PathVariable Long id,@RequestBody FlashSaleVo flashDate){
+        var ret = flashSaleService.modifyFlashSale(id, flashDate.getFlashDate().atStartOfDay());
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -132,8 +146,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("flashsales/{id}/flashitems")
-    public Object addFlashitems(@PathVariable Integer id, @RequestBody FlashsaleVo flashsaleVo){
-        return null;
+    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo){
+        var ret = flashSaleService.addSkuToFlashSale(id, flashsaleVo);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -171,10 +186,8 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("flashsales/{fid}/flashitems/{id}")
-    public Object deleteFlashitems(@PathVariable Integer fid, @PathVariable Integer id){
-        return null;
+    public Object deleteFlashitems(@PathVariable("fid") Long flashSaleId, @PathVariable("id") Long itemId){
+        var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
+        return Common.decorateReturnObject(ret);
     }
-
-
-
 }

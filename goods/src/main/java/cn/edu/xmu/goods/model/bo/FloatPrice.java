@@ -111,7 +111,6 @@ public class FloatPrice implements VoObject {
         FloatPriceRetVo retVo=new FloatPriceRetVo();
         retVo.setActivityPrice(this.getActivityPrice());
         retVo.setBeginTime(this.getBeginTime());
-        retVo.setCreateBy(this.getCreatedBy());
         retVo.setEndTime(this.getEndTime());
         retVo.setValid(this.getValid());
         retVo.setId(this.getId());

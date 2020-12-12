@@ -2,9 +2,17 @@ package cn.edu.xmu.activity.service.dubbo;
 
 import cn.edu.xmu.activity.dao.CouponActivityDao;
 import cn.edu.xmu.activity.dao.CouponDao;
+import cn.edu.xmu.activity.dao.GrouponActivityDao;
+import cn.edu.xmu.activity.dao.PresaleActivityDao;
+import cn.edu.xmu.activity.model.Timeline;
 import cn.edu.xmu.activity.model.bo.Coupon;
 import cn.edu.xmu.activity.model.po.CouponPo;
-import cn.edu.xmu.activity.model.po.CouponSPUPo;
+import cn.edu.xmu.activity.model.po.CouponSKUPo;
+import cn.edu.xmu.goods.client.IGoodsService;
+import cn.edu.xmu.goods.client.dubbo.PriceDTO;
+import cn.edu.xmu.goods.client.dubbo.SkuDTO;
+import cn.edu.xmu.goods.client.dubbo.SpuDTO;
+import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IActivityService;
@@ -17,11 +25,16 @@ import java.util.*;
 
 @DubboService(version = "0.0.1-SNAPSHOT")
 public class ActivityServiceImpl implements IActivityService {
-
+    @Autowired
+    GrouponActivityDao grouponActivityDao;
+    @Autowired
+    PresaleActivityDao presaleActivityDao;
     @Autowired
     CouponActivityDao couponActivityDao;
     @Autowired
     CouponDao couponDao;
+    @Autowired
+    IGoodsService goodsService;
 
     @Override
     public Map<Long, Long> validateActivity(List<OrderItemDTO> orderItemDTOS, Long couponId){
@@ -31,12 +44,12 @@ public class ActivityServiceImpl implements IActivityService {
             return new HashMap<>();
         }
         Map<Long, Long> map = new HashMap<>();
-        // 考虑增加缓存，缓存活动适用的SPU
+        // 考虑增加缓存，缓存活动适用的SKU
         Long activityId = couponPo.getActivityId();
-        List<CouponSPUPo> couponSPUPoList = couponActivityDao.getSPUsInActivity(activityId);
+        List<CouponSKUPo> couponSPUPoList = couponActivityDao.getSKUsInActivity(activityId);
         Set<Long> spuSet = new HashSet<>();
-        for(CouponSPUPo couponSPUPo:couponSPUPoList){
-            spuSet.add(couponSPUPo.getSpuId());
+        for(CouponSKUPo couponSPUPo:couponSPUPoList){
+            spuSet.add(couponSPUPo.getSkuId());
         }
 
         for(OrderItemDTO o: orderItemDTOS){
@@ -59,16 +72,20 @@ public class ActivityServiceImpl implements IActivityService {
      */
     public Boolean useCoupon(Long couponId){
         CouponPo couponToUse = couponDao.getCoupon(couponId);
+        if(couponToUse == null){
+//            new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "您使用的优惠券不存在");
+            return false;
+        }
         if(couponToUse.getBeginTime().isAfter(LocalDateTime.now())
                 ||couponToUse.getEndTime().isBefore(LocalDateTime.now())){
-            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
+//            new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券过期或未到使用时间");
+            return false;
         }
-        if(couponToUse.getState() != Coupon.CouponStatus.NORMAL.getCode()){
-            new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
+        if(!couponToUse.getState().equals(Coupon.CouponStatus.NORMAL.getCode())){
+            new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "优惠券状态不可用");
+            return false;
         }
-        if(couponToUse == null){
-            new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "您使用的优惠券不存在");
-        }
+
 
         CouponPo po = new CouponPo();
         po.setId(couponToUse.getId());
@@ -83,11 +100,69 @@ public class ActivityServiceImpl implements IActivityService {
 
     @Override
     public Long getGrouponId(Long skuId) {
-        return null;
+        SkuDTO skuDTO = goodsService.getSku(skuId);
+        if(skuDTO == null){
+            return null;
+        }
+        SpuDTO spuDTO = goodsService.getSimpleSpuById(skuDTO.getGoodsSpuId());
+        long spuId = spuDTO.getId();
+        var f = grouponActivityDao.getActivitiesBySPUId(1,1,spuId, (byte)Timeline.RUNNING.ordinal());
+        if(f.getList().isEmpty()){
+            return null;
+        } else {
+            return f.getList().get(0).getId();
+        }
     }
 
     @Override
     public Long getPreSale(Long skuId) {
-        return null;
+        var f = presaleActivityDao.getActivitiesBySKUId(1,1,skuId,(byte)Timeline.RUNNING.ordinal());
+        if(f.getList().isEmpty()){
+            return null;
+        } else {
+            return f.getList().get(0).getId();
+        }
+    }
+
+    @Override
+    public Map<String, Long> getPrePrice(Long avtivityId) {
+        var activity = presaleActivityDao.getActivityById(avtivityId);
+        Map<String, Long> ret = new HashMap<>();
+        ret.put("prePrice", activity.getAdvancePayPrice());
+        ret.put("finalPrice", activity.getRestPayPrice());
+        return ret;
+    }
+
+    @Override
+    public List<PriceDTO> getPriceAndName(List<OrderItemDTO> list, Integer type) {
+        List<PriceDTO> retList = new ArrayList<>();
+        if(type.equals(1)){
+            // 团购活动
+            for(OrderItemDTO dto:list){
+                var sku = goodsService.getSku(dto.getSkuId());
+                if(sku == null)continue;
+                PriceDTO priceDTO =new PriceDTO();
+                priceDTO.setName(sku.getName());
+                priceDTO.setSkuId(sku.getId());
+                priceDTO.setPrePrice(sku.getOriginalPrice());
+                priceDTO.setFinalPrice(null);
+                retList.add(priceDTO);
+            }
+        }else if(type.equals(2)){
+            // 预售活动
+            for(OrderItemDTO dto:list){
+                var sku = goodsService.getSku(dto.getSkuId());
+                var p = presaleActivityDao.getActivitiesBySKUId(1,1,sku.getId(),(byte)Timeline.RUNNING.ordinal());
+                var activity = p.getList();
+                if(activity.isEmpty())continue;
+                PriceDTO priceDTO =new PriceDTO();
+                priceDTO.setName(sku.getName());
+                priceDTO.setSkuId(sku.getId());
+                priceDTO.setPrePrice(activity.get(0).getAdvancePayPrice());
+                priceDTO.setFinalPrice(activity.get(0).getRestPayPrice());
+                retList.add(priceDTO);
+            }
+        }
+        return retList;
     }
 }

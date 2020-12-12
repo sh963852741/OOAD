@@ -1,9 +1,12 @@
 package cn.edu.xmu.goods.controller;
 
 import ch.qos.logback.classic.Logger;
+import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.vo.ShopConclusionVo;
 import cn.edu.xmu.goods.model.vo.ShopVo;
 import cn.edu.xmu.goods.service.ShopService;
+import cn.edu.xmu.ooad.annotation.Audit;
+import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -60,15 +63,19 @@ public class ShopController {
             @ApiResponse(code = 908, message = "用户已经有店铺"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops")
-    public Object addShop(@RequestBody @Validated ShopVo shopvo, BindingResult bindingResult){
+    @Audit
+    public Object addShop(@Depart Long did, @RequestBody @Validated ShopVo shopvo, BindingResult bindingResult){
         Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
         if (null != obj) {
             return obj;
         }
-        else{
+        if(did == -1)
+        {
             ReturnObject ret=shopService.newShop(shopvo);
             return Common.decorateReturnObject(ret);
         }
+        else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR, "您已经拥有店铺，无法重新申请"));
+        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "商铺名称不能为空"));
     }
 
     /**
@@ -115,7 +122,7 @@ public class ShopController {
     })
     @DeleteMapping(value = "/shops/{id}")
     public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
-        if(shopService.getShopByShopId(id).getData().getState()==4)
+        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()||shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
         {
             ReturnObject ret=shopService.deleteShopById(id);
             return Common.decorateReturnObject(ret);
@@ -168,6 +175,7 @@ public class ShopController {
             @ApiImplicitParam(name = "authorization", value = "adminToken", required = true, dataType = "String", paramType = "header")
     })
     @PutMapping(value = "/shops/{id}/onshelves")
+    @Audit
     public Object shopsIdOnshelvesPut(@PathVariable("id") long id){
         ReturnObject ret=shopService.onShelfShop(id);
         return Common.decorateReturnObject(ret);
@@ -188,7 +196,7 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{id}/offshelves")
     public Object shopsIdOffshelvesPut(@PathVariable("id") long id){
-        if(shopService.getShopByShopId(id).getData().getState()==4)
+        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
         {
             ReturnObject ret=shopService.offShelfShop(id);
             return Common.decorateReturnObject(ret);

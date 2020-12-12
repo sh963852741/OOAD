@@ -1,25 +1,27 @@
 package cn.edu.xmu.goods.service.dubbo.implement;
 
 
+import cn.edu.xmu.goods.client.IActivityService;
+import cn.edu.xmu.goods.client.dubbo.*;
 import cn.edu.xmu.goods.dao.GoodsDao;
 import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.model.bo.*;
+import cn.edu.xmu.goods.model.po.SPUPo;
 import cn.edu.xmu.goods.model.vo.SkuRetVo;
 import cn.edu.xmu.goods.service.GoodsService;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.goods.model.po.SKUPo;
 import cn.edu.xmu.goods.client.IGoodsService;
+import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
-import cn.edu.xmu.goods.client.dubbo.ShopDTO;
-import cn.edu.xmu.goods.client.dubbo.SkuDTO;
-import cn.edu.xmu.goods.client.dubbo.SpuDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +29,11 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@DubboService(version = "0.0.1-SNAPSHOT")
+@DubboService(version = "0.0.3-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
+
+//    @DubboReference(version = "0.0.1-SNAPSHOT")
+    private IActivityService activityService;
 
     @Autowired
     private GoodsService goodsService;
@@ -39,17 +44,8 @@ public class GoodsServiceImpl implements IGoodsService {
     @Autowired
     private GoodsDao goodsDao;
 
-    @Override
-    public Long getPrice(Long skuId) {
-        if(skuId == null){
-            return null;
-        }
-        ReturnObject<Long> ret = goodsService.getActicityPrice(skuId);
-        if(ret.getCode() != ResponseCode.OK){
-            return null;
-        }
-        return ret.getData();
-    }
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Override
     public Map<ShopDTO, List<OrderItemDTO>> classifySku(List<OrderItemDTO> orderItemDTOS) {
@@ -84,9 +80,14 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
+        if(redisTemplate.hasKey("sku_"+skuId)){
+            SkuDTO dto = (SkuDTO) redisTemplate.opsForValue().get("sku_"+skuId);
+            return dto;
+        }
+        redisTemplate.delete("sku_"+skuId);
         ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
-            return new SkuDTO();
+            return null;
         }
         SkuDTO skuDTO =new SkuDTO();
         Sku sku=skuRet.getData();
@@ -104,24 +105,11 @@ public class GoodsServiceImpl implements IGoodsService {
         skuDTO.setDetail(sku.getDetail());
         skuDTO.setGoodsSpuId(sku.getGoodsSpuId());
         skuDTO.setPrice(sku.getPrice());
+        //String json = JacksonUtil.toJson(skuDTO);
+        redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
         return skuDTO;
     }
 
-    @Override
-    public SkuDTO getSimpleSku(Long skuId) {
-        if(skuId == null){
-            return null;
-        }
-        ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
-        if(skuRet.getCode()!=ResponseCode.OK){
-            return new SkuDTO();
-        }
-        SkuDTO skuDTO =new SkuDTO();
-        Sku sku=skuRet.getData();
-        skuDTO.setName(sku.getName());
-        skuDTO.setPrice(sku.getPrice());
-        return skuDTO;
-    }
 
     @Override
     public SpuDTO getSimpleSpuById(Long spuId) {
@@ -162,5 +150,66 @@ public class GoodsServiceImpl implements IGoodsService {
         ShopDTO shopDTO =shop.createDTO();
         log.debug("shopDTO:" + shopDTO);
         return shopDTO;
+    }
+
+    @Override
+    public Long getGoodWeightBySku(Long skuId) {
+        ReturnObject<Sku> ret = goodsDao.getSkuById(skuId);
+        if(ret.getCode() != ResponseCode.OK){
+            return null;
+        }
+        Long weight = ret.getData().getWeight();
+        return weight;
+    }
+
+    @Override
+    public Long getFreightModelIdBySku(Long skuId) {
+        ReturnObject<Sku> ret = goodsDao.getSkuById(skuId);
+        if(ret.getCode() != ResponseCode.OK){
+            return null;
+        }
+        ReturnObject<SPUPo> spuRet = goodsDao.getSpuById(ret.getData().getGoodsSpuId());
+        if(spuRet.getCode() != ResponseCode.OK){
+            return null;
+        }
+        return spuRet.getData().getFreightId();
+    }
+
+    @Override
+    public Boolean deleteFreightModelIdBySku(Long modelId, Long shopId) {
+        List<SPUPo> list = goodsDao.getSpusByShopId(shopId);
+        if(list.size() ==0){
+            return true;
+        }
+        for(SPUPo po : list){
+            if(po.getDisabled() == 0 && po.getFreightId() == modelId){
+                Spu spu = new Spu();
+                spu.setId(po.getId());
+                spu.setFreightId(null);
+                ReturnObject ret = goodsDao.updateSpu(spu);
+                if(ret.getCode() != ResponseCode.OK){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<PriceDTO> getPriceAndName(List<OrderItemDTO> orderItemDTOS) {
+        List<PriceDTO> retData = new ArrayList<>();
+        for(OrderItemDTO dto : orderItemDTOS){
+            SkuDTO sku = this.getSku(dto.getSkuId());
+            if(sku == null){
+                return null;
+            }
+            PriceDTO priceDTO = new PriceDTO();
+            priceDTO.setSkuId(sku.getId());
+            priceDTO.setName(sku.getName());
+            priceDTO.setPrePrice(sku.getOriginalPrice());
+            priceDTO.setFinalPrice(null);
+            retData.add(priceDTO);
+        }
+        return retData;
     }
 }

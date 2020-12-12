@@ -12,11 +12,9 @@ import java.util.Map;
 public class PresaleActivity {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum PresaleStatus {
-        NEW((byte)0,"已新建"),
-        DEPOSIT((byte)1,"支付定金"),
-        BALANCE((byte)2,"支付尾款"),
-        CANCELED((byte)3,"已下线"),
-        FINISHED((byte)4,"活动结束");
+        OFFLINE((byte)0,"已下线"),
+        ONLINE((byte)1,"已上线"),
+        DELETE((byte)2,"删除");
 
         private static final Map<Byte, PresaleStatus> typeMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值

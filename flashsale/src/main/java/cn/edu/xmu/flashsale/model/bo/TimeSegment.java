@@ -2,6 +2,7 @@ package cn.edu.xmu.flashsale.model.bo;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
@@ -12,4 +13,6 @@ public class TimeSegment {
     private Long id;
     private LocalTime startTime;
     private LocalTime endTime;
+    private LocalDateTime gmtCreate;
+    private LocalDateTime gmtModified;
 }

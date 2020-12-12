@@ -18,28 +18,37 @@ public class PresaleActivityDao {
     @Autowired
     PresaleActivityPoMapper presaleActivityPoMapper;
 
-    public List<PresaleActivityPo> getAllActivityBySPUId(byte state, long spuId){
+    public List<PresaleActivityPo> getAllActivityBySKUId(byte state, long skuId){
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSkuIdEqualTo(spuId);
+        criteria.andGoodsSkuIdEqualTo(skuId);
         criteria.andStateEqualTo(state);
 
         return presaleActivityPoMapper.selectByExample(example);
     }
 
+    public boolean getSameSKU(long skuId){
+        PresaleActivityPoExample example = new PresaleActivityPoExample();
+        PresaleActivityPoExample.Criteria criteria = example.createCriteria();
+        criteria.andEndTimeGreaterThan(LocalDateTime.now());
+        criteria.andStateNotEqualTo(PresaleActivity.PresaleStatus.DELETE.getCode());
+
+        return presaleActivityPoMapper.selectByExample(example).size() > 0;
+    }
+
     /**
-     * 顾客获取某SPU的预售活动信息，此函数为高频读
+     * 顾客获取某上线的SKU预售活动信息，此函数为高频读
      * @param page
      * @param pageSize
-     * @param spuId SPU的ID
+     * @param skuId SPU的ID
      * @return
      */
-    public PageInfo<PresaleActivityPo> getActivitiesBySPUId(int page, int pageSize, long spuId, Byte timeline){
+    public PageInfo<PresaleActivityPo> getActivitiesBySKUId(int page, int pageSize, long skuId, Byte timeline){
         PageHelper.startPage(page, pageSize);
 
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSkuIdEqualTo(spuId);
+        criteria.andGoodsSkuIdEqualTo(skuId);
 
         if(timeline != null) {
             if (timeline == 0) {
@@ -57,12 +66,10 @@ public class PresaleActivityDao {
                 criteria.andEndTimeLessThan(LocalDateTime.now());
             }
         }
+        criteria.andStateEqualTo(PresaleActivity.PresaleStatus.ONLINE.getCode());
 
         var list = presaleActivityPoMapper.selectByExample(example);
-
-        PageInfo<PresaleActivityPo> po = PageInfo.of(list);
-
-        return po;
+        return PageInfo.of(list);
     }
 
     public boolean changeActivityStatus(long id, byte state){
@@ -79,7 +86,6 @@ public class PresaleActivityDao {
 
     public PageInfo<PresaleActivityPo> getEffectiveActivities(int page,int pageSize, Long shopId, Byte timeline){
         PageHelper.startPage(page, pageSize);
-
         PresaleActivityPoExample example = new PresaleActivityPoExample();
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
 
@@ -99,23 +105,20 @@ public class PresaleActivityDao {
                 criteria.andEndTimeLessThan(LocalDateTime.now());
             }
         }
-
         if(shopId != null){
             criteria.andShopIdEqualTo(shopId);
         }
-
-        criteria.andStateNotEqualTo(PresaleActivity.PresaleStatus.CANCELED.getCode());
+        criteria.andStateEqualTo(PresaleActivity.PresaleStatus.ONLINE.getCode());
 
         var list = presaleActivityPoMapper.selectByExample(example);
-        PageInfo<PresaleActivityPo> po = PageInfo.of(list);
-        return po;
+        return PageInfo.of(list);
     }
 
     public int addActivity(PresaleActivityPo po, long skuId, long shopId){
         po.setGoodsSkuId(skuId);
         po.setShopId(shopId);
         po.setGmtCreate(LocalDateTime.now());
-        po.setState(PresaleActivity.PresaleStatus.NEW.getCode());
+        po.setState(PresaleActivity.PresaleStatus.OFFLINE.getCode());
         return presaleActivityPoMapper.insert(po);
     }
 

@@ -1,8 +1,11 @@
 package cn.edu.xmu.flashsale.model.bo;
 
-import cn.edu.xmu.flashsale.model.po.SKUPo;
 import cn.edu.xmu.flashsale.model.vo.ProductRetVo;
+import cn.edu.xmu.goods.client.dubbo.SkuDTO;
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.ooad.order.discount.JsonSerializable;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -11,6 +14,7 @@ import java.time.LocalDateTime;
  * @author Ming Qiu
  * @date Created in 2020/11/22 13:32
  **/
+@Data
 public class Product implements VoObject, Serializable{
     private Long id;
     private String name;
@@ -29,25 +33,25 @@ public class Product implements VoObject, Serializable{
 
     private String configuration;
 
-    private Boolean disabled;
+    private Byte disabled;
 
     private LocalDateTime gmtCreate;
 
     private LocalDateTime gmtModified;
 
-    public Product(SKUPo skuPo) {
-        this.id = skuPo.getId();
-        this.name = skuPo.getName();
-        this.skuSn = skuPo.getSkuSn();
-        this.detail = skuPo.getDetail();
-        this.imgUrl = skuPo.getImageUrl();
-        this.originalPrice = skuPo.getOriginalPrice();
-        this.inventory = skuPo.getInventory();
-        this.weight = skuPo.getWeight();
-        this.configuration = skuPo.getConfiguration();
-        this.gmtCreate = skuPo.getGmtCreate();
-        this.gmtModified = skuPo.getGmtModified();
-        this.disabled = skuPo.getDisabled() == 1;
+    public Product(SkuDTO skuDTO) {
+        this.id = skuDTO.getId();
+        this.name = skuDTO.getName();
+        this.skuSn = skuDTO.getSkuSn();
+        this.detail = skuDTO.getDetail();
+        this.imgUrl = skuDTO.getImageUrl();
+        this.originalPrice = skuDTO.getOriginalPrice();
+        this.inventory = skuDTO.getInventory();
+        this.weight = skuDTO.getWeight();
+        this.configuration = skuDTO.getConfiguration();
+        this.gmtCreate = skuDTO.getGmtCreate();
+        this.gmtModified = skuDTO.getGmtModified();
+        this.disabled = skuDTO.getDisable();
     }
 
     @Override

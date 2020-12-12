@@ -2,10 +2,7 @@ package cn.edu.xmu.goods.client;
 
 
 
-import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
-import cn.edu.xmu.goods.client.dubbo.ShopDTO;
-import cn.edu.xmu.goods.client.dubbo.SkuDTO;
-import cn.edu.xmu.goods.client.dubbo.SpuDTO;
+import cn.edu.xmu.goods.client.dubbo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -15,13 +12,6 @@ import java.util.Map;
  * @Date: 2020/12/6 10:49
  */
 public interface IGoodsService {
-
-	/**
-	 * 获取价格
-	 * @param skuId
-	 * @return
-	 */
-	Long getPrice(Long skuId);
 
 	/**
 	 * 根据sku所属商铺划分orderItem
@@ -40,8 +30,6 @@ public interface IGoodsService {
 	 */
 	SkuDTO getSku(Long skuId);
 
-	SkuDTO getSimpleSku(Long skuId);
-
 	/**
 	 * 根据SPU ID返回SPU的DTO
 	 * @param spuId
@@ -55,4 +43,14 @@ public interface IGoodsService {
 	 * @return
 	 */
 	ShopDTO getShopBySKUId(Long skuId);
+
+	Long getGoodWeightBySku(Long skuId);
+
+	Long getFreightModelIdBySku(Long skuID);
+
+	Boolean deleteFreightModelIdBySku(Long modelId, Long shopId);
+
+	//下单获取名字和价格 用户普通订单
+	List<PriceDTO> getPriceAndName(List<OrderItemDTO> orderItemDTOS);
+
 }

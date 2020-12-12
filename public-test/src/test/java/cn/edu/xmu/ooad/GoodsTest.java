@@ -42,4 +42,17 @@ public class GoodsTest {
                 .returnResult()
                 .getResponseBodyContent();
     }
+    @Test
+    public void getAllSkus(){
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.get().uri("/skus/state");
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+    }
+
 }

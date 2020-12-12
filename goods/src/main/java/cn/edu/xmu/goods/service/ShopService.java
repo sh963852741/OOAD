@@ -3,7 +3,6 @@ package cn.edu.xmu.goods.service;
 import cn.edu.xmu.goods.dao.ShopDao;
 import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.ShopPo;
-import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.model.vo.*;
@@ -120,7 +119,7 @@ public class ShopService {
         Shop shop=new Shop();
         shop.setId(id);
         shop.setState(Shop.State.ONLINE.getCode().byteValue());
-        if(getShopByShopId(id).getData().getState()==5) {
+        if(getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()) {
             ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
         }

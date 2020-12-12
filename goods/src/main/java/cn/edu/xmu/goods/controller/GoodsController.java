@@ -2,7 +2,8 @@ package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.service.GoodsService;
-import cn.edu.xmu.goods.model.vo.*;
+import cn.edu.xmu.ooad.annotation.Audit;
+import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -256,11 +257,14 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/share/{sid}/spus/{id}")
+    @Audit
     public Object getSharedSpu(@PathVariable Long sid, @PathVariable Long id) {
         if (id == null || sid == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
+        /** @problem 此处需要查看spuid是否是分享活动的id;
+         */
         ReturnObject ret = goodsService.getSpuById(id);
         return Common.decorateReturnObject(ret);
 
@@ -378,7 +382,7 @@ public class GoodsController {
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
      */
-    @ApiOperation(value = "店家逻辑上架SPU")
+    @ApiOperation(value = "店家逻辑上架SKU")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "id", value = "spuid", required = true, dataType = "Integer", paramType = "path"),
@@ -387,13 +391,13 @@ public class GoodsController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PutMapping("/shops/{shopId}/spus/{id}/onshelves")
-    public Object onShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId) {
+    @PutMapping("/shops/{shopId}/skus/{id}/onshelves")
+    public Object onShelvesSpu(@PathVariable Long id, @PathVariable Long shopId) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        ReturnObject ret = goodsService.onShelfSpu(id, shopId);
+        ReturnObject ret = goodsService.onShelfSku(id, shopId);
         return Common.decorateReturnObject(ret);
     }
 
@@ -404,7 +408,7 @@ public class GoodsController {
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
      */
-    @ApiOperation(value = "店家商品下架")
+    @ApiOperation(value = "店家SKU商品下架")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header"),
             @ApiImplicitParam(name = "id", value = "spuid", required = true, dataType = "Integer", paramType = "path"),
@@ -413,13 +417,13 @@ public class GoodsController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PutMapping("/shops/{shopId}/spus/{id}/offshelves")
-    public Object offShelvesSpu(@PathVariable Integer id, @PathVariable Integer shopId) {
+    @PutMapping("/shops/{shopId}/skus/{id}/offshelves")
+    public Object offShelvesSpu(@PathVariable Long id, @PathVariable Long shopId) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        ReturnObject ret = goodsService.offShelfSpu(id, shopId);
+        ReturnObject ret = goodsService.offShelfSku(id, shopId);
         return Common.decorateReturnObject(ret);
     }
 
@@ -439,8 +443,8 @@ public class GoodsController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PostMapping("/shops/{shopId}/spus/{id}/floatPrices")
-    public Object addFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId, Long userId, @RequestBody @Validated FloatPriceVo floatPriceVo, BindingResult bindingResult) {
+    @PostMapping("/shops/{shopId}/skus/{id}/floatPrices")
+    public Object addFloatPrices(@PathVariable Long id, @PathVariable Long shopId, @LoginUser Long userId, @RequestBody @Validated FloatPriceVo floatPriceVo, BindingResult bindingResult) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -471,7 +475,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/floatPrices/{id}")
-    public Object deleteFloatPrices(@PathVariable Integer id, @PathVariable Integer shopId, Long userId) {
+    public Object deleteFloatPrices(@PathVariable Long id, @PathVariable Long shopId, @LoginUser Long userId) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -499,7 +503,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/categories/{id}")
-    public Object addSputoCategory(@PathVariable Integer shopId, @PathVariable Integer spuId, @PathVariable Integer id) {
+    public Object addSputoCategory(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -526,7 +530,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/spus/{spuId}/categories/{id}")
-    public Object deleteSpufromCategory(@PathVariable Integer shopId, @PathVariable Integer spuId, @PathVariable Integer id) {
+    public Object deleteSpufromCategory(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -553,7 +557,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/brands/{id}")
-    public Object addSputoBrand(@PathVariable Integer shopId, @PathVariable Integer spuId, @PathVariable Integer id) {
+    public Object addSputoBrand(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -580,7 +584,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/spus/{spuId}/brands/{id}")
-    public Object deleteSpufromBrand(@PathVariable Integer shopId, @PathVariable Integer spuId, @PathVariable Integer id) {
+    public Object deleteSpufromBrand(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));

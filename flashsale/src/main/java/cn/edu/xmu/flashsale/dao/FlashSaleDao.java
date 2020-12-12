@@ -43,6 +43,14 @@ public class FlashSaleDao {
         return flashSalePoMapper.updateByPrimaryKeySelective(po);
     }
 
+    public int delFlashSaleItemByFlashSaleId(long flashSaleId){
+        FlashSaleItemPoExample example = new FlashSaleItemPoExample();
+        FlashSaleItemPoExample.Criteria criteria = example.createCriteria();
+        criteria.andSaleIdEqualTo(flashSaleId);
+
+        return flashSaleItemPoMapper.deleteByExample(example);
+    }
+
     public int addFlashSaleItem(FlashSaleItemPo po){
         return flashSaleItemPoMapper.insert(po);
     }
@@ -55,8 +63,8 @@ public class FlashSaleDao {
         log.debug(segmentIds.toString());
         FlashSalePoExample example = new FlashSalePoExample();
         FlashSalePoExample.Criteria criteria = example.createCriteria();
-        criteria.andFlashDateGreaterThan(date.atStartOfDay());
-        criteria.andFlashDateLessThan(date.atStartOfDay().plusDays(1));
+        criteria.andFlashDateGreaterThanOrEqualTo(date.atStartOfDay());
+        criteria.andFlashDateLessThanOrEqualTo(date.atStartOfDay().plusDays(1));
         criteria.andTimeSegIdIn(segmentIds);
 
         return flashSalePoMapper.selectByExample(example);
@@ -68,5 +76,9 @@ public class FlashSaleDao {
         criteria.andSaleIdEqualTo(id);
 
         return flashSaleItemPoMapper.selectByExample(example);
+    }
+
+    public FlashSaleItemPo getFlashSaleItemByPrimaryKey(long id){
+        return flashSaleItemPoMapper.selectByPrimaryKey(id);
     }
 }

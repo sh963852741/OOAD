@@ -1,12 +1,11 @@
 package cn.edu.xmu.activity.dao;
 
 import cn.edu.xmu.activity.mapper.GrouponActivityPoMapper;
+import cn.edu.xmu.activity.model.Timeline;
 import cn.edu.xmu.activity.model.bo.GrouponActivity;
 import cn.edu.xmu.activity.model.bo.PresaleActivity;
 import cn.edu.xmu.activity.model.po.GrouponActivityPo;
 import cn.edu.xmu.activity.model.po.GrouponActivityPoExample;
-import cn.edu.xmu.activity.model.vo.GrouponActivityVo;
-import cn.edu.xmu.ooad.model.VoObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,31 +25,55 @@ public class GrouponActivityDao {
         return grouponActivityPoMapper.selectByPrimaryKey(id);
     }
 
-    public PageInfo<GrouponActivityPo> getActivitiesBySPUId(int page, int pageSize, Long id, Byte timeline){
+    /**
+     * 普通用户获取SPU的活动
+     * @param page
+     * @param pageSize
+     * @param spuId
+     * @param timeline
+     * @return
+     */
+    public PageInfo<GrouponActivityPo> getActivitiesBySPUId(int page, int pageSize, long spuId, Byte timeline){
         PageHelper.startPage(page, pageSize);
 
         GrouponActivityPoExample example = new GrouponActivityPoExample();
         GrouponActivityPoExample.Criteria criteria = example.createCriteria();
-        criteria.andGoodsSpuIdEqualTo(id);
+        criteria.andGoodsSpuIdEqualTo(spuId);
 
         if(timeline != null) {
-            if (timeline == 0) {
+            if (timeline == Timeline.PENDING.ordinal()) {
                 /* 获取未开始的活动 */
                 criteria.andBeginTimeGreaterThan(LocalDateTime.now());
-            } else if (timeline == 1) {
+            } else if (timeline == Timeline.TOMORROW.ordinal()) {
                 /* 获取明天开始的活动 */
                 criteria.andBeginTimeGreaterThan(LocalDateTime.now());
                 criteria.andBeginTimeLessThan(LocalDateTime.now().plusDays(1));
-            } else if (timeline == 2) {
+            } else if (timeline == Timeline.RUNNING.ordinal()) {
                 /* 获取正在进行中的活动 */
                 criteria.andBeginTimeLessThan(LocalDateTime.now());
                 criteria.andEndTimeGreaterThan(LocalDateTime.now());
-            } else if (timeline == 3) {
+            } else if (timeline == Timeline.FINISHED.ordinal()) {
                 criteria.andEndTimeLessThan(LocalDateTime.now());
             }
         }
-        PageInfo<GrouponActivityPo> info=PageInfo.of(grouponActivityPoMapper.selectByExample(example));
-        return info;
+        criteria.andStateNotEqualTo(GrouponActivity.GrouponStatus.DELETE.getCode());
+
+        return PageInfo.of(grouponActivityPoMapper.selectByExample(example));
+    }
+
+    /**
+     * 查询相同的SPU是否被重复添加
+     * @param id
+     * @return
+     */
+    public boolean hasSameSpu(long id){
+        GrouponActivityPoExample example = new GrouponActivityPoExample();
+        GrouponActivityPoExample.Criteria criteria = example.createCriteria();
+
+        criteria.andEndTimeGreaterThan(LocalDateTime.now());
+        criteria.andStateNotEqualTo(GrouponActivity.GrouponStatus.DELETE.getCode());
+
+        return grouponActivityPoMapper.selectByExample(example).size() > 0;
     }
 
     public PageInfo<GrouponActivityPo> getGrouponsByAdmin(Long shopId, Byte state, Long spuId, LocalDateTime beginTime, LocalDateTime endTime, Integer page, Integer pageSize){
@@ -67,12 +90,13 @@ public class GrouponActivityDao {
         if(spuId!=null){
             criteria.andGoodsSpuIdEqualTo(spuId);
         }
-        if(beginTime!=null && endTime!=null){
-            criteria.andBeginTimeBetween(beginTime,endTime);
-            criteria.andEndTimeBetween(beginTime,endTime);
+        if(beginTime!=null){
+            criteria.andBeginTimeGreaterThan(beginTime);
         }
-        PageInfo<GrouponActivityPo> info=PageInfo.of(grouponActivityPoMapper.selectByExample(example));
-        return info;
+        if(endTime!=null){
+            criteria.andEndTimeLessThan(endTime);
+        }
+        return PageInfo.of(grouponActivityPoMapper.selectByExample(example));
     }
 
     public PageInfo<GrouponActivityPo> getEffectiveActivities(int page, int pageSize, Long shopId, Byte timeline, Long spuId, Boolean all){
@@ -107,15 +131,14 @@ public class GrouponActivityDao {
         }
 
         if(!all){
-            criteria.andStateNotEqualTo(PresaleActivity.PresaleStatus.CANCELED.getCode());
+            criteria.andStateEqualTo(GrouponActivity.GrouponStatus.ONLINE.getCode());
         }
 
         List<GrouponActivityPo> list=grouponActivityPoMapper.selectByExample(example);
-        PageInfo<GrouponActivityPo> info=PageInfo.of(list);
-        return info;
+        return PageInfo.of(list);
     }
 
-    public List<GrouponActivity> getAllGrouponsBySpuAmdin(Long id,Long shopId,Byte state){
+    public List<GrouponActivity> getAllGrouponsBySpuAdmin(Long id, Long shopId, Byte state){
         GrouponActivityPoExample example = new GrouponActivityPoExample();
         GrouponActivityPoExample.Criteria criteria = example.createCriteria();
         if(id!=null){
@@ -128,16 +151,14 @@ public class GrouponActivityDao {
             criteria.andStateEqualTo(state);
         }
         List<GrouponActivityPo> pos=grouponActivityPoMapper.selectByExample(example);
-        List<GrouponActivity> retList = pos.stream().map(e -> new GrouponActivity(e)).collect(Collectors.toList());
-        return retList;
+        return pos.stream().map(GrouponActivity::new).collect(Collectors.toList());
     }
 
     public boolean addActivity(GrouponActivityPo po, long spuId, long shopId){
         po.setShopId(shopId);
         po.setGoodsSpuId(spuId);
         po.setGmtCreate(LocalDateTime.now());
-        po.setGmtModified(po.getGmtCreate());
-        po.setState(GrouponActivity.GrouponStatus.NORMAL.getCode());
+        po.setState(GrouponActivity.GrouponStatus.OFFLINE.getCode());
         return grouponActivityPoMapper.insert(po) == 1;
     }
 
