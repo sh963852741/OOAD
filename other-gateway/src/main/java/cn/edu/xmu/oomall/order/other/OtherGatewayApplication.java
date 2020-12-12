@@ -1,4 +1,4 @@
-package cn.edu.xmu.oomall.other;
+package cn.edu.xmu.oomall.order.other;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

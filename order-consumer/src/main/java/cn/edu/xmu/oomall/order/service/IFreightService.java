@@ -1,8 +1,8 @@
-package cn.edu.xmu.oomall.service;
+package cn.edu.xmu.oomall.order.service;
 
 
-import cn.edu.xmu.oomall.dto.CalculateFreightRequest;
-import cn.edu.xmu.oomall.dto.FreightModelDto;
+import cn.edu.xmu.oomall.order.dto.CalculateFreightRequest;
+import cn.edu.xmu.oomall.order.dto.FreightModelDto;
 
 import java.util.List;
 

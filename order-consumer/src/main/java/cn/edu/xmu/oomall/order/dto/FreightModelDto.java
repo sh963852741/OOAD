@@ -1,4 +1,4 @@
-package cn.edu.xmu.oomall.dto;
+package cn.edu.xmu.oomall.order.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FreightModelDto {
+public class FreightModelDto implements Serializable {
     private Long id;
 
     private String name;

@@ -1,4 +1,4 @@
-package cn.edu.xmu.oomall.other;
+package cn.edu.xmu.oomall.order.other;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
