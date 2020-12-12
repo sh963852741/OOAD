@@ -1,17 +1,13 @@
-package cn.edu.xmu.oomall.other;
+package cn.edu.xmu.oomall.order.other;
 
 import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.webservices.client.AutoConfigureWebServiceClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

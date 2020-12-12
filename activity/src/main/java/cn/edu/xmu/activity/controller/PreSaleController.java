@@ -168,7 +168,7 @@ public class PreSaleController {
     @ApiResponses(value = {
             @ApiResponse(code = 906, message = "预售活动状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
-    @DeleteMapping(value = "/shops/{shopId}/presales/{id}/onshelves")
+    @PutMapping(value = "/shops/{shopId}/presales/{id}/onshelves")
     @Audit
     public Object onlinePresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
                                          @ApiParam(value = "预售活动id",required=true) @PathVariable("id") Long id){
@@ -187,7 +187,7 @@ public class PreSaleController {
     @ApiResponses(value = {
             @ApiResponse(code = 906, message = "预售活动状态禁止"),
             @ApiResponse(code = 200, message = "成功") })
-    @DeleteMapping(value = "/shops/{shopId}/presales/{id}")
+    @PutMapping(value = "/shops/{shopId}/presales/{id}/offshelves")
     @Audit
     public Object offlinePresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
                                          @ApiParam(value = "预售活动id",required=true) @PathVariable("id") Long id){

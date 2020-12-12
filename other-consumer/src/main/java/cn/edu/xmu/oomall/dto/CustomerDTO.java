@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author zhibin lan
- * @date 2020-11-23
+ * @author xincong yao
+ * @date 2020-11-16
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CalculateFreightRequest {
-    Long skuId;
-
-    Integer count;
+public class CustomerDTO {
+	private Long id;
+	private String userName;
+	private String realName;
 }

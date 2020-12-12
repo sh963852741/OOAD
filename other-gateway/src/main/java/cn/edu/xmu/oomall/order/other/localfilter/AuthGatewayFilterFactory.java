@@ -1,4 +1,4 @@
-package cn.edu.xmu.oomall.other.localfilter;
+package cn.edu.xmu.oomall.order.other.localfilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
