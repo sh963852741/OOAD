@@ -790,11 +790,12 @@ public class GoodsService implements InitializingBean {
         if(ret.getCode() != ResponseCode.OK){
             return ret;
         }
+        //redisBloomFilter.addByBloomFilter(skuBloomFilter,);
         Spu spu=new Spu();
         spu.setId(id.longValue());
         ReturnObject spuRet=goodsDao.updateSpu(spu);
-        /** @problem 需要更新spu的规格 但是规格参数不明;
-        ReturnObject spuRet=goodsDao.updateSpu(spu);
+        //TODO 需要更新spu的规格 但是规格参数不明;
+        /**ReturnObject spuRet=goodsDao.updateSpu(spu);
         if(spuRet.getCode()!=ResponseCode.OK){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }**/

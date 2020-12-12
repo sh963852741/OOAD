@@ -80,11 +80,11 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuId == null){
             return null;
         }
-//        if(redisTemplate.hasKey("sku_"+skuId)){
-//            SkuDTO dto = (SkuDTO) redisTemplate.opsForValue().get("sku_"+skuId);
-//            return dto;
-//        }
-//        redisTemplate.delete("sku_"+skuId);
+        if(redisTemplate.hasKey("sku_"+skuId)){
+            SkuDTO dto = (SkuDTO) redisTemplate.opsForValue().get("sku_"+skuId);
+            return dto;
+        }
+        redisTemplate.delete("sku_"+skuId);
         ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
             return null;
@@ -106,7 +106,7 @@ public class GoodsServiceImpl implements IGoodsService {
         skuDTO.setGoodsSpuId(sku.getGoodsSpuId());
         skuDTO.setPrice(sku.getPrice());
         //String json = JacksonUtil.toJson(skuDTO);
-        //redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
+        redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
         return skuDTO;
     }
 
