@@ -48,6 +48,8 @@ public class GoodsDao {
     FloatPricePoMapper floatPricePoMapper;
     @Autowired
     CategoryPoMapper categoryPoMapper;
+    @Autowired
+    RedisTemplate redisTemplate;
 
     public List<SKUPo> getSkuList(){
         SKUPoExample example = new SKUPoExample();
@@ -274,9 +276,16 @@ public class GoodsDao {
      * @Date: 2020/11/26 16:43
      */
     public ReturnObject getSkuById(Long id){
-        SKUPo skuPo;
+        SKUPo skuPo = new SKUPo();
         try {
-            skuPo = skuPoMapper.selectByPrimaryKey(id);
+            if(redisTemplate.hasKey("skuPo")){
+                skuPo = (SKUPo) redisTemplate.opsForValue().get("skuPo_"+id);
+            }else{
+                skuPo = skuPoMapper.selectByPrimaryKey(id);
+                if(skuPo!=null){
+                    redisTemplate.opsForValue().set("skuPo_"+id,skuPo);
+                }
+            }
         }catch (Exception e){
             logger.error("selectSkuDetails: DataAccessException:" + e.getMessage());
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
@@ -292,6 +301,9 @@ public class GoodsDao {
         if(priceRet.getCode() != ResponseCode.OK){
             sku.setPrice(sku.getOriginalPrice());
         }
+        if(priceRet.getData() == null){
+            sku.setPrice(sku.getOriginalPrice());
+        }
         sku.setPrice(priceRet.getData());
         return new ReturnObject<>(sku);
     }
@@ -305,7 +317,12 @@ public class GoodsDao {
      */
     public ReturnObject changSkuInventory(Long skuId, Integer quantity){
         try{
-            SKUPo skuPo = skuPoMapper.selectByPrimaryKey(skuId);
+            SKUPo skuPo = new SKUPo();
+            if(redisTemplate.hasKey("skuPo_"+skuId)){
+                skuPo = (SKUPo) redisTemplate.opsForValue().get("skuPo_"+skuId);
+            }else{
+                skuPo = skuPoMapper.selectByPrimaryKey(skuId);
+            }
             if(skuPo == null){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
             }
@@ -319,6 +336,7 @@ public class GoodsDao {
             if(ret == 0){
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
             }
+            redisTemplate.delete("skuPo_"+skuId);
             return new ReturnObject(ResponseCode.OK);
         }catch (Exception e){
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
@@ -333,7 +351,12 @@ public class GoodsDao {
      * @Date: 2020/11/26 17:26
      */
     public ReturnObject updateSku(Sku sku) {
-        SKUPo po = skuPoMapper.selectByPrimaryKey(sku.getId());
+        SKUPo po;
+        if(redisTemplate.hasKey("skuPo_"+sku.getId())){
+            po = (SKUPo) redisTemplate.opsForValue().get("skuPo_"+sku.getId());
+        }else{
+            po = skuPoMapper.selectByPrimaryKey(sku.getId());
+        }
         if(po == null || po.getDisabled() == 1){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
@@ -355,6 +378,7 @@ public class GoodsDao {
             return new ReturnObject(ResponseCode.FIELD_NOTVALID);
         } else {
             logger.debug("updateSku: update sku success : " + sku.toString());
+            redisTemplate.delete("skuPo_"+sku.getId());
             return new ReturnObject();
         }
     }
@@ -368,7 +392,14 @@ public class GoodsDao {
      */
     public ReturnObject<Long> getShopIdBySkuId(Long id){
         try {
-            SKUPo skuPo = skuPoMapper.selectByPrimaryKey(id);
+            SKUPo skuPo;
+            if(redisTemplate.hasKey("skuPo_"+id)){
+                skuPo = (SKUPo) redisTemplate.opsForValue().get("skuPo_"+id);
+            }else{
+                skuPo = skuPoMapper.selectByPrimaryKey(id);
+                if(skuPo != null)
+                redisTemplate.opsForValue().set("skuPo_"+id,skuPo);
+            }
             if(skuPo==null){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
             }
@@ -586,11 +617,7 @@ public class GoodsDao {
         try{
             List<FloatPricePo> floatPricePoList = floatPricePoMapper.selectByExample(example);
             if(floatPricePoList == null || floatPricePoList.size()==0){
-                SKUPo po = skuPoMapper.selectByPrimaryKey(skuId);
-                if(po == null){
-                    return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
-                }
-                return new ReturnObject(po.getOriginalPrice());
+                return new ReturnObject(null);
             }
             return new ReturnObject(floatPricePoList.get(0).getActivityPrice());
         }catch (Exception e){
