@@ -126,8 +126,9 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("flashsales/{id}")
-    public Object changeFlashsale(@PathVariable Integer id,@RequestBody String flashDate){
-        return null;
+    public Object changeFlashsale(@PathVariable Long id,@RequestBody FlashSaleVo flashDate){
+        var ret = flashSaleService.modifyFlashSale(id, flashDate.getFlashDate().atStartOfDay());
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -185,7 +186,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("flashsales/{fid}/flashitems/{id}")
-    public Object deleteFlashitems(@PathVariable Long flashSaleId, @PathVariable Long itemId){
+    public Object deleteFlashitems(@PathVariable("fid") Long flashSaleId, @PathVariable("id") Long itemId){
         var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
         return Common.decorateReturnObject(ret);
     }

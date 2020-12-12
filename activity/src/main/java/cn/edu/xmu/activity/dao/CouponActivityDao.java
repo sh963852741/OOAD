@@ -1,17 +1,22 @@
 package cn.edu.xmu.activity.dao;
 
 import cn.edu.xmu.activity.mapper.CouponActivityPoMapper;
+import cn.edu.xmu.activity.mapper.CouponPoMapper;
 import cn.edu.xmu.activity.mapper.CouponSKUPoMapper;
 import cn.edu.xmu.activity.model.Timeline;
 import cn.edu.xmu.activity.model.bo.CouponActivity;
 import cn.edu.xmu.activity.model.po.*;
+import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
+import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.hash.Funnels;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +29,13 @@ public class CouponActivityDao {
     CouponActivityPoMapper couponActivityPoMapper;
     @Autowired
     CouponSKUPoMapper couponSKUPoMapper;
+    @Autowired
+    CouponPoMapper couponPoMapper;
 
     @Autowired
     RedisTemplate redisTemplate;
+    RedisBloomFilter redisBloomFilter =  new RedisBloomFilter<>(redisTemplate,
+            new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
 
     public Boolean hasSameSKU(long skuId){
         CouponSKUPoExample example = new CouponSKUPoExample();
@@ -164,9 +173,23 @@ public class CouponActivityDao {
             var res = couponActivityPoMapper.selectByPrimaryKey(id);
             if (res != null){
                 redisTemplate.boundHashOps("coupon-activity").put(id, res);
+                int count = setBloomByActivity(id);
+                redisTemplate.opsForValue().set("Claimed"+res.getId(), res.getQuantity() - count);
             }
             return res;
         }
+    }
+
+    public int setBloomByActivity(long activityId){
+        CouponPoExample example =new CouponPoExample();
+        CouponPoExample.Criteria criteria = example.createCriteria();
+        criteria.andActivityIdEqualTo(activityId);
+
+        List<CouponPo> list = couponPoMapper.selectByExample(example);
+        for(CouponPo couponPo: list){
+            redisBloomFilter.addByBloomFilter("Claimed" + couponPo.getActivityId(),couponPo.getActivityId() + couponPo.getCustomerId());
+        }
+        return list.size();
     }
 
     public Long addSpuToActivity(long activityId,long skuId){
