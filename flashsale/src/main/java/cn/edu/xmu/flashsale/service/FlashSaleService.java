@@ -119,9 +119,14 @@ public class FlashSaleService implements InitializingBean {
         FlashSaleItemPo po = vo.createPo();
         po.setGmtCreate(LocalDateTime.now());
         po.setSaleId(flashSaleId);
+        po.setGoodsSkuId(vo.getSkuId());
+        SkuDTO skuDTO = goodsService.getSku(po.getGoodsSkuId());
+        if(skuDTO == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(flashSaleDao.addFlashSaleItem(po) == 1){
-            SkuDTO skuDTO = goodsService.getSku(po.getGoodsSkuId());
             FlashSaleItem flashSaleItem = new FlashSaleItem(po, skuDTO);
+            log.debug("flashSaleItem" + flashSaleItem.toString());
             return new ReturnObject(flashSaleItem);
         }else{
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
@@ -130,14 +135,17 @@ public class FlashSaleService implements InitializingBean {
 
     public ReturnObject removeSkuFromFlashSale(Long flashSaleId, Long flashSaleItemId){
         FlashSalePo flashSalePo = flashSaleDao.getFlashSale(flashSaleId);
+        log.debug("删除缓存中……" + flashSaleItemId);
+        FlashSaleItemPo flashSaleItemPo = flashSaleDao.getFlashSaleItemByPrimaryKey(flashSaleItemId);
         if(flashSalePo == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "秒杀活动不存在");
         }
         if(flashSalePo.getFlashDate().minusHours(24).isBefore(LocalDateTime.now())){
             // 需要更新缓存
+            log.debug("删除缓存中……" + flashSaleItemPo.getGoodsSkuId().toString());
             redisTemplate.opsForSet().remove(
                     "FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId(),
-                    flashSaleItemId);
+                    flashSaleItemPo.getGoodsSkuId().toString());
         }
 
         if(flashSaleDao.deleteFlashSaleItem(flashSaleItemId) == 1){
@@ -155,6 +163,9 @@ public class FlashSaleService implements InitializingBean {
 
         Set<Object> skus = Objects.requireNonNull(redisTemplate.opsForSet().members(setKey)).stream().map(x -> x.toString()).collect(Collectors.toSet());
         log.debug("skus:" + skus);
+        if(skus.isEmpty()){
+            return Mono.just(new ArrayList<>());
+        }
         return reactiveRedisTemplate.opsForHash().multiGet(hashKey, skus).map(y ->{
             List<FlashSaleItem> ret = new ArrayList<>();
             log.debug("y:" + ((List)y).toString());

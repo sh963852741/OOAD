@@ -77,4 +77,8 @@ public class FlashSaleDao {
 
         return flashSaleItemPoMapper.selectByExample(example);
     }
+
+    public FlashSaleItemPo getFlashSaleItemByPrimaryKey(long id){
+        return flashSaleItemPoMapper.selectByPrimaryKey(id);
+    }
 }

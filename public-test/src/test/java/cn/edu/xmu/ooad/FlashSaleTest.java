@@ -5,8 +5,7 @@ import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -17,7 +16,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 注意！！！
+ * 在执行此测试前请清空并重新设置测试数据，以确保日期数据有效
+ */
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FlashSaleTest {
     @Autowired
     private ObjectMapper mObjectMapper;
@@ -107,14 +111,15 @@ public class FlashSaleTest {
      * @throws Exception
      */
     @Test
+    @Order(1)
     public void getFlashSaleActivity1()throws Exception {
         byte[] responseBuffer = null;
         WebTestClient.RequestHeadersSpec res = webClient.get().uri("/flashsales/current?page=1&pageSize=10");
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8").expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$").isArray()
-                .jsonPath("$[?(@.id == 4)].product.id").isEqualTo(275)
-                .jsonPath("$[?(@.id == 3)].product.id").isEqualTo(290)
+                .jsonPath("$[?(@.id == 8)].product.id").isEqualTo(275)
+                .jsonPath("$[?(@.id == 7)].product.id").isEqualTo(290)
                 .returnResult()
                 .getResponseBodyContent();
 
@@ -154,6 +159,7 @@ public class FlashSaleTest {
                 .returnResult()
                 .getResponseBodyContent();
 
+        response = new String(responseBuffer, "utf-8");
         jsonNode = mObjectMapper.readTree(response).findPath("data").get("id");
         int insertItemId = jsonNode.asInt();
 
@@ -171,6 +177,77 @@ public class FlashSaleTest {
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").doesNotExist()
+                .returnResult()
+                .getResponseBodyContent();
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE - 1)
+    public void delFlashItem() throws Exception {
+        // region 删除今天的秒杀商品
+        webClient.delete().uri("flashsales/3/flashitems/5").exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").doesNotExist()
+                .returnResult()
+                .getResponseBodyContent();
+        webClient.delete().uri("flashsales/3/flashitems/6").exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").doesNotExist()
+                .returnResult()
+                .getResponseBodyContent();
+        webClient.delete().uri("flashsales/4/flashitems/7").exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").doesNotExist()
+                .returnResult()
+                .getResponseBodyContent();
+        webClient.delete().uri("flashsales/4/flashitems/8").exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data").doesNotExist()
+                .returnResult()
+                .getResponseBodyContent();
+        // endregion
+
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.get().uri("/flashsales/current?page=1&pageSize=10");
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8").expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$").isArray()
+                .jsonPath("$.length()").isEqualTo(0)
+                .returnResult()
+                .getResponseBodyContent();
+
+        String response = new String(responseBuffer, "utf-8");
+
+    }
+
+    @Test
+    @Order(Integer.MAX_VALUE)
+    public void delFlashSale(){
+        for(int i=1;i<=4;++i){
+            webClient.delete().uri("flashsales/" + i).exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                    .expectBody()
+                    .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                    .jsonPath("$.errmsg").isEqualTo("成功")
+                    .jsonPath("$.data").doesNotExist()
+                    .returnResult()
+                    .getResponseBodyContent();
+        }
+
+        /**
+         * 继续删，应当报错
+         */
+        webClient.delete().uri("flashsales/0").exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
                 .jsonPath("$.data").doesNotExist()
                 .returnResult()
                 .getResponseBodyContent();
