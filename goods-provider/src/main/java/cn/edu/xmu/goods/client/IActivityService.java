@@ -53,5 +53,5 @@ public interface IActivityService {
 	 * @param orderItemDTOS
 	 * @return 扣库存成功的orderItem列表
 	 */
-	List<OrderItemDTO> modifyPresaleInventory(List<OrderItemDTO> orderItemDTOS);
+	List<OrderItemDTO> modifyPresaleInventory(List<OrderItemDTO> orderItemDTOS, Long presaleId);
 }
