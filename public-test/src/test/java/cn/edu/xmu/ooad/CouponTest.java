@@ -1,11 +1,13 @@
 package cn.edu.xmu.ooad;
 
 import cn.edu.xmu.ooad.util.JwtHelper;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest   //标识本类是一个SpringBootTest
+@AutoConfigureWebTestClient(timeout = "100000")//100 seconds
 class CouponTest {
 
     @Autowired
@@ -41,6 +44,10 @@ class CouponTest {
         shopToken =jwtHelper.createToken(59L,1L, 3600);
     }
 
+    /**
+     * 获取优惠券状态
+     * @throws Exception
+     */
     @Test
     void getCouponState() throws Exception
     {
@@ -121,14 +128,19 @@ class CouponTest {
         responseString = new String(responseBuffer, "utf-8");
     }
 
+    /**
+     * 向活动中添加SKU
+     * @throws Exception
+     */
     @Test
     void createCouponSkus() throws Exception{
         List<Long> body=new ArrayList<>();
         body.add((long)275);
         body.add((long)276);
 
+        /* 加入SKU */
         byte[] responseBuffer = null;
-        responseBuffer = webClient.post().uri("/goods/shops/0/couponactivities/6/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
+        responseBuffer = webClient.post().uri("/shops/0/couponactivities/6/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -138,68 +150,67 @@ class CouponTest {
         String expectedResponse="{\"errno\":0,\"errmsg\":\"成功\"}";
         JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer = webClient.post().uri("/goods/shops/0/couponactivities/5/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
+        /* 重复加入SKU */
+        responseBuffer = webClient.post().uri("/shops/0/couponactivities/5/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.COUPONACT_STATENOTALLOW.getCode())
                 .returnResult().getResponseBody();
 
         responseString = new String(responseBuffer, StandardCharsets.UTF_8);
-        expectedResponse="{\"errno\":904,\"errmsg\":\"优惠活动状态禁止\"}";
-        JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer=webClient.post().uri("/goods/shops/0/couponactivities/4/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
+        /* SKU不是自己的 */
+        responseBuffer=webClient.post().uri("/shops/1/couponactivities/4/skus").header("authorization",shopToken).bodyValue(body.toString()).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode())
                 .returnResult().getResponseBody();
 
         responseString = new String(responseBuffer, StandardCharsets.UTF_8);
-        expectedResponse="{\"errno\":505,\"errmsg\":\"操作的资源id不是自己的对象\"}";
-        JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer = webClient.post().uri("/goods/shops/0/couponactivities/7/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
+        /* 活动上线中 */
+        responseBuffer = webClient.post().uri("/shops/0/couponactivities/7/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.COUPONACT_STATENOTALLOW.getCode())
                 .returnResult().getResponseBody();
 
         responseString = new String(responseBuffer, StandardCharsets.UTF_8);
-        expectedResponse="{\"errno\":904,\"errmsg\":\"优惠活动状态禁止\"}";
-        JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer=webClient.post().uri("/goods/shops/1/couponactivities/6/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
+        /* 活动不是自己的 */
+        responseBuffer=webClient.post().uri("/shops/1/couponactivities/6/skus").header("authorization",shopToken).bodyValue(body.toString()).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode())
                 .returnResult().getResponseBody();
 
         responseString = new String(responseBuffer, StandardCharsets.UTF_8);
-        expectedResponse="{\"code\":\"RESOURCE_ID_OUTSCOPE\",\"errmsg\":\"操作的资源id不是自己的对象\",\"data\":null}";
-        JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-
-        responseBuffer = webClient.post().uri("/goods/shops/0/couponactivities/6/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType("application/json;charset=UTF-8")
-                .expectBody()
-                .returnResult().getResponseBody();
-
-        responseString = new String(responseBuffer, StandardCharsets.UTF_8);
-        expectedResponse="{\"code\":\"RESOURCE_ID_OUTSCOPE\",\"errmsg\":\"操作的资源id不是自己的对象\",\"data\":null}";
-        JSONAssert.assertEquals(expectedResponse,responseString,true);
-
-        List<Long> body1=new ArrayList<>();
-        body1.add((long)1);
-        responseBuffer = webClient.post().uri("/goods/shops/0/couponactivities/6/skus").header("authorization",adminToken).bodyValue(body1.toString()).exchange()
-                .expectStatus().is4xxClientError()
-                .expectHeader().contentType("application/json;charset=UTF-8")
-                .expectBody()
-                .returnResult().getResponseBody();
-
-        responseString = new String(responseBuffer, StandardCharsets.UTF_8);
-        expectedResponse="{\"code\":\"RESOURCE_ID_OUTSCOPE\",\"errmsg\":\"操作的资源id不是自己的对象\",\"data\":null}";
-        JSONAssert.assertEquals(expectedResponse,responseString,true);
+//        responseBuffer = webClient.post().uri("/shops/0/couponactivities/6/skus").header("authorization",adminToken).bodyValue(body.toString()).exchange()
+//                .expectStatus().isOk()
+//                .expectHeader().contentType("application/json;charset=UTF-8")
+//                .expectBody()
+//                .returnResult().getResponseBody();
+//
+//        responseString = new String(responseBuffer, StandardCharsets.UTF_8);
+//        expectedResponse="{\"code\":\"RESOURCE_ID_OUTSCOPE\",\"errmsg\":\"操作的资源id不是自己的对象\",\"data\":null}";
+//        JSONAssert.assertEquals(expectedResponse,responseString,true);
+//
+//        List<Long> body1=new ArrayList<>();
+//        body1.add((long)1);
+//        responseBuffer = webClient.post().uri("/shops/0/couponactivities/6/skus").header("authorization",adminToken).bodyValue(body1.toString()).exchange()
+//                .expectStatus().is4xxClientError()
+//                .expectHeader().contentType("application/json;charset=UTF-8")
+//                .expectBody()
+//                .returnResult().getResponseBody();
+//
+//        responseString = new String(responseBuffer, StandardCharsets.UTF_8);
+//        expectedResponse="{\"code\":\"RESOURCE_ID_OUTSCOPE\",\"errmsg\":\"操作的资源id不是自己的对象\",\"data\":null}";
+//        JSONAssert.assertEquals(expectedResponse,responseString,true);
 
     }
 
@@ -207,7 +218,7 @@ class CouponTest {
     void deleteCouponSku() throws Exception
     {
         byte[] responseBuffer = null;
-        responseBuffer=webClient.delete().uri("/goods/shops/0/couponskus/5").header("authorization",shopToken).exchange()
+        responseBuffer=webClient.delete().uri("/shops/0/couponskus/5").header("authorization",shopToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -217,7 +228,7 @@ class CouponTest {
         String expectedResponse="{\"errno\":0,\"errmsg\":\"成功\"}";
         JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer=webClient.delete().uri("/goods/shops/1/couponskus/5").header("authorization",adminToken).exchange()
+        responseBuffer=webClient.delete().uri("/shops/1/couponskus/5").header("authorization",adminToken).exchange()
                 .expectStatus().is4xxClientError()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -227,7 +238,7 @@ class CouponTest {
         expectedResponse="{\"errno\":504,\"errmsg\":\"操作的资源id不存在\"}";
         JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer=webClient.delete().uri("/goods/shops/1/couponskus/1").header("authorization",adminToken).exchange()
+        responseBuffer=webClient.delete().uri("/shops/1/couponskus/1").header("authorization",adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -237,7 +248,7 @@ class CouponTest {
         expectedResponse="{\"errno\":904,\"errmsg\":\"优惠活动状态禁止\"}";
         JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer=webClient.delete().uri("/goods/shops/2/couponskus/5").header("authorization",adminToken).exchange()
+        responseBuffer=webClient.delete().uri("/shops/2/couponskus/5").header("authorization",adminToken).exchange()
                 .expectStatus().is4xxClientError()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -247,7 +258,7 @@ class CouponTest {
         expectedResponse="{\"errno\":503,\"errmsg\":\"departId不匹配\"}";
         JSONAssert.assertEquals(expectedResponse,responseString,true);
 
-        responseBuffer=webClient.delete().uri("/goods/shops/2/couponskus/5").header("authorization",adminToken).exchange()
+        responseBuffer=webClient.delete().uri("/shops/2/couponskus/5").header("authorization",adminToken).exchange()
                 .expectStatus().is4xxClientError()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()

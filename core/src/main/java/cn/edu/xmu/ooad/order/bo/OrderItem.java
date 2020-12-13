@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
  * @author xincong yao
  * @date 2020-11-16
  */
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class OrderItem {
 
 	private Long id;

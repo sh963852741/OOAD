@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
  **/
 @Service
 @RocketMQMessageListener(topic = "coupon-topic", consumeMode = ConsumeMode.CONCURRENTLY, consumeThreadMax = 10, consumerGroup = "activity-group")
-public class PayConsumerListener implements RocketMQListener<String> {
-    private static final Logger logger = LoggerFactory.getLogger(PayConsumerListener.class);
+public class ActivityConsumerListener implements RocketMQListener<String> {
+    private static final Logger logger = LoggerFactory.getLogger(ActivityConsumerListener.class);
     @Autowired
     CouponPoMapper couponPoMapper;
     @Override
