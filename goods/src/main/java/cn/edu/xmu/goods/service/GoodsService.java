@@ -11,13 +11,17 @@ import cn.edu.xmu.goods.model.bo.Sku;
 import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
+import cn.edu.xmu.goods.utility.OrderAdapter;
 import cn.edu.xmu.ooad.util.ImgHelper;
+import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
 import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
+import cn.edu.xmu.oomall.order.dto.FreightModelDto;
 import cn.edu.xmu.oomall.order.service.IFreightService;
 import com.google.common.hash.Funnels;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,9 +30,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -43,7 +50,7 @@ public class GoodsService implements InitializingBean {
 
     private  static  final Logger logger = LoggerFactory.getLogger(GoodsService.class);
 
-    //@DubboReference(version = "0.0.1-SNAPSHOT")
+//    @DubboReference(version = "0.0.1-SNAPSHOT")
     private IFreightService freightService;
 
     @Autowired

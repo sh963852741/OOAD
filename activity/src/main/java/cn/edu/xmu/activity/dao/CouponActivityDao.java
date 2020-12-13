@@ -34,8 +34,12 @@ public class CouponActivityDao {
 
     @Autowired
     RedisTemplate redisTemplate;
-    RedisBloomFilter redisBloomFilter =  new RedisBloomFilter<>(redisTemplate,
-            new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
+    RedisBloomFilter redisBloomFilter;
+
+    public CouponActivityDao(){
+        redisBloomFilter = new RedisBloomFilter<>(redisTemplate,
+                new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
+    }
 
     public Boolean hasSameSKU(long skuId){
         CouponSKUPoExample example = new CouponSKUPoExample();
@@ -46,11 +50,13 @@ public class CouponActivityDao {
             return false;
         }
 
+        /* 分析SKU对应的优惠活动 */
         CouponActivityPoExample activityExample = new CouponActivityPoExample();
         CouponActivityPoExample.Criteria activityCriteria = activityExample.createCriteria();
         activityCriteria.andIdIn(
                 couponSKUPo.stream().map(CouponSKUPo::getActivityId).collect(Collectors.toList()));
-        var x = couponActivityPoMapper.selectByExample(activityExample).stream().filter(z -> !z.getState().equals(CouponActivity.CouponStatus.DELETE.getCode()));
+        var x = couponActivityPoMapper.selectByExample(activityExample).stream().filter(
+                z -> (!z.getState().equals(CouponActivity.CouponStatus.DELETE.getCode()) && z.getEndTime().isAfter(LocalDateTime.now())));
         return x.count() > 0;
     }
 
@@ -166,20 +172,25 @@ public class CouponActivityDao {
      * @return
      */
     public CouponActivityPo getActivityById(long id){
-        var x = redisTemplate.boundHashOps("coupon-activity").get(id);
+        var x = redisTemplate.boundHashOps("coupon-activity").get(String.valueOf(id));
         if(x != null){
             return (CouponActivityPo)x;
         }else{
             var res = couponActivityPoMapper.selectByPrimaryKey(id);
             if (res != null){
-                redisTemplate.boundHashOps("coupon-activity").put(id, res);
+                redisTemplate.boundHashOps("coupon-activity").putIfAbsent(String.valueOf(id), res);
                 int count = setBloomByActivity(id);
-                redisTemplate.opsForValue().set("Claimed"+res.getId(), res.getQuantity() - count);
+                redisTemplate.opsForValue().setIfAbsent("Claimed"+res.getId(), res.getQuantity() - count);
             }
             return res;
         }
     }
 
+    /**
+     * 设置某活动的布隆过滤器
+     * @param activityId 优惠活动ID
+     * @return 本活动已经领取了多少优惠券
+     */
     public int setBloomByActivity(long activityId){
         CouponPoExample example =new CouponPoExample();
         CouponPoExample.Criteria criteria = example.createCriteria();
@@ -192,10 +203,11 @@ public class CouponActivityDao {
         return list.size();
     }
 
-    public Long addSpuToActivity(long activityId,long skuId){
+    public Long addSkuToActivity(long activityId, long skuId){
         CouponSKUPo po = new CouponSKUPo();
         po.setActivityId(activityId);
         po.setSkuId(skuId);
+        po.setGmtCreate(LocalDateTime.now());
         couponSKUPoMapper.insert(po);
         return po.getId();
     }
