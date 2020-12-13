@@ -1,4 +1,4 @@
-package cn.edu.xmu.oomall;
+package cn.edu.xmu.oomall.other;
 
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package cn.edu.xmu.oomall.order.other;
+package cn.edu.xmu.oomall.gateway;
 
 import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
