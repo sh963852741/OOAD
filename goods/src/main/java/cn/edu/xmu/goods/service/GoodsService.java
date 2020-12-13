@@ -817,7 +817,6 @@ public class GoodsService implements InitializingBean {
         return goodsDao.getShopIdBySkuId(id);
     }
 
-    // TODO 需要对区分是什么的库存
     public ReturnObject changSkuInventory(Long skuId, Integer quantity){
         return goodsDao.changSkuInventory(skuId,quantity);
     }

@@ -108,8 +108,11 @@ public class GoodsController {
     })
     @GetMapping("/skus/{id}")
     //TODO 查询后添加足迹
-    public Object getSkuDetails(@PathVariable Long id) {
+    public Object getSkuDetails(@PathVariable Long id,Long loginUser) {
         ReturnObject ret = goodsService.getSkuDetails(id);
+        if(ret.getCode() == ResponseCode.OK){
+            //rocketMQTemplate.sendOneWay("");
+        }
         return Common.decorateReturnObject(ret);
     }
 
@@ -263,7 +266,7 @@ public class GoodsController {
     })
     @GetMapping("/share/{sid}/skus/{id}")
     @Audit
-    public Object getSharedSpu(@PathVariable Long sid, @PathVariable Long id) {
+    public Object getSharedSpu(@PathVariable Long sid, @PathVariable Long id,@LoginUser Long userId) {
         if (id == null || sid == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -273,10 +276,6 @@ public class GoodsController {
          */
 
         ReturnObject ret = goodsService.getSkuDetails(id);
-        if(ret.getData() == ResponseCode.OK){
-            //TODO 发送rocketMq消息
-            //rocketMQTemplate.sendOneWay("",);
-        }
         return Common.decorateReturnObject(ret);
 
     }
