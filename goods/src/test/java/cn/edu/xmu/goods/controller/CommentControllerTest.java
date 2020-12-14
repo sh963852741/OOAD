@@ -3,7 +3,9 @@ package cn.edu.xmu.goods.controller;
 import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.ooad.util.JacksonUtil;
+import cn.edu.xmu.ooad.util.JwtHelper;
 import net.minidev.json.JSONUtil;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,8 +19,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CommentControllerTest {
+    private static String adminToken;
+    private static String shopToken;
     @Autowired
     private MockMvc mvc;
+
+    @BeforeAll
+    private static void login(){
+        JwtHelper jwtHelper = new JwtHelper();
+        adminToken =jwtHelper.createToken(1L,0L, 3600);
+        shopToken =jwtHelper.createToken(59L,1L, 3600);
+    }
 
     /**
      * 获取评论状态

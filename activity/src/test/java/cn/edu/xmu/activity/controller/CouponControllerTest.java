@@ -358,4 +358,12 @@ public class CouponControllerTest {
                 .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
                 .andDo(MockMvcResultHandlers.print());
     }
+
+    /**
+     * 用户领取优惠券
+     */
+    @Test
+    public void claimCoupon() throws Exception{
+
+    }
 }

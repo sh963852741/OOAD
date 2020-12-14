@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@Rollback(value = false)
 public class PresaleControllerTest {
 
     private static String adminToken;
@@ -50,7 +49,7 @@ public class PresaleControllerTest {
         String request="{ \"name\": \"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isOk()))
@@ -69,8 +68,8 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.gmtModified").isEmpty())
                 .andExpect(jsonPath("$.data.gmtCreate").isString())
                 .andExpect(jsonPath("$.data.state").isNumber())
-                .andExpect(jsonPath("$.data.goodsSpu.shopId").doesNotExist())
-                .andExpect(jsonPath("$.data.goodsSpu.id").value(290))
+                .andExpect(jsonPath("$.data.goodsSku.shopId").doesNotExist())
+                .andExpect(jsonPath("$.data.goodsSku.id").value(290))
                 .andExpect(jsonPath("$.data.shop.id").value(1))
                 .andExpect(jsonPath("$.data.shop.name").isString())
                 .andDo(MockMvcResultHandlers.print())
@@ -87,7 +86,7 @@ public class PresaleControllerTest {
         String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isBadRequest()))
@@ -107,7 +106,7 @@ public class PresaleControllerTest {
         String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isBadRequest()))
@@ -127,7 +126,7 @@ public class PresaleControllerTest {
         String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isBadRequest()))
@@ -147,7 +146,7 @@ public class PresaleControllerTest {
         String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isBadRequest()))
@@ -167,7 +166,7 @@ public class PresaleControllerTest {
         String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": -3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isBadRequest()))
@@ -187,7 +186,7 @@ public class PresaleControllerTest {
         String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/3000/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/3000/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isNotFound()))
@@ -207,10 +206,10 @@ public class PresaleControllerTest {
         String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/2/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/299/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
-        String responseString = response.andExpect((status().isForbidden()))
+        String responseString = response.andExpect((status().isOk()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
@@ -226,7 +225,7 @@ public class PresaleControllerTest {
         String request="{ \"name\": \"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isOk()))
@@ -245,8 +244,8 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.gmtModified").isEmpty())
                 .andExpect(jsonPath("$.data.gmtCreate").isString())
                 .andExpect(jsonPath("$.data.state").isNumber())
-                .andExpect(jsonPath("$.data.goodsSpu.shopId").doesNotExist())
-                .andExpect(jsonPath("$.data.goodsSpu.id").value(290))
+                .andExpect(jsonPath("$.data.goodsSku.shopId").doesNotExist())
+                .andExpect(jsonPath("$.data.goodsSku.id").value(290))
                 .andExpect(jsonPath("$.data.shop.id").value(1))
                 .andExpect(jsonPath("$.data.shop.name").isString())
                 .andDo(MockMvcResultHandlers.print())
@@ -254,7 +253,7 @@ public class PresaleControllerTest {
         String request1="{ \"name\": \"预售活动1\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        ResultActions response1 = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response1 = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request1)
                 .header("authorization", shopToken));
         String responseString1 = response1.andExpect((status().isOk()))
@@ -273,8 +272,8 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.gmtModified").isEmpty())
                 .andExpect(jsonPath("$.data.gmtCreate").isString())
                 .andExpect(jsonPath("$.data.state").isNumber())
-                .andExpect(jsonPath("$.data.goodsSpu.shopId").doesNotExist())
-                .andExpect(jsonPath("$.data.goodsSpu.id").value(290))
+                .andExpect(jsonPath("$.data.goodsSku.shopId").doesNotExist())
+                .andExpect(jsonPath("$.data.goodsSku.id").value(290))
                 .andExpect(jsonPath("$.data.shop.id").value(1))
                 .andExpect(jsonPath("$.data.shop.name").isString())
                 .andDo(MockMvcResultHandlers.print())
@@ -291,7 +290,7 @@ public class PresaleControllerTest {
         String request="{ \"name\": \"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\",\"state\":\"1\"}";
-        ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
+        ResultActions response = mvc.perform(post("/presale/shops/1/skus/290/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isOk()))
@@ -310,8 +309,8 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.gmtModified").isEmpty())
                 .andExpect(jsonPath("$.data.gmtCreate").isString())
                 .andExpect(jsonPath("$.data.state").isNumber())
-                .andExpect(jsonPath("$.data.goodsSpu.shopId").doesNotExist())
-                .andExpect(jsonPath("$.data.goodsSpu.id").value(290))
+                .andExpect(jsonPath("$.data.goodsSku.shopId").doesNotExist())
+                .andExpect(jsonPath("$.data.goodsSku.id").value(290))
                 .andExpect(jsonPath("$.data.shop.id").value(1))
                 .andExpect(jsonPath("$.data.shop.name").isString())
                 .andDo(MockMvcResultHandlers.print())
@@ -348,14 +347,14 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.list[0].BeginTime").isString())
                 .andExpect(jsonPath("$.data.list[0].payTime").isString())
                 .andExpect(jsonPath("$.data.list[0].endTime").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.id").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.name").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.skuSn").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.imageUrl").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.inventory").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.price").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.disable").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.id").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.name").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.skuSn").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.imageUrl").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.inventory").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.originalPrice").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.price").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.disable").isNumber())
                 .andReturn().getResponse().getContentAsString();
 
     }
@@ -363,7 +362,7 @@ public class PresaleControllerTest {
     //正常 用户根据sku id
     public void getPresaleActivity2()throws Exception{
         ResultActions response = mvc.perform(get("/presale/presales")
-                .queryParam("sku id", "1")
+                .queryParam("skuId", "1")
                 .queryParam("page", "1")
                 .queryParam("pageSize", "3")
                 .contentType("application/json;charset=UTF-8"));
@@ -376,14 +375,14 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.list[0].BeginTime").isString())
                 .andExpect(jsonPath("$.data.list[0].payTime").isString())
                 .andExpect(jsonPath("$.data.list[0].endTime").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.id").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.name").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.skuSn").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.imageUrl").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.inventory").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.price").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.disable").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.id").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.name").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.skuSn").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.imageUrl").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.inventory").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.originalPrice").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.price").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.disable").isNumber())
                 .andReturn().getResponse().getContentAsString();
 
     }
@@ -391,7 +390,7 @@ public class PresaleControllerTest {
     //正常 用户根据shop id
     public void getPresaleActivity3()throws Exception{
         ResultActions response = mvc.perform(get("/presale/presales")
-                .queryParam("shop id", "1")
+                .queryParam("shopId", "1")
                 .queryParam("page", "1")
                 .queryParam("pageSize", "3")
                 .contentType("application/json;charset=UTF-8"));
@@ -404,14 +403,14 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data.list[0].BeginTime").isString())
                 .andExpect(jsonPath("$.data.list[0].payTime").isString())
                 .andExpect(jsonPath("$.data.list[0].endTime").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.id").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.name").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.skuSn").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.imageUrl").isString())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.inventory").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.price").isNumber())
-                .andExpect(jsonPath("$.data.list[0].goodsSpu.disable").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.id").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.name").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.skuSn").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.imageUrl").isString())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.inventory").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.originalPrice").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.price").isNumber())
+                .andExpect(jsonPath("$.data.list[0].goodsSku.disable").isNumber())
                 .andReturn().getResponse().getContentAsString();
 
     }
@@ -470,7 +469,7 @@ public class PresaleControllerTest {
         ResultActions response = mvc.perform(put("/presale/shops/0/presales/1")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", adminToken));
-        String responseString = response.andExpect((status().isOk()))
+        String responseString = response.andExpect((status().is4xxClientError()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
@@ -490,7 +489,7 @@ public class PresaleControllerTest {
         ResultActions response = mvc.perform(put("/presale/shops/0/presales/1")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", adminToken));
-        String responseString = response.andExpect((status().isOk()))
+        String responseString = response.andExpect((status().is4xxClientError()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
@@ -510,7 +509,7 @@ public class PresaleControllerTest {
         ResultActions response = mvc.perform(put("/presale/shops/0/presales/1")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", adminToken));
-        String responseString = response.andExpect((status().isOk()))
+        String responseString = response.andExpect((status().is4xxClientError()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
@@ -550,7 +549,7 @@ public class PresaleControllerTest {
         ResultActions response = mvc.perform(put("/presale/shops/0/presales/1")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", adminToken));
-        String responseString = response.andExpect((status().isOk()))
+        String responseString = response.andExpect((status().is4xxClientError()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
