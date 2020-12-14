@@ -32,11 +32,14 @@ public class CouponActivityDao {
     @Autowired
     CouponPoMapper couponPoMapper;
 
-    @Autowired
+
     RedisTemplate redisTemplate;
+
     RedisBloomFilter redisBloomFilter;
 
-    public CouponActivityDao(){
+    @Autowired
+    public CouponActivityDao(RedisTemplate redisTemplate){
+        this.redisTemplate = redisTemplate;
         redisBloomFilter = new RedisBloomFilter<>(redisTemplate,
                 new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
     }
@@ -198,7 +201,7 @@ public class CouponActivityDao {
 
         List<CouponPo> list = couponPoMapper.selectByExample(example);
         for(CouponPo couponPo: list){
-            redisBloomFilter.addByBloomFilter("Claimed" + couponPo.getActivityId(),couponPo.getActivityId() + couponPo.getCustomerId());
+            redisBloomFilter.addByBloomFilter("Claimed" + couponPo.getActivityId(),couponPo.getActivityId().toString() + couponPo.getCustomerId().toString());
         }
         return list.size();
     }

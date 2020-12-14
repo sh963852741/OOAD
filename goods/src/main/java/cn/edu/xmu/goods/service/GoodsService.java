@@ -18,10 +18,8 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
 import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
-import cn.edu.xmu.oomall.order.dto.FreightModelDto;
 import cn.edu.xmu.oomall.order.service.IFreightService;
 import com.google.common.hash.Funnels;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -91,16 +89,16 @@ public class GoodsService implements InitializingBean {
                 Funnels.longFunnel(),
                 5000, 0.03);
         this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
-        SKUPoExample example = new SKUPoExample();
-        List<SKUPo> skuPoList = goodsDao.getSkuList();
-        for(SKUPo skuPo : skuPoList){
-            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
-        }
-        SPUPoExample example1 = new SPUPoExample();
-        List<SPUPo> spuPoList = goodsDao.getSpuList();
-        for(SPUPo spuPo : spuPoList){
-            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
-        }
+//        SKUPoExample example = new SKUPoExample();
+//        List<SKUPo> skuPoList = goodsDao.getSkuList();
+//        for(SKUPo skuPo : skuPoList){
+//            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
+//        }
+//        SPUPoExample example1 = new SPUPoExample();
+//        List<SPUPo> spuPoList = goodsDao.getSpuList();
+//        for(SPUPo spuPo : spuPoList){
+//            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
+//        }
     }
 
     /**

@@ -5,12 +5,14 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IInventoryService;
 import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @DubboService(version = "0.0.1-SNAPSHOT")
 public class InventoryServiceImpl implements IInventoryService {
 
@@ -29,6 +31,7 @@ public class InventoryServiceImpl implements IInventoryService {
                 retData.add(orderItemDTO);
             }
         }
+        log.debug("retData:" + retData);
         return retData;
     }
 }

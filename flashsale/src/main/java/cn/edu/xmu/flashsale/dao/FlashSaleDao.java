@@ -81,4 +81,12 @@ public class FlashSaleDao {
     public FlashSaleItemPo getFlashSaleItemByPrimaryKey(long id){
         return flashSaleItemPoMapper.selectByPrimaryKey(id);
     }
+
+    public int delFlashSaleByTimeSegment(Long timesegmentId) {
+        FlashSalePoExample example = new FlashSalePoExample();
+        FlashSalePoExample.Criteria criteria = example.createCriteria();
+
+        criteria.andTimeSegIdEqualTo(timesegmentId);
+        return flashSalePoMapper.deleteByExample(example);
+    }
 }

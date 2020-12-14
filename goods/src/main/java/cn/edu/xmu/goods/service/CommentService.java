@@ -7,6 +7,8 @@ import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.other.impl.ICustomerService;
+
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ public class CommentService {
     private static final Logger logger= LoggerFactory.getLogger(CommentService.class);
     @Autowired
     private CommentDao commentDao;
+
     @DubboReference
     private ICustomerService customerService;
     /**
