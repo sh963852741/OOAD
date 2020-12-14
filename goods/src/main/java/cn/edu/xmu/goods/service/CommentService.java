@@ -30,10 +30,10 @@ public class CommentService {
     @Autowired
     private CommentDao commentDao;
 
-    @DubboReference
+//    @DubboReference
     private ICustomerService customerService;
 
-    @DubboReference
+//    @DubboReference
     private IDubboOrderService orderService;
     /**
      * 获取评论所有状态
