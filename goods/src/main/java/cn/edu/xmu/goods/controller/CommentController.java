@@ -67,7 +67,6 @@ public class CommentController {
     @PostMapping("orderitems/{id}/comments")
     @Audit
     public Object addCommentOnSku(
-            @Depart long shopId,
             @LoginUser long uid,
             @PathVariable long id,
             @Validated @RequestBody CommentVo commentVo,

@@ -32,7 +32,7 @@ public class CommentControllerTest {
     }
 
     /**
-     * 买家新增SKU的评论(内容好评，类型好评),内容好评，类型差评？
+     * 买家新增SKU的评论
      */
     @Test
     public void addGoodCommentGoodType() throws Exception{
