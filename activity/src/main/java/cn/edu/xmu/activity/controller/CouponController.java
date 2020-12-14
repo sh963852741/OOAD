@@ -269,7 +269,6 @@ public class CouponController {
         return Common.decorateReturnObject(ret);
     }
 
-
     /**
      * 管理员为己方某优惠券活动新增限定范围
      * @param
