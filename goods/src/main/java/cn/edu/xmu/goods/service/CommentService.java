@@ -7,18 +7,20 @@ import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import cn.edu.xmu.oomall.impl.*;
 
 @Service
 public class CommentService {
     private static final Logger logger= LoggerFactory.getLogger(CommentService.class);
     @Autowired
     private CommentDao commentDao;
-
+    @DubboReference
+    private ICustomerService customerService;
     /**
      * 获取评论所有状态
      * @return
@@ -97,6 +99,7 @@ public class CommentService {
         }
         return commentDao.selelctCommentsOfState(state.byteValue(),pageNum,pageSize);
     }
+
 
 
 
