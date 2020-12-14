@@ -18,8 +18,8 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
 import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
-import cn.edu.xmu.oomall.dto.FreightModelDto;
-import cn.edu.xmu.oomall.service.IFreightService;
+import cn.edu.xmu.oomall.order.dto.FreightModelDto;
+import cn.edu.xmu.oomall.order.service.IFreightService;
 import com.google.common.hash.Funnels;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
@@ -325,8 +325,8 @@ public class GoodsService implements InitializingBean {
         }
         Spu spu=new Spu((SPUPo)ret.getData());
         SpuRetVo vo=spu.createVo();
-        FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
-        vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
+       // FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
+       // vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
         return new ReturnObject<>(vo);
     }
 

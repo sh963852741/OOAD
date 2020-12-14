@@ -460,18 +460,28 @@ public class ActivityService implements InitializingBean {
      * @param activityId
      * @return
      */
-    public ReturnObject addSPUToCouponActivity(List<Long> skuIds, long shopId, long activityId){
+    public ReturnObject addSKUToCouponActivity(List<Long> skuIds, long shopId, long activityId){
+        CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
+        if(!couponActivityPo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())) {
+            return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "只允许修改下线的活动");
+        }
+        if (!couponActivityPo.getShopId().equals(shopId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "不允许修改其他店铺的活动");
+        }
+
         for(Long skuId:skuIds){
             SkuDTO skuDTO = goodsService.getSku(skuId);
             ShopDTO shopDTO = goodsService.getShopBySKUId(skuId);
             if(skuDTO == null){
-                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "SPU ID不存在");
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "SKU ID不存在");
             }
             if(!shopDTO.getId().equals(shopId)) {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE, "SPU 不属于你的店铺");
             }
-
-            Long insertId = couponActivityDao.addSpuToActivity(activityId, skuId);
+            if(couponActivityDao.hasSameSKU(skuId)){
+                return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "本SKU已经处于一个尚未结束的优惠活动中");
+            }
+            Long insertId = couponActivityDao.addSkuToActivity(activityId, skuId);
             if(insertId == null){
                 return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
             }

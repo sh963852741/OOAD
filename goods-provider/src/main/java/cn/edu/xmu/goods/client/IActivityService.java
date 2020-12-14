@@ -45,4 +45,13 @@ public interface IActivityService {
 
 	// type表示类型 团购或者预售 如果priceDto里预售款是null 则尾款表示是团购活动的价格
 	List<PriceDTO> getPriceAndName(List<OrderItemDTO> list , Integer type);
+
+	/**
+	 * 修改一批预售项对应的库存
+	 * 部分库存不足不影响其他
+	 * 返回不能为null，全部失败返回空列表
+	 * @param orderItemDTOS
+	 * @return 扣库存成功的orderItem列表
+	 */
+	List<OrderItemDTO> modifyPresaleInventory(List<OrderItemDTO> orderItemDTOS, Long presaleId);
 }

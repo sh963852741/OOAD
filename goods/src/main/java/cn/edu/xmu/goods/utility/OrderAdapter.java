@@ -1,7 +1,7 @@
 package cn.edu.xmu.goods.utility;
 
 
-import cn.edu.xmu.oomall.dto.FreightModelDto;
+import cn.edu.xmu.oomall.order.dto.FreightModelDto;
 
 import java.util.HashMap;
 import java.util.Map;

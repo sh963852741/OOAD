@@ -165,4 +165,15 @@ public class ActivityServiceImpl implements IActivityService {
         }
         return retList;
     }
+
+    @Override
+    public synchronized List<OrderItemDTO> modifyPresaleInventory(List<OrderItemDTO> orderItemDTOS, Long presaleId) {
+        var p = presaleActivityDao.getActivityById(presaleId);
+        for (OrderItemDTO orderItemDTO:orderItemDTOS){
+            if(p.getQuantity() < orderItemDTO.getQuantity()) return null;
+            p.setQuantity(p.getQuantity()-orderItemDTO.getQuantity());
+            presaleActivityDao.updateActivity(p,presaleId);
+        }
+        return orderItemDTOS;
+    }
 }

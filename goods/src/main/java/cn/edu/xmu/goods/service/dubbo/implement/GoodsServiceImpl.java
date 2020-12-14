@@ -153,6 +153,20 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
+    public Long getShopIdBySKUId(Long skuId) {
+        if(skuId == null){
+            return null;
+        }
+        ReturnObject<Long> shopIdRet = goodsService.getShopIdBySkuId(skuId);
+        log.debug("shopIdRet:" + shopIdRet.getData());
+        if(shopIdRet.getCode() != ResponseCode.OK){
+            return null;
+        }
+        Long shopId=shopIdRet.getData();
+        return shopId;
+    }
+
+    @Override
     public Long getGoodWeightBySku(Long skuId) {
         ReturnObject<Sku> ret = goodsDao.getSkuById(skuId);
         if(ret.getCode() != ResponseCode.OK){

@@ -1,6 +1,6 @@
-package cn.edu.xmu.oomall.impl;
+package cn.edu.xmu.oomall.other.impl;
 
-import cn.edu.xmu.oomall.dto.CustomerDTO;
+import cn.edu.xmu.oomall.other.dto.CustomerDTO;
 
 /**
  * @author xincong yao

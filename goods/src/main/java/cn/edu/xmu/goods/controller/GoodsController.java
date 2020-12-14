@@ -8,6 +8,7 @@ import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class GoodsController {
     @Autowired
     private HttpServletResponse httpServletResponse;
 
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
     /**
      * 获得商品SPU的所有状态
      *
@@ -47,11 +51,11 @@ public class GoodsController {
      * @return Object
      * createdBy Yifei Wang 2020/11/17 15:01
      */
-    @ApiOperation(value = "获取商品SPU的所有状态")
+    @ApiOperation(value = "获取商品SKU的所有状态")
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("/spus/states")
+    @GetMapping("/skus/states")
     public Object getSpuStates() {
         ReturnObject<List> returnObject = goodsService.getGoodsStates();
         return Common.decorateReturnObject(returnObject);
@@ -77,7 +81,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/skus")
-    public Object getSkus(@Validated SkuSelectVo vo, @RequestParam(required = false, defaultValue = "1") Integer page, @RequestParam(required = false, defaultValue = "10") Integer pageSize, BindingResult bindingResult) {
+    public Object getSkus(@Validated  SkuSelectVo vo, @RequestParam(required = false, defaultValue = "1") Integer page, @RequestParam(required = false, defaultValue = "10") Integer pageSize, BindingResult bindingResult) {
         logger.debug("getAllSkus: page = " + page + "  pageSize =" + pageSize);
         Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
         if (null != obj) {
@@ -103,6 +107,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/skus/{id}")
+    //TODO 查询后添加足迹
     public Object getSkuDetails(@PathVariable Long id) {
         ReturnObject ret = goodsService.getSkuDetails(id);
         return Common.decorateReturnObject(ret);
@@ -256,16 +261,22 @@ public class GoodsController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("/share/{sid}/spus/{id}")
+    @GetMapping("/share/{sid}/skus/{id}")
     @Audit
     public Object getSharedSpu(@PathVariable Long sid, @PathVariable Long id) {
         if (id == null || sid == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        /** @problem 此处需要查看spuid是否是分享活动的id;
+        /** TODO 此处需要查看skuid是否是分享活动的id;
+         *
          */
-        ReturnObject ret = goodsService.getSpuById(id);
+
+        ReturnObject ret = goodsService.getSkuDetails(id);
+        if(ret.getData() == ResponseCode.OK){
+            //TODO 发送rocketMq消息
+            //rocketMQTemplate.sendOneWay("",);
+        }
         return Common.decorateReturnObject(ret);
 
     }

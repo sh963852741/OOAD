@@ -120,7 +120,7 @@ public class GoodsDao {
         if(null != vo.getSpuId()){
             criteria.andGoodsSpuIdEqualTo(vo.getSpuId());
         }
-        criteria.andDisabledEqualTo((byte)0);
+        criteria.andDisabledEqualTo((byte)4);
         if(null != vo.getShopId()){
             List<SPUPo> list = getSpusByShopId(vo.getShopId());
             if(list != null){

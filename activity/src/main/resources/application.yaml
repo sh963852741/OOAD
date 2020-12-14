@@ -94,7 +94,7 @@ rocketmq:
   name-server: 47.115.162.144:9876
   producer:
     #生产者group名称
-    group: producer_group
+    group: activity_group
     #一次发送多少数量消息
     max-message-size: 4096
     #发送消息超时时间,默认3000

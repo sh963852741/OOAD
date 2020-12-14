@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.service.dubbo.implement;
 
+import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.service.ShopService;
 import cn.edu.xmu.goods.client.IShopService;
 import cn.edu.xmu.goods.client.dubbo.ShopDTO;
@@ -17,11 +18,19 @@ public class ShopServiceImpl implements IShopService {
     @Override
     public ShopDTO getShopById(Long shopId) {
         log.debug("Method getShopById(IShopService) was invoked;");
-        var shop = shopService.getShopByShopId(shopId).getData();
-        if(shop == null){
-            return null;
-        } else {
+
+        if(shopId == 0){
+            Shop shop = new Shop();
+            shop.setName("平台管理员");
+            shop.setId(0L);
             return shop.createDTO();
+        } else {
+            Shop shop = shopService.getShopByShopId(shopId).getData();
+            if(shop == null){
+                return null;
+            } else {
+                return shop.createDTO();
+            }
         }
     }
 }
