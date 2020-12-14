@@ -60,7 +60,7 @@ public class ActivityService implements InitializingBean {
     @DubboReference(version = "0.0.1-SNAPSHOT")
     IShopService shopService;
 
-//    @Autowired
+    @Autowired
     IUserService userService;
 
     @Autowired
@@ -374,7 +374,7 @@ public class ActivityService implements InitializingBean {
      */
     public ReturnObject<PageInfo<VoObject>> getCouponActivities(ActivityFinderVo activityFinderVo) {
         PageInfo<CouponActivityPo> couponList;
-        if (activityFinderVo.getTimeline().equals(CouponActivity.CouponStatus.DELETE.getCode())) {
+        if (!activityFinderVo.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())) {
             couponList = couponActivityDao.getInvalidActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId());
         } else {
@@ -396,15 +396,21 @@ public class ActivityService implements InitializingBean {
      * 新增优惠活动
      * @param couponActivityVo
      * @param shopId
+     * @param userId
      * @return
      */
-    public ReturnObject addCouponActivity(CouponActivityVo couponActivityVo, Long shopId) {
+    public ReturnObject<CouponActivityVo> addCouponActivity(CouponActivityVo couponActivityVo, Long shopId, Long userId) {
         CouponActivityPo po = couponActivityVo.createPo();
+        po.setCreatedBy(userId);
         po.setState(CouponActivity.CouponStatus.OFFLINE.getCode());
+
+        UserDTO userDTO = userService.getUserById(userId);
         if (couponActivityDao.addActivity(po, shopId)) {
-            return new ReturnObject(new CouponActivityVo(po));
+            var ret = new CouponActivityVo(po);
+            ret.createdBy = new UserVo(userDTO);
+            return new ReturnObject<>();
         } else {
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
     }
 
@@ -433,7 +439,7 @@ public class ActivityService implements InitializingBean {
 //            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经取消的优惠活动");
 //        }
         // 如果修改为下线，那需要取消优惠券
-        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())){
+        if(couponActivityVo.getState() != null && couponActivityVo.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())){
             couponDao.cancelCoupon(id);
         }
 

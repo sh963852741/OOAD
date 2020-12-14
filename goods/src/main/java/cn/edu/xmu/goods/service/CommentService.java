@@ -7,6 +7,7 @@ import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.oomall.order.service.IDubboOrderService;
 import cn.edu.xmu.other.impl.ICustomerService;
 
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import cn.edu.xmu.oomall.impl.*;
 
 @Service
 public class CommentService {
@@ -24,6 +24,9 @@ public class CommentService {
 
     @DubboReference
     private ICustomerService customerService;
+
+    @DubboReference
+    private IDubboOrderService orderService;
     /**
      * 获取评论所有状态
      * @return
@@ -36,18 +39,23 @@ public class CommentService {
      * 买家新增评论
      * @param orderItemId
      * @param commentVo
+     * @param userId
      * @return
      */
-    public ReturnObject newComment(Long orderItemId, CommentVo commentVo){
-        CommentPo po=new CommentPo();
-        Long customerId=123456L;
+    public ReturnObject newComment(Long orderItemId, CommentVo commentVo, Long userId){
+        if(!orderService.isCustomerOwnOrderItem(userId, orderItemId)){
+            return new ReturnObject(ResponseCode.FIELD_NOTVALID, "用户没有购买此商品");
+        }
 
-        po.setOrderitemId(123456L);
+//        var customer = customerService.getCustomerById(userId);
+        CommentPo po=new CommentPo();
+        po.setOrderitemId(orderItemId);
         po.setContent(commentVo.getContent());
         po.setType(commentVo.getType().byteValue());
         po.setState(Comment.State.NOT_AUDIT.getCode());
-        po.setCustomerId(customerId);
-        ReturnObject ret=commentDao.insertComment(po);
+        po.setCustomerId(userId);
+
+        ReturnObject ret = commentDao.insertComment(po);
         return ret;
     }
 
@@ -96,7 +104,7 @@ public class CommentService {
      * @param pageSize
      * @return
      */
-    public ReturnObject selelctCommentsOfState(Long did,Integer state,Integer pageNum, Integer pageSize){
+    public ReturnObject selectCommentsOfState(Long did, Integer state, Integer pageNum, Integer pageSize){
         if(did!=0){
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }

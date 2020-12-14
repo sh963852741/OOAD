@@ -4,7 +4,6 @@ import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.goods.service.CommentService;
 import cn.edu.xmu.ooad.annotation.Audit;
-import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -78,7 +77,7 @@ public class CommentController {
             logger.debug("validate fail");
             return returnObject;
         }
-        ReturnObject ret=commentService.newComment(id,commentVo);
+        ReturnObject ret=commentService.newComment(id,commentVo, uid);
         return Common.decorateReturnObject(ret);
     }
 
@@ -167,7 +166,7 @@ public class CommentController {
             @RequestParam(required = false,defaultValue = "1") Integer page,
             @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         logger.debug("getAllComments: page = "+ page +"  pageSize ="+pageSize);
-        ReturnObject ret=commentService.selelctCommentsOfState(did,state,page,pageSize);
+        ReturnObject ret=commentService.selectCommentsOfState(did,state,page,pageSize);
         return ret;
     }
 

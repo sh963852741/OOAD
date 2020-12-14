@@ -1,5 +1,6 @@
 package cn.edu.xmu.activity.service.mq;
 
+import cn.edu.xmu.activity.mapper.CouponActivityPoMapper;
 import cn.edu.xmu.activity.mapper.CouponPoMapper;
 import cn.edu.xmu.activity.model.po.CouponPo;
 import cn.edu.xmu.ooad.util.JacksonUtil;
@@ -24,11 +25,15 @@ public class ActivityConsumerListener implements RocketMQListener<String> {
     private static final Logger logger = LoggerFactory.getLogger(ActivityConsumerListener.class);
     @Autowired
     CouponPoMapper couponPoMapper;
+    @Autowired
+    CouponActivityPoMapper couponActivityPoMapper;
+
     @Override
     public void onMessage(String message) {
         CouponPo po = JacksonUtil.toObj(message, CouponPo.class);
         logger.info("onMessage: got message coupon =" + po +" time = "+ LocalDateTime.now());
         couponPoMapper.insert(po);
+        couponActivityPoMapper.decreaseCoupon(po.getActivityId());
         return;
     }
 }
