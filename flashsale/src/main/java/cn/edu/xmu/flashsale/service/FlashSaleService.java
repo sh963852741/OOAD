@@ -50,7 +50,7 @@ public class FlashSaleService implements InitializingBean {
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
-    @DubboReference(version = "0.0.3-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT")
     IGoodsService goodsService;
     @Autowired
     ITimeSegmentService timeSegmentService;

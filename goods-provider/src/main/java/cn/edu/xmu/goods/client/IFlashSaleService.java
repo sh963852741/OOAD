@@ -19,4 +19,9 @@ public interface IFlashSaleService {
 	 * @return
 	 */
 	Long getPrice(Long skuId);
+
+	/**
+	 * 删除某时段下的秒杀
+	 */
+	Integer delFlashSaleBySegId(Long segId);
 }

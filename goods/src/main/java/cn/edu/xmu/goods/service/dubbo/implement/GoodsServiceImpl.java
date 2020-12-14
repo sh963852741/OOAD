@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@DubboService(version = "0.0.3-SNAPSHOT")
+@DubboService(version = "0.0.1-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
 
 //    @DubboReference(version = "0.0.1-SNAPSHOT")

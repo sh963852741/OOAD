@@ -51,18 +51,24 @@ public class ActivityService implements InitializingBean {
     @Autowired
     CouponDao couponDao;
 
-    @Autowired
     private RedisTemplate redisTemplate;
-    RedisBloomFilter redisBloomFilter =  new RedisBloomFilter<>(redisTemplate,
-            new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
 
-    @DubboReference(version = "0.0.3-SNAPSHOT")
+    private RedisBloomFilter redisBloomFilter;
+
+    @DubboReference(version = "0.0.1-SNAPSHOT")
     IGoodsService goodsService;
     @DubboReference(version = "0.0.1-SNAPSHOT")
     IShopService shopService;
 
 //    @Autowired
     IUserService userService;
+
+    @Autowired
+    public ActivityService(RedisTemplate redisTemplate){
+        this.redisTemplate = redisTemplate;
+        redisBloomFilter =  new RedisBloomFilter<>(redisTemplate,
+                new BloomFilterHelper<>(Funnels.stringFunnel(Charset.defaultCharset()), 100000, 0.03));
+    }
 
     //region 预售活动部分
     public ReturnObject<PresaleActivity.PresaleStatus[]> getPresaleActivityStatus() {
@@ -394,6 +400,7 @@ public class ActivityService implements InitializingBean {
      */
     public ReturnObject addCouponActivity(CouponActivityVo couponActivityVo, Long shopId) {
         CouponActivityPo po = couponActivityVo.createPo();
+        po.setState(CouponActivity.CouponStatus.OFFLINE.getCode());
         if (couponActivityDao.addActivity(po, shopId)) {
             return new ReturnObject(new CouponActivityVo(po));
         } else {
@@ -416,12 +423,15 @@ public class ActivityService implements InitializingBean {
         if(!activity.getShopId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "这个优惠活动不属于你");
         }
-        if(activity.getBeginTime().isAfter(LocalDateTime.now())){
-            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经开始的优惠活动");
+        if(!activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改未下线的优惠活动");
         }
-        if(activity.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())){
-            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经取消的优惠活动");
-        }
+//        if(activity.getBeginTime().isAfter(LocalDateTime.now())){
+//            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经开始的优惠活动");
+//        }
+//        if(activity.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())){
+//            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经取消的优惠活动");
+//        }
         // 如果修改为下线，那需要取消优惠券
         if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())){
             couponDao.cancelCoupon(id);
@@ -557,32 +567,24 @@ public class ActivityService implements InitializingBean {
      * @param pageSize
      * @return
      */
-    public ReturnObject getCouponList(Long userId, Byte state, Integer page, Integer pageSize) {
+    public ReturnObject<PageInfo<VoObject>> getCouponList(Long userId, Byte state, Integer page, Integer pageSize) {
         PageInfo<CouponPo> couponPoList = couponDao.getCouponList(userId, state, page, pageSize);
 
-        List<HashMap<String,Object>> couponList = new ArrayList<>();
+        List<VoObject> couponList = new ArrayList<>();
         /* 获取每个优惠券所参加的活动 */
         for(CouponPo couponPo:couponPoList.getList()){
-            HashMap<String, Object> singleCoupon = new HashMap<>();
-            HashMap<String, Object> singleActivity = new HashMap<>();
-
             var activityPo = couponActivityDao.getActivityById(couponPo.getActivityId());
-
-            singleCoupon.put("id", couponPo.getId());
-            singleCoupon.put("activity", new ActivityInCouponVo(activityPo));
-            singleCoupon.put("name",couponPo.getName());
-            singleCoupon.put("couponSn",couponPo.getCouponSn());
-
-            couponList.add(singleCoupon);
+            SingleCouponVo singleCouponVo =new SingleCouponVo(activityPo, couponPo);
+            couponList.add(singleCouponVo);
         }
 
-        PageInfo ret = new PageInfo(couponList);
+        PageInfo<VoObject> ret = new PageInfo<>(couponList);
         ret.setPageNum(couponPoList.getPageNum());
         ret.setPages(couponPoList.getPages());
         ret.setPageSize(couponPoList.getPageSize());
         ret.setTotal(couponPoList.getTotal());
 
-        return new ReturnObject(ret);
+        return new ReturnObject<>(ret);
     }
 
     /**
@@ -661,7 +663,7 @@ public class ActivityService implements InitializingBean {
         } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
                 || couponActivityPo.getEndTime().isBefore(LocalDateTime.now())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动已结束或者未开始");
-        } else if (couponActivityPo.getState() != CouponActivity.CouponStatus.OFFLINE.getCode()) {
+        } else if (!couponActivityPo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
         }
         ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);

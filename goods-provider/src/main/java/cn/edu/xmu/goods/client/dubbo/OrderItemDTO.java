@@ -25,21 +25,4 @@ public class OrderItemDTO implements Serializable {
 	private Long couponActivityId;
 	private Long beShareId;
 
-//	public static OrderItem toOrderItem(OrderItemPo po) {
-//		if (po == null) {
-//			return null;
-//		}
-//		OrderItem oi = new OrderItem();
-//		oi.setId(po.getId());
-//		oi.setSkuId(po.getGoodsSkuId());
-//		oi.setOrderId(po.getOrderId());
-//		oi.setName(po.getName());
-//		oi.setQuantity(po.getQuantity());
-//		oi.setPrice(po.getPrice());
-//		oi.setDiscount(po.getDiscount());
-//		oi.setCouponActivityId(po.getCouponActivityId());
-//		oi.setBeShareId(po.getBeShareId());
-//		return oi;
-//	}
-
 }

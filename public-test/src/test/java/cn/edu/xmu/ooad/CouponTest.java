@@ -272,25 +272,31 @@ class CouponTest {
     @Test
     void showCoupons() throws Exception
     {
-        webClient.post().uri("/goods/couponactivities/1/usercoupons").header("authorization",adminToken).exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType("application/json;charset=UTF-8")
-                .expectBody()
-                .returnResult().getResponseBody();
-        webClient.post().uri("/goods/couponactivities/1/usercoupons").header("authorization",adminToken).exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType("application/json;charset=UTF-8")
-                .expectBody()
-                .returnResult().getResponseBody();
-
         byte[] responseBuffer = null;
-        responseBuffer=webClient.get().uri("/goods/coupons?state=1&page=1&pageSize=2").header("authorization",adminToken).exchange()
+        responseBuffer = webClient.post().uri("/couponactivities/5/usercoupons").header("authorization",adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
                 .returnResult().getResponseBody();
 
         String responseString = new String(responseBuffer, StandardCharsets.UTF_8);
+
+        responseBuffer = webClient.post().uri("/couponactivities/5/usercoupons").header("authorization",adminToken).exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .returnResult().getResponseBody();
+
+        responseString = new String(responseBuffer, StandardCharsets.UTF_8);
+
+        responseBuffer=webClient.get().uri("/coupons?state=1&page=1&pageSize=2").header("authorization",adminToken).exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType("application/json;charset=UTF-8")
+                .expectBody()
+                .returnResult().getResponseBody();
+
+        responseString = new String(responseBuffer, StandardCharsets.UTF_8);
+
         String expectedResponse="{\"code\":\"OK\",\"errmsg\":\"成功\",\"data\":{\"total\":2,\"list\":[{\"id\":28,\"activity\":{\"id\":1,\"name\":\"foodsale\",\"beginTime\":\"2020-12-02T20:18:43\",\"endTime\":\"2020-12-07T20:18:46\",\"quantity\":2,\"couponTime\":\"2020-12-03T02:00:00\"},\"name\":\"foodsale\",\"couponSn\":\"202012060145267JZ\"},{\"id\":29,\"activity\":{\"id\":1,\"name\":\"foodsale\",\"beginTime\":\"2020-12-02T20:18:43\",\"endTime\":\"2020-12-07T20:18:46\",\"quantity\":2,\"couponTime\":\"2020-12-03T02:00:00\"},\"name\":\"foodsale\",\"couponSn\":\"2020120601452690X\"}],\"pageNum\":1,\"pageSize\":2,\"size\":2,\"startRow\":0,\"endRow\":1,\"pages\":1,\"prePage\":0,\"nextPage\":0,\"isFirstPage\":true,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":8,\"navigatepageNums\":[1],\"navigateFirstPage\":1,\"navigateLastPage\":1}}";
         JSONAssert.assertEquals(expectedResponse,responseString,false);
 

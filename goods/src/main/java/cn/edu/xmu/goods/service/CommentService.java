@@ -7,6 +7,8 @@ import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.other.impl.ICustomerService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class CommentService {
     private static final Logger logger= LoggerFactory.getLogger(CommentService.class);
     @Autowired
     private CommentDao commentDao;
+
+//    @DubboReference(version = "1.0.0")
+    private ICustomerService customerService;
 
     /**
      * 获取评论所有状态
