@@ -1,6 +1,7 @@
 package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.bo.Comment;
+import cn.edu.xmu.goods.model.po.CommentPo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -32,13 +33,22 @@ public class CommentRetVo {
     public CommentRetVo(Comment comment){
         this.id=comment.getId();
         this.goodsSkuId=comment.getGoodsSkuId();
-       // this.orderitemId=comment.getOrderitemId();
-        //this.customer.set(comment.getCustomer().getId(),comment.getCustomer().getUserName(),comment.getCustomer().getName());
-        this.customer.set(comment.getCustomerId(),"小沈","小小沈");
+        this.customer.set(comment.getCustomerId(),comment.getUserName(),comment.getRealName());
         this.type=comment.getType();
         this.state=comment.getState();
         this.gmtCreated=comment.getGmtCreated();
         this.gmtModified=comment.getGmtModified();
+    }
+
+    public CommentRetVo(CommentPo commentPo,String userName,String realName){
+        this.setId(commentPo.getId());
+        this.customer.set(commentPo.getId(),userName,realName);
+        this.setState(commentPo.getState());
+        this.setContent(commentPo.getContent());
+        this.setType(commentPo.getType());
+        this.setGoodsSkuId(commentPo.getGoodsSkuId());
+        this.setGmtCreated(commentPo.getGmtCreate());
+        this.setGmtModified(commentPo.getGmtModified());
     }
 
     /*
