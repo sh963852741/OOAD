@@ -93,6 +93,8 @@ public class GoodsService implements InitializingBean {
         this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
         SKUPoExample example = new SKUPoExample();
         List<SKUPo> skuPoList = goodsDao.getSkuList();
+        redisTemplate.delete(skuBloomFilter);
+        redisTemplate.delete(spuBloomFilter);
         for(SKUPo skuPo : skuPoList){
             redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
         }
@@ -790,16 +792,9 @@ public class GoodsService implements InitializingBean {
         if(ret.getCode() != ResponseCode.OK){
             return ret;
         }
-        //redisBloomFilter.addByBloomFilter(skuBloomFilter,);
-        Spu spu=new Spu();
-        spu.setId(id.longValue());
-        ReturnObject spuRet=goodsDao.updateSpu(spu);
-        //TODO 需要更新spu的规格 但是规格参数不明;
-        /**ReturnObject spuRet=goodsDao.updateSpu(spu);
-        if(spuRet.getCode()!=ResponseCode.OK){
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        }**/
-        return spuRet;
+        SkuSimpleRetVo vo = (SkuSimpleRetVo)ret.getData();
+        redisBloomFilter.addByBloomFilter(skuBloomFilter,vo.getId());
+        return ret;
     }
 
     /**
@@ -824,6 +819,13 @@ public class GoodsService implements InitializingBean {
         return goodsDao.getShopIdBySkuId(id);
     }
 
+    /**
+     * 功能描述: 修改sku库存
+     * @Param: [skuId, quantity]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/14 10:30
+     */
     public ReturnObject changSkuInventory(Long skuId, Integer quantity){
         return goodsDao.changSkuInventory(skuId,quantity);
     }
