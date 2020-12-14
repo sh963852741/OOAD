@@ -37,6 +37,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.rocketmq</groupId>
+			<artifactId>rocketmq-spring-boot-starter</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -156,6 +162,18 @@
 		<dependency>
 			<groupId>cn.edu.xmu</groupId>
 			<artifactId>order-consumer</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>cn.edu.xmu</groupId>
+			<artifactId>other-consumer</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>cn.edu.xmu</groupId>
+			<artifactId>other-client</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

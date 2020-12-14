@@ -215,7 +215,7 @@ public class CouponController {
     }
 
     /**
-     * 管理员下线己方某优惠活动
+     * 管理员删除己方某优惠活动
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
@@ -229,7 +229,42 @@ public class CouponController {
         CouponActivityVo vo =  new CouponActivityVo();
         vo.setState(CouponActivity.CouponStatus.DELETE.getCode());
         ReturnObject ret = activityService.modifyCouponActivity(id, vo, shopId);
-//        ReturnObject ret = activityService.modifyCouponActivityStatus(id, CouponActivity.CouponStatus.CANCELED);
+        return Common.decorateReturnObject(ret);
+    }
+
+    /**
+     * 管理员上线优惠活动
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "管理员上线己方某优惠活动", nickname = "shopsShopIdCouponactivitiesIdDelete", notes = "`管理员`可上线己方的某优惠活动, 需要将已发行未用的优惠卷一并下线", tags={ "coupon", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "成功") })
+    @DeleteMapping(value = "/shops/{shopId}/couponactivities/{id}/onshelves")
+    public Object onlineCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+                                       @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        CouponActivityVo vo =  new CouponActivityVo();
+        vo.setState(CouponActivity.CouponStatus.ONLINE.getCode());
+        ReturnObject ret = activityService.modifyCouponActivity(id, vo, shopId);
+        return Common.decorateReturnObject(ret);
+    }
+
+    /**
+     * 管理员下线优惠活动
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/17 21:37
+     */
+    @ApiOperation(value = "管理员下线己方某优惠活动", nickname = "shopsShopIdCouponactivitiesIdDelete", notes = "`管理员`可上线己方的某优惠活动, 需要将已发行未用的优惠卷一并下线", tags={ "coupon", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "成功") })
+    @DeleteMapping(value = "/shops/{shopId}/couponactivities/{id}/offshelves")
+    public Object offlineCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
+                                        @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+        CouponActivityVo vo =  new CouponActivityVo();
+        vo.setState(CouponActivity.CouponStatus.OFFLINE.getCode());
+        ReturnObject ret = activityService.modifyCouponActivity(id, vo, shopId);
         return Common.decorateReturnObject(ret);
     }
 
@@ -280,18 +315,14 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/coupons")
-    public Object showCoupons(Long userId,
+    @Audit
+    public Object showCoupons(@LoginUser Long userId,
                               @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state,
                               @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,
-                              @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize,
-                              BindingResult bindingResult, HttpServletResponse httpServletResponse){
-        var res = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if(res != null){
-            return res;
-        }
-        ReturnObject ret = activityService.getCouponList(userId,state,page,pageSize);
+                              @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
+        ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponList(userId,state,page,pageSize);
 
-        return ret;
+        return Common.getPageRetObject(ret);
     }
 
     /**
@@ -340,10 +371,11 @@ public class CouponController {
             @ApiResponse(code = 911, message = "优惠卷活动终止"),
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/couponactivities/{id}/usercoupons")
+    @Audit
     public Object couponactivitiesIdUsercouponsPost(
             @LoginUser Long userId,
             @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
-        var ret = activityService.claimCoupon(id,userId);
+        var ret = activityService.claimCouponQuickly(id,userId);
         return Common.decorateReturnObject(ret);
     }
 
