@@ -109,6 +109,7 @@ public class PresaleControllerTest {
         String responseString = response.andExpect((status().isBadRequest()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
@@ -119,7 +120,7 @@ public class PresaleControllerTest {
         LocalDateTime payTime = time.plusHours(2);
         LocalDateTime endTime = time.minusHours(3);
 
-        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+        String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
         ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
@@ -128,17 +129,18 @@ public class PresaleControllerTest {
         String responseString = response.andExpect((status().isBadRequest()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
-    //尾款支付时间早于当前时间
+    //尾款支付时间早于当前时间√
     public void addPresaleActivity5() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
         LocalDateTime payTime = time.minusHours(2);
         LocalDateTime endTime = time.plusHours(3);
 
-        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+        String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
         ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
@@ -147,17 +149,18 @@ public class PresaleControllerTest {
         String responseString = response.andExpect((status().isBadRequest()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
-    //尾款是负数
+    //尾款是负数√
     public void addPresaleActivity6() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
         LocalDateTime payTime = time.plusHours(2);
         LocalDateTime endTime = time.plusHours(3);
 
-        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": -3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+        String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": -3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
         ResultActions response = mvc.perform(post("/presale/shops/1/spus/290/presales")
@@ -166,25 +169,27 @@ public class PresaleControllerTest {
         String responseString = response.andExpect((status().isBadRequest()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
-    //测试错误！指定的sku不存在（错误码应为操作的资源不存在）
+    //指定的sku不存在√
     public void addPresaleActivity7() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
         LocalDateTime payTime = time.plusHours(2);
         LocalDateTime endTime = time.plusHours(3);
 
-        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+        String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
         ResultActions response = mvc.perform(post("/presale/shops/1/spus/3000/presales")
                 .contentType("application/json;charset=UTF-8").content(request)
                 .header("authorization", shopToken));
-        String responseString = response.andExpect((status().isBadRequest()))
+        String responseString = response.andExpect((status().isNotFound()))
                 // .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_NOTEXIST.getCode()))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
     }
     @Test
@@ -195,7 +200,7 @@ public class PresaleControllerTest {
         LocalDateTime payTime = time.plusHours(2);
         LocalDateTime endTime = time.plusHours(3);
 
-        String request="{ \"name\":\"\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
+        String request="{ \"name\":\"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
         ResultActions response = mvc.perform(post("/presale/shops/2/spus/290/presales")
