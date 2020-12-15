@@ -162,7 +162,8 @@ public class GoodsServiceImpl implements IGoodsService {
        dto.setName((String)ret.getData().get("name"));
        dto.setGoodsSn((String)ret.getData().get("goodsSn"));
        dto.setImageUrl((String)ret.getData().get("imageUrl"));
-       dto.setDisable((Byte)ret.getData().get(""));
+       dto.setDisable((Byte)ret.getData().get("disable"));
+       dto.setShopId((Long)ret.getData().get("shopId"));
        return dto;
     }
 

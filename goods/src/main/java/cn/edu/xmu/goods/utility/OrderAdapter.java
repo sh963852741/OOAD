@@ -9,6 +9,9 @@ import java.util.Map;
 public class OrderAdapter {
 
     public static Map<String, Object> adapterFreigthModel(FreightModelDto dto){
+        if(dto == null){
+            return new HashMap<>();
+        }
         Map<String, Object> ret = new HashMap<>();
         ret.put("id", dto.getId());
         ret.put("name", dto.getName());

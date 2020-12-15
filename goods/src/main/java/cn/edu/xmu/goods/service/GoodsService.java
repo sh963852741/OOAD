@@ -324,8 +324,11 @@ public class GoodsService implements InitializingBean {
         }
         Spu spu=new Spu((SPUPo)ret.getData());
         SpuRetVo vo=spu.createVo();
-//        FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
-//        vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
+        if(spu.getFreightId() != null){
+            //FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
+            FreightModelDto dto = freightService.getFreightModel(1000L);
+            vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
+        }
         return new ReturnObject<>(vo);
     }
 
