@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author xincong yao
  * @date 2020-11-16
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerDTO {
+public class CustomerDTO implements Serializable {
 	private Long id;
 	private String userName;
 	private String realName;

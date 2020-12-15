@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +22,8 @@ public class Comment implements VoObject {
      */
     public enum State{
         NOT_AUDIT((byte)0 ,"未审核"),
-        PASS((byte)1,"审核通过"),
-        FORBID((byte)2, "封禁");
+        PASS((byte)1,"审核成功"),
+        FORBID((byte)2, "未通过");
 
         private static final Map<Byte, Comment.State> stateMap;
         static {
@@ -55,8 +56,9 @@ public class Comment implements VoObject {
     }
 
     private Long id;
-    //private UserPo customer = new UserPo();
     private Long customerId;
+    private String userName;
+    private String realName;
     private Long goodsSkuId;
     private Long orderitemId;
     private Byte type;
@@ -69,11 +71,7 @@ public class Comment implements VoObject {
         this.id=commentPo.getId();
         this.goodsSkuId=commentPo.getGoodsSkuId();
         this.orderitemId=commentPo.getOrderitemId();
-
-        //UserPoMapper userPoMapper;
-        //this.customer=userPoMapper.selectByPrimaryKey(commentPo.getCustomerId());
-        this.customerId=123456L;
-
+        this.customerId=commentPo.getCustomerId();
         this.content=commentPo.getContent();
         this.type=commentPo.getType();
         this.state=commentPo.getState();
@@ -106,7 +104,7 @@ public class Comment implements VoObject {
         CommentPo po=new CommentPo();
         po.setId(this.getId());
         po.setOrderitemId(this.getOrderitemId());
-        //po.setCustomerId(this.getCustomer().getId());
+        po.setCustomerId(this.getCustomerId());
         po.setCustomerId(this.getCustomerId());
         po.setContent(this.getContent());
         po.setType(this.getType());

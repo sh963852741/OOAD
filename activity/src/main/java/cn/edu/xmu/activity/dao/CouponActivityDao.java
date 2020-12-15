@@ -63,7 +63,7 @@ public class CouponActivityDao {
         return x.count() > 0;
     }
 
-    public List<CouponActivityPo> getActivitiesBySPUId(long id){
+    public List<CouponActivityPo> getActivitiesBySKUId(long id){
         CouponSKUPoExample example = new CouponSKUPoExample();
         CouponSKUPoExample.Criteria criteria = example.createCriteria();
         criteria.andSkuIdEqualTo(id);
@@ -97,7 +97,7 @@ public class CouponActivityDao {
         CouponActivityPoExample example = new CouponActivityPoExample();
         CouponActivityPoExample.Criteria criteria = example.createCriteria();
         criteria.andShopIdEqualTo(shopId);
-        criteria.andStateEqualTo(CouponActivity.CouponStatus.DELETE.getCode());
+        criteria.andStateNotEqualTo(CouponActivity.CouponStatus.ONLINE.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);
@@ -183,7 +183,7 @@ public class CouponActivityDao {
             if (res != null){
                 redisTemplate.boundHashOps("coupon-activity").putIfAbsent(String.valueOf(id), res);
                 int count = setBloomByActivity(id);
-                redisTemplate.opsForValue().setIfAbsent("Claimed"+res.getId(), res.getQuantity() - count);
+                redisTemplate.opsForValue().setIfAbsent("CouponCount"+res.getId(), res.getQuantity() - count);
             }
             return res;
         }

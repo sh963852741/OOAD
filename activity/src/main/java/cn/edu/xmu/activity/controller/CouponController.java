@@ -59,9 +59,11 @@ public class CouponController {
             @ApiResponse(code = 200, message = "成功") })
     @Audit
     @PostMapping(value = "/shops/{shopId}/couponactivities")
-    public Object addCouponActivity(@PathVariable("shopId") Long shopId,
-                                    @Valid @RequestBody CouponActivityVo couponActivityVo,
-                                    BindingResult bindingResult, HttpServletResponse httpServletResponse){
+    public Object addCouponActivity(
+            @PathVariable("shopId") Long shopId,
+            @LoginUser Long userId,
+            @Valid @RequestBody CouponActivityVo couponActivityVo,
+            BindingResult bindingResult, HttpServletResponse httpServletResponse){
         var res = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(res != null){
             return res;
@@ -71,8 +73,8 @@ public class CouponController {
             return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "活动开始时间必须小于活动结束时间，优惠券一定要在活动结束前发放");
         }
 
-        ReturnObject ret = activityService.addCouponActivity(couponActivityVo, shopId);
-        return ret;
+        ReturnObject ret = activityService.addCouponActivity(couponActivityVo, shopId, userId);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -99,17 +101,19 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/couponactivities")
-    public Object getOnlineCouponActivities(@Valid @RequestBody ActivityFinderVo activityFinderVo,
-                                            BindingResult bindingResult, HttpServletResponse httpServletResponse){
-        var res = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if(res != null){
-            return res;
-        }
+    public Object getOnlineCouponActivities(@RequestParam(value = "shopId", required = false) Long shopId,
+                                            @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                            @RequestParam(value = "timeline",required = false) Byte timeline){
+        ActivityFinderVo vo =new ActivityFinderVo();
+        vo.setPage(page);
+        vo.setPageSize(pageSize);
+        vo.setTimeline(timeline);
+        vo.setShopId(shopId);
+        vo.setState(CouponActivity.CouponStatus.ONLINE.getCode());
+        ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponActivities(vo);
 
-        activityFinderVo.setState(CouponActivity.CouponStatus.OFFLINE.getCode());
-        ReturnObject ret = activityService.getCouponActivities(activityFinderVo);
-
-        return Common.getListRetObject(ret);
+        return Common.getPageRetObject(ret);
     }
 
     /**
@@ -123,15 +127,15 @@ public class CouponController {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/{id}/couponactivities/invalid")
     @Audit
-    public Object showOwnInvalidCouponActivities(@Valid @RequestBody ActivityFinderVo activityFinderVo,
-                                                 BindingResult bindingResult, HttpServletResponse httpServletResponse){
-        var res = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if(res != null){
-            return res;
-        }
-
-        activityFinderVo.setState(CouponActivity.CouponStatus.DELETE.getCode());
-        ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponActivities(activityFinderVo);
+    public Object showOwnInvalidCouponActivities(@PathVariable("id") Long shopId,
+                                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                 @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
+        ActivityFinderVo vo =new ActivityFinderVo();
+        vo.setPage(page);
+        vo.setPageSize(pageSize);
+        vo.setShopId(shopId);
+        vo.setState(CouponActivity.CouponStatus.OFFLINE.getCode());
+        ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponActivities(vo);
         return Common.getPageRetObject(ret);
     }
 
@@ -164,6 +168,7 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/{shopId}/couponactivities/{id}")
+    @Audit
     public Object getCouponActivity(
             @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
             @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
@@ -207,11 +212,7 @@ public class CouponController {
 
         ReturnObject ret = activityService.modifyCouponActivity(id, couponActivityVo, shopId);
 
-        if(ret.getCode() == ResponseCode.OK){
-            return new ReturnObject<>();
-        }else{
-            return ret;
-        }
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -241,7 +242,7 @@ public class CouponController {
     @ApiOperation(value = "管理员上线己方某优惠活动", nickname = "shopsShopIdCouponactivitiesIdDelete", notes = "`管理员`可上线己方的某优惠活动, 需要将已发行未用的优惠卷一并下线", tags={ "coupon", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @DeleteMapping(value = "/shops/{shopId}/couponactivities/{id}/onshelves")
+    @PutMapping(value = "/shops/{shopId}/couponactivities/{id}/onshelves")
     public Object onlineCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
                                        @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
         CouponActivityVo vo =  new CouponActivityVo();
@@ -259,7 +260,7 @@ public class CouponController {
     @ApiOperation(value = "管理员下线己方某优惠活动", nickname = "shopsShopIdCouponactivitiesIdDelete", notes = "`管理员`可上线己方的某优惠活动, 需要将已发行未用的优惠卷一并下线", tags={ "coupon", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @DeleteMapping(value = "/shops/{shopId}/couponactivities/{id}/offshelves")
+    @PutMapping(value = "/shops/{shopId}/couponactivities/{id}/offshelves")
     public Object offlineCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
                                         @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
         CouponActivityVo vo =  new CouponActivityVo();
@@ -267,7 +268,6 @@ public class CouponController {
         ReturnObject ret = activityService.modifyCouponActivity(id, vo, shopId);
         return Common.decorateReturnObject(ret);
     }
-
 
     /**
      * 管理员为己方某优惠券活动新增限定范围
@@ -318,8 +318,8 @@ public class CouponController {
     @Audit
     public Object showCoupons(@LoginUser Long userId,
                               @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state,
-                              @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,
-                              @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
+                              @ApiParam(value = "页码") @Valid @RequestParam(value = "page", defaultValue = "1") Integer page,
+                              @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
         ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponList(userId,state,page,pageSize);
 
         return Common.getPageRetObject(ret);

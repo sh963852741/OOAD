@@ -225,7 +225,7 @@ class ActivityServiceTest {
         vo.setQuantity(30);
         vo.setQuantityType((byte)1);
 
-        ReturnObject<CouponActivityVo> ret = activityService.addCouponActivity(vo, 1L);
+        ReturnObject<CouponActivityVo> ret = activityService.addCouponActivity(vo, 1L,1L );
         assertEquals(ResponseCode.OK, ret.getCode());
         Assertions.assertEquals(vo.getStrategy(),ret.getData().getStrategy());
         Assertions.assertEquals(vo.getQuantity(),ret.getData().getQuantity());

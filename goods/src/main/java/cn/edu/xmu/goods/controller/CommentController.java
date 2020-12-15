@@ -4,10 +4,11 @@ import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
 import cn.edu.xmu.goods.service.CommentService;
 import cn.edu.xmu.ooad.annotation.Audit;
-import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.annotation.LoginUser;
+import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,11 +66,11 @@ public class CommentController {
             @ApiResponse(code = 903, message = "用户没有购买此商品")
     })
     @PostMapping("orderitems/{id}/comments")
+    @ResponseBody
     @Audit
     public Object addCommentOnSku(
-            @Depart long shopId,
-            @LoginUser long uid,
-            @PathVariable long id,
+            @LoginUser Long uid,
+            @PathVariable Long id,
             @Validated @RequestBody CommentVo commentVo,
             BindingResult bindingResult){
         logger.debug("add comment by skuId:" + id);
@@ -79,7 +80,7 @@ public class CommentController {
             logger.debug("validate fail");
             return returnObject;
         }
-        ReturnObject ret=commentService.newComment(id,commentVo);
+        ReturnObject ret=commentService.newComment(id,commentVo, uid);
         return Common.decorateReturnObject(ret);
     }
 
@@ -105,7 +106,7 @@ public class CommentController {
             return obj;
         }*/
         ReturnObject ret=commentService.selectAllPassCommentBySkuId(id,page,pageSize);
-        return ret;
+        return Common.getPageRetObject(ret);
     }
 
     /**
@@ -140,13 +141,15 @@ public class CommentController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("comments")
+    @ResponseBody
     @Audit
-    public Object getOwnComments(@LoginUser long uid,
+    public Object getOwnComments(
+            @LoginUser Long uid,
             @RequestParam(required = false,defaultValue = "1") Integer page,
             @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         logger.debug("getOwnComments: page = "+ page +"  pageSize ="+pageSize);
-        ReturnObject ret=commentService.selectAllCommentsOfUser(page,pageSize);
-        return ret;
+        ReturnObject<PageInfo<VoObject>> ret=commentService.selectAllCommentsOfUser(uid,page,pageSize);
+        return Common.getPageRetObject(ret);
     }
 
     /**
@@ -163,13 +166,13 @@ public class CommentController {
     })
     @GetMapping("shops/{id}/comments/all")
     public Object getAllComments(
-            @PathVariable long did,
+            @PathVariable Long id,
             @RequestParam(required = false) Integer state,
             @RequestParam(required = false,defaultValue = "1") Integer page,
             @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         logger.debug("getAllComments: page = "+ page +"  pageSize ="+pageSize);
-        ReturnObject ret=commentService.selelctCommentsOfState(did,state,page,pageSize);
-        return ret;
+        ReturnObject ret=commentService.selectCommentsOfState(id,state,page,pageSize);
+        return Common.getPageRetObject(ret);
     }
 
 }

@@ -84,28 +84,30 @@ public class CommentDao {
         //查看是否有此sku
         SKUPo skuPo=skuPoMapper.selectByPrimaryKey(skuId);
         if(skuPo==null){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject(null);
         }
 
         CommentPoExample example=new CommentPoExample();
         CommentPoExample.Criteria criteria=example.createCriteria();
         List<CommentPo> commentPos=new ArrayList<>();
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
 
-        //分页查询
-        PageHelper.startPage(pageNum,pageSize);
         logger.debug("page = " + pageNum + "pageSize = " + pageSize);
+        PageHelper.startPage(pageNum,pageSize);
         try{
             //按照skuId进行查询
             criteria.andGoodsSkuIdEqualTo(skuId);
             criteria.andStateEqualTo(Comment.State.PASS.getCode());
             commentPos=commentPoMapper.selectByExample(example);
+            if(commentPos.size()==0){
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
         }catch (DataAccessException e){
             logger.error("selectAllCommentBySkuId:DataAccessException:"+e.getMessage());
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
+        return new ReturnObject<>(commentPos);
 
-        for(CommentPo po:commentPos){
+        /*for(CommentPo po:commentPos){
             Comment comment=new Comment(po);
             commentRetVos.add(comment.createVo());
         }
@@ -118,7 +120,7 @@ public class CommentDao {
         commentSelectRetVo.setTotal(commentSelectRetVo.getTotal());
         commentSelectRetVo.setList(commentRetVos);
 
-        return new ReturnObject<>(commentSelectRetVo);
+        return new ReturnObject<>(commentSelectRetVo);*/
     }
     
 
@@ -147,26 +149,17 @@ public class CommentDao {
     /**
      * 买家查看自己的评价记录，包括评论状态
      */
-    public ReturnObject selectAllCommentsOfUser(Integer pageNum, Integer pageSize){
+    public List<CommentPo> selectAllCommentsOfUser(Long userId,Integer pageNum, Integer pageSize){
         CommentPoExample example=new CommentPoExample();
         CommentPoExample.Criteria criteria=example.createCriteria();
-        List<CommentPo> commentPos=new ArrayList<>();
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
-
+        criteria.andCustomerIdEqualTo(userId);
+        List<CommentPo> commentPos;
         PageHelper.startPage(pageNum,pageSize);
-        logger.debug("page = " + pageNum + "pageSize = " + pageSize);
-        try{
-            commentPos=commentPoMapper.selectByExample(example);
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
+        commentPos=commentPoMapper.selectByExample(example);
 
-        for(CommentPo po:commentPos){
-            Comment comment=new Comment(po);
-            commentRetVos.add(comment.createVo());
-        }
+        return commentPos;
 
-        PageInfo<CommentRetVo> commentRetVoPageInfo=PageInfo.of(commentRetVos);
+        /*PageInfo<CommentRetVo> commentRetVoPageInfo=PageInfo.of(commentRetVos);
         CommentSelectRetVo commentSelectRetVo=new CommentSelectRetVo();
         commentSelectRetVo.setPage(pageNum.longValue());
         commentSelectRetVo.setPageSize(pageSize.longValue());
@@ -174,34 +167,24 @@ public class CommentDao {
         commentSelectRetVo.setTotal(commentSelectRetVo.getTotal());
         commentSelectRetVo.setList(commentRetVos);
 
-        return new ReturnObject<>(commentSelectRetVo);
+        return new ReturnObject<>(commentSelectRetVo);*/
     }
 
     /**
      *管理员查看未审核/已审核评论列表
      */
-    public ReturnObject selelctCommentsOfState(Byte state,Integer pageNum, Integer pageSize){
+    public List<CommentPo> selelctCommentsOfState(Byte state,Integer pageNum, Integer pageSize){
         CommentPoExample example=new CommentPoExample();
         CommentPoExample.Criteria criteria=example.createCriteria();
         List<CommentPo> commentPos=new ArrayList<>();
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
 
         PageHelper.startPage(pageNum,pageSize);
         logger.debug("page = " + pageNum + "pageSize = " + pageSize);
-        try{
-            criteria.andStateEqualTo(state);
-            commentPos=commentPoMapper.selectByExample(example);
-        }catch (Exception e){
-            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-        }
+        criteria.andStateEqualTo(state);
+        commentPos=commentPoMapper.selectByExample(example);
+        return commentPos;
 
-        for(CommentPo po:commentPos){
-            Comment comment=new Comment(po);
-            commentRetVos.add(comment.createVo());
-        }
-
-
-        PageInfo<CommentRetVo> commentRetVoPageInfo=PageInfo.of(commentRetVos);
+        /*PageInfo<CommentRetVo> commentRetVoPageInfo=PageInfo.of(commentRetVos);
         CommentSelectRetVo commentSelectRetVo=new CommentSelectRetVo();
         commentSelectRetVo.setPage(pageNum.longValue());
         commentSelectRetVo.setPageSize(pageSize.longValue());
@@ -209,7 +192,7 @@ public class CommentDao {
         commentSelectRetVo.setTotal(commentSelectRetVo.getTotal());
         commentSelectRetVo.setList(commentRetVos);
 
-        return new ReturnObject<>(commentSelectRetVo);
+        return new ReturnObject<>(commentSelectRetVo);*/
     }
 }
 

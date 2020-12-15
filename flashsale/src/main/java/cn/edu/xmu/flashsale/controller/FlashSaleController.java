@@ -190,4 +190,46 @@ public class FlashSaleController {
         var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
         return Common.decorateReturnObject(ret);
     }
+
+    /**
+     * 平台管理员上线秒杀活动
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/15 21:37
+     */
+    @ApiOperation(value = "平台管理员上线秒杀活动")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
+            @ApiImplicitParam(name="fid",value = "秒杀活动id",required = true,dataType = "Integer", paramType = "query"),
+            @ApiImplicitParam(name="id",value = "秒杀活动项id",required = true,dataType = "Integer", paramType = "query")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
+    @PutMapping("/shops/{did}/flashsales/{id}/onshelves")
+    public Object onlineFlashSale(@PathVariable("id") Long flashSaleId){
+        var ret = flashSaleService.onlineFlashSale(flashSaleId);
+        return Common.decorateReturnObject(ret);
+    }
+
+    /**
+     * 平台管理员下线秒杀活动
+     * @param
+     * @return Object
+     * createdBy Yifei Wang 2020/11/15 21:37
+     */
+    @ApiOperation(value = "平台管理员上线秒杀活动")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="authorization", value="Token", required = true, dataType="String", paramType="header"),
+            @ApiImplicitParam(name="fid",value = "秒杀活动id",required = true,dataType = "Integer", paramType = "query"),
+            @ApiImplicitParam(name="id",value = "秒杀活动项id",required = true,dataType = "Integer", paramType = "query")
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
+    @PutMapping("/shops/{did}/flashsales/{id}/offshelves")
+    public Object offlineFlashSale(@PathVariable("id") Long flashSaleId){
+        var ret = flashSaleService.offlineFlashSale(flashSaleId);
+        return Common.decorateReturnObject(ret);
+    }
 }

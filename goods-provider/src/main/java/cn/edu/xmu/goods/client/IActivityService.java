@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.client;
 
+import cn.edu.xmu.goods.client.dubbo.CouponActivityDTO;
 import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
 import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 
@@ -54,4 +55,6 @@ public interface IActivityService {
 	 * @return 扣库存成功的orderItem列表
 	 */
 	List<OrderItemDTO> modifyPresaleInventory(List<OrderItemDTO> orderItemDTOS, Long presaleId);
+
+	Map<Long, List<CouponActivityDTO>> getSkuCouponActivity(List<Long> skuIds);
 }

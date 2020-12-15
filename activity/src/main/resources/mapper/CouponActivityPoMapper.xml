@@ -304,4 +304,7 @@
       quantitiy_type = #{quantitiyType,jdbcType=TINYINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="decreaseCoupon">
+    update coupon_activity set quantity=quantity-1 where id = #{id,jdbcType=BIGINT}
+  </update>
 </mapper>
