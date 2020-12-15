@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.service;
 
+import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
 import cn.edu.xmu.goods.dao.CommentDao;
 import cn.edu.xmu.goods.model.bo.Comment;
 import cn.edu.xmu.goods.model.po.CommentPo;
@@ -7,15 +8,19 @@ import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentRetVo;
 import cn.edu.xmu.goods.model.vo.CommentSelectRetVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
+import cn.edu.xmu.goods.service.dubbo.CustomerServiceMock;
+import cn.edu.xmu.goods.service.dubbo.OrderServiceMock;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.edu.xmu.oomall.order.service.IDubboOrderService;
-import cn.edu.xmu.other.impl.ICustomerService;
+import cn.edu.xmu.oomall.other.impl.ICustomerService;
 
+import cn.edu.xmu.oomall.service.IDubboOrderService;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.Data;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.bouncycastle.voms.VOMSAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +40,12 @@ public class CommentService {
 
 //    @DubboReference
     private IDubboOrderService orderService;
+
+    @Autowired
+    private CustomerServiceMock customerServiceMock;
+
+    @Autowired
+    private OrderServiceMock orderServiceMock;
     /**
      * 获取评论所有状态
      * @return
@@ -51,11 +62,20 @@ public class CommentService {
      * @return
      */
     public ReturnObject newComment(Long orderItemId, CommentVo commentVo, Long userId){
-        if(!orderService.isCustomerOwnOrderItem(userId, orderItemId)){
+        /*if(!orderService.isCustomerOwnOrderItem(userId, orderItemId)){
+            return new ReturnObject(ResponseCode.FIELD_NOTVALID, "用户没有购买此商品");
+        }*/
+
+        if(!orderServiceMock.isCustomerOwnOrderItem(userId,orderItemId)){
             return new ReturnObject(ResponseCode.FIELD_NOTVALID, "用户没有购买此商品");
         }
 
-        var customer = customerService.getCustomerById(userId);
+        //var customer = customerService.getCustomerById(userId);
+        //var orderItem=orderService.getOrderItem(orderItemId);
+
+        var orderItem=orderServiceMock.getOrderItem(orderItemId);
+        var customer=customerServiceMock.getCustomer(userId);
+
         CommentPo commentPo=new CommentPo();
         commentPo.setOrderitemId(orderItemId);
         commentPo.setContent(commentVo.getContent());
@@ -64,7 +84,7 @@ public class CommentService {
         commentPo.setCustomerId(userId);
 
         ReturnObject ret=commentDao.insertComment(commentPo);
-        return new ReturnObject(new CommentRetVo(commentPo,customer.getRealName(),customer.getRealName()));
+        return new ReturnObject(new CommentRetVo(commentPo,customer.getRealName(),customer.getRealName(),orderItem.getSkuId()));
     }
 
     /**
@@ -74,16 +94,21 @@ public class CommentService {
      * @param pageSize
      * @return
      */
-    public ReturnObject<PageInfo<CommentRetVo>> selectAllPassCommentBySkuId(Long skuId,Integer pageNum,Integer pageSize){
-        ReturnObject<List<CommentPo>> commentPos=commentDao.selectAllPassCommentBySkuId(skuId,pageNum,pageSize);
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
-        for(CommentPo po:commentPos.getData()){
-            var customer = customerService.getCustomerById(po.getCustomerId());
+    public ReturnObject<PageInfo<VoObject>> selectAllPassCommentBySkuId(Long skuId,Integer pageNum,Integer pageSize){
+        ReturnObject<List<CommentPo>> ret=commentDao.selectAllPassCommentBySkuId(skuId,pageNum,pageSize);
+        if(ret.getCode()!=ResponseCode.OK){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,"该商品不存在");
+        }
+        List<VoObject> commentRetVos=new ArrayList<>();
+        for(CommentPo po:ret.getData()){
+            //var customer = customerService.getCustomerById(po.getCustomerId());
+
+            var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
         }
 
-        PageInfo<CommentRetVo> commentRetVoPageInfo=PageInfo.of(commentRetVos);
+        PageInfo<VoObject> commentRetVoPageInfo=PageInfo.of(commentRetVos);
         CommentSelectRetVo commentSelectRetVo=new CommentSelectRetVo();
         commentSelectRetVo.setPage(pageNum.longValue());
         commentSelectRetVo.setPageSize(pageSize.longValue());
@@ -117,16 +142,18 @@ public class CommentService {
      * @param pageSize
      * @return
      */
-    public ReturnObject<PageInfo<CommentRetVo>> selectAllCommentsOfUser(Integer pageNum, Integer pageSize){
-        List<CommentPo> commentPos=commentDao.selectAllCommentsOfUser(pageNum,pageSize);
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
+    public ReturnObject<PageInfo<VoObject>> selectAllCommentsOfUser(Long userId,Integer pageNum, Integer pageSize){
+        List<CommentPo> commentPos=commentDao.selectAllCommentsOfUser(userId,pageNum,pageSize);
+        List<VoObject> commentRetVos=new ArrayList<>();
         for(CommentPo po:commentPos){
-            var customer = customerService.getCustomerById(po.getCustomerId());
+            //var customer = customerService.getCustomerById(po.getCustomerId());
+            var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
         }
 
-        PageInfo<CommentRetVo> commentRetVoPageInfo=PageInfo.of(commentRetVos);
+        //分页查询
+        PageInfo<VoObject> commentRetVoPageInfo=PageInfo.of(commentRetVos);
         CommentSelectRetVo commentSelectRetVo=new CommentSelectRetVo();
         commentSelectRetVo.setPage(pageNum.longValue());
         commentSelectRetVo.setPageSize(pageSize.longValue());
@@ -144,19 +171,20 @@ public class CommentService {
      * @param pageSize
      * @return
      */
-    public ReturnObject<PageInfo<CommentRetVo>> selectCommentsOfState(Long did, Integer state, Integer pageNum, Integer pageSize){
+    public ReturnObject<PageInfo<VoObject>> selectCommentsOfState(Long did, Integer state, Integer pageNum, Integer pageSize){
         if(did!=0){
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }
         List<CommentPo> commentPos=commentDao.selelctCommentsOfState(state.byteValue(),pageNum,pageSize);
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
+        List<VoObject> commentRetVos=new ArrayList<>();
         for(CommentPo po:commentPos){
-            var customer = customerService.getCustomerById(po.getCustomerId());
+            //var customer = customerService.getCustomerById(po.getCustomerId());
+            var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
         }
 
-        PageInfo<CommentRetVo> commentRetVoPageInfo=PageInfo.of(commentRetVos);
+        PageInfo<VoObject> commentRetVoPageInfo=PageInfo.of(commentRetVos);
         CommentSelectRetVo commentSelectRetVo=new CommentSelectRetVo();
         commentSelectRetVo.setPage(pageNum.longValue());
         commentSelectRetVo.setPageSize(pageSize.longValue());

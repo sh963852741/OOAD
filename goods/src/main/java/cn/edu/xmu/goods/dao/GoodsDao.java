@@ -120,14 +120,17 @@ public class GoodsDao {
         if(null != vo.getSpuId()){
             criteria.andGoodsSpuIdEqualTo(vo.getSpuId());
         }
-        criteria.andDisabledEqualTo((byte)4);
+        //TODO 查询所有sku disable 现在是4  应该是0 1  现在不涉及此条件 下面的查询也是一样
+        //criteria.andDisabledEqualTo((byte)0);
+        criteria.andStateEqualTo(Sku.State.NORM.getCode().byteValue());
         if(null != vo.getShopId()){
             List<SPUPo> list = getSpusByShopId(vo.getShopId());
             if(list != null){
                 for(SPUPo po: list){
                     SKUPoExample.Criteria temp = example.createCriteria();
                     temp.andGoodsSpuIdEqualTo(po.getId());
-                    temp.andDisabledEqualTo((byte)0);
+                    //temp.andDisabledEqualTo((byte)0);
+                    temp.andStateEqualTo(Sku.State.NORM.getCode().byteValue());
                     if(null != vo.getSkuSn() && !"".equals(vo.getSkuSn())){
                         criteria.andSkuSnEqualTo(vo.getSkuSn());
                     }
@@ -188,7 +191,8 @@ public class GoodsDao {
         SKUPoExample example =new SKUPoExample();
         SKUPoExample.Criteria criteria=example.createCriteria();
         criteria.andGoodsSpuIdEqualTo(spuId);
-        criteria.andDisabledEqualTo((byte)0);
+        // TODO disable
+        //criteria.andDisabledEqualTo((byte)0);
         criteria.andStateEqualTo(Sku.State.NORM.getCode().byteValue());
         try {
             List<SKUPo> skuPoList = skuPoMapper.selectByExample(example);
@@ -251,7 +255,7 @@ public class GoodsDao {
     public ReturnObject newSku(SKUPo po){
         po.setGmtCreate(LocalDateTime.now());
         po.setGmtModified(po.getGmtCreate());
-        po.setSkuSn(UUID.randomUUID().toString());
+        po.setSkuSn(Common.genSeqNum());
         po.setState(Sku.State.OFFSHELF.getCode().byteValue());
         try{
             int ret;
@@ -278,7 +282,7 @@ public class GoodsDao {
     public ReturnObject getSkuById(Long id){
         SKUPo skuPo = new SKUPo();
         try {
-            if(redisTemplate.hasKey("skuPo")){
+            if(redisTemplate.hasKey("skuPo_"+id)){
                 skuPo = (SKUPo) redisTemplate.opsForValue().get("skuPo_"+id);
             }else{
                 skuPo = skuPoMapper.selectByPrimaryKey(id);
@@ -293,7 +297,10 @@ public class GoodsDao {
         if(skuPo == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-        if(skuPo.getDisabled() == (byte)1){
+        if(skuPo.getState().equals(Sku.State.OFFSHELF.getCode().byteValue()) ||
+        skuPo.getState().equals(Sku.State.FORBID.getCode().byteValue()) ||
+        skuPo.getDisabled().equals((byte)1))
+        {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         Sku sku = new Sku(skuPo);
@@ -307,6 +314,44 @@ public class GoodsDao {
         sku.setPrice(priceRet.getData());
         return new ReturnObject<>(sku);
     }
+
+    /**
+     * 功能描述: 内部调用获取sku 不用 判断是否被删除 未上架 以及店铺关闭
+     * @Param: [id]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/15 10:18
+     */
+    public ReturnObject getSkuByDubbo(Long id){
+        SKUPo skuPo = new SKUPo();
+        try {
+            if(redisTemplate.hasKey("skuPo_"+id)){
+                skuPo = (SKUPo) redisTemplate.opsForValue().get("skuPo_"+id);
+            }else{
+                skuPo = skuPoMapper.selectByPrimaryKey(id);
+                if(skuPo!=null){
+                    redisTemplate.opsForValue().set("skuPo_"+id,skuPo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("selectSkuDetails: DataAccessException:" + e.getMessage());
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+        if(skuPo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        Sku sku = new Sku(skuPo);
+        ReturnObject<Long> priceRet = getActivityPrice(id);
+        if(priceRet.getCode() != ResponseCode.OK){
+            sku.setPrice(sku.getOriginalPrice());
+        }
+        if(priceRet.getData() == null){
+            sku.setPrice(sku.getOriginalPrice());
+        }
+        sku.setPrice(priceRet.getData());
+        return new ReturnObject<>(sku);
+    }
+
 
     /**
      * 功能描述: 更改商品库存
@@ -323,7 +368,10 @@ public class GoodsDao {
             }else{
                 skuPo = skuPoMapper.selectByPrimaryKey(skuId);
             }
-            if(skuPo == null){
+            //如果查询不到 或者被删除 为上架 和 店家已关店 返回失败
+            if(skuPo == null || skuPo.getState().equals(Sku.State.FORBID.getCode().byteValue()) ||
+            skuPo.getState().equals(Sku.State.OFFSHELF.getCode().byteValue()) ||
+            skuPo.getDisabled().equals((byte)1)){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
             }
             if(skuPo.getInventory() < quantity){
@@ -357,18 +405,14 @@ public class GoodsDao {
         }else{
             po = skuPoMapper.selectByPrimaryKey(sku.getId());
         }
-        if(po == null || po.getDisabled() == 1){
+        if(po == null || po.getState() == Sku.State.FORBID.getCode().byteValue()){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-
         SKUPo skuPo=sku.createPo();
         int ret;
         try{
             skuPo.setGmtModified(LocalDateTime.now());
             ret=skuPoMapper.updateByPrimaryKeySelective(skuPo);
-            if(skuPo.getDisabled() == 1){
-                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
-            }
         }catch (Exception e){
             logger.error("updateSkuImg: DataAccessException:" + e.getMessage());
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
@@ -379,6 +423,7 @@ public class GoodsDao {
         } else {
             logger.debug("updateSku: update sku success : " + sku.toString());
             redisTemplate.delete("skuPo_"+sku.getId());
+            redisTemplate.delete("sku_"+sku.getId());
             return new ReturnObject();
         }
     }
@@ -466,7 +511,7 @@ public class GoodsDao {
             int ret;
             po.setGmtCreate(LocalDateTime.now());
             po.setGmtModified(LocalDateTime.now());
-            po.setDisabled(Spu.State.OFFSHELF.getCode().byteValue());
+            po.setDisabled((byte) 0);
 //            po.setState(Spu.State.OFFSHELF.getCode().byteValue());
             po.setGoodsSn(Common.genSeqNum());
             ret=spuPoMapper.insertSelective(po);
@@ -523,11 +568,13 @@ public class GoodsDao {
         FloatPricePoExample.Criteria criteria2 = example.createCriteria();
         try{
             criteria1.andGoodsSkuIdEqualTo(po.getGoodsSkuId());
-            criteria1.andBeginTimeBetween(po.getBeginTime(),po.getEndTime());
-            criteria1.andValidEqualTo((byte)0);
+            criteria1.andBeginTimeGreaterThanOrEqualTo(po.getBeginTime());
+            criteria1.andBeginTimeLessThan(po.getEndTime());
+            criteria1.andValidEqualTo((byte)1);
             criteria2.andGoodsSkuIdEqualTo(po.getGoodsSkuId());
-            criteria2.andEndTimeBetween(po.getBeginTime(),po.getEndTime());
-            criteria2.andValidEqualTo((byte)0);
+            criteria2.andEndTimeGreaterThan(po.getBeginTime());
+            criteria2.andEndTimeLessThanOrEqualTo(po.getEndTime());
+            criteria2.andValidEqualTo((byte)1);
             example.or(criteria2);
             List<FloatPricePo> list=floatPricePoMapper.selectByExample(example);
             if(list.size() != 0){
@@ -565,6 +612,14 @@ public class GoodsDao {
         int ret;
         po.setGmtModified(LocalDateTime.now());
 
+        try{
+            FloatPricePo temp = floatPricePoMapper.selectByPrimaryKey(floatPrice.getId());
+            if(temp == null || temp.getValid() == 0){
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
+        }catch (Exception e){
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
         try{
             ret = floatPricePoMapper.updateByPrimaryKeySelective(po);
         }catch (Exception e){

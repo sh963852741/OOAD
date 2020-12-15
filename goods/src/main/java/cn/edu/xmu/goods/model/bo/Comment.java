@@ -22,8 +22,8 @@ public class Comment implements VoObject {
      */
     public enum State{
         NOT_AUDIT((byte)0 ,"未审核"),
-        PASS((byte)1,"审核通过"),
-        FORBID((byte)2, "封禁");
+        PASS((byte)1,"审核成功"),
+        FORBID((byte)2, "未通过");
 
         private static final Map<Byte, Comment.State> stateMap;
         static {

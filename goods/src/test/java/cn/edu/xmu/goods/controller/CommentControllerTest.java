@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.CommentConclusionVo;
 import cn.edu.xmu.goods.model.vo.CommentVo;
+import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
@@ -56,7 +57,8 @@ public class CommentControllerTest {
         String requestJSON= JacksonUtil.toJson(commentVo);*/
         String requestJSON="{\"type\":0 ,\"content\":\"这个真不错\"}";
 
-        mvc.perform(post("/comment/orderitems/1/comments").contentType("application/json;charset=UTF-8").header(userToken).content(requestJSON))
+        mvc.perform(post("/comment/orderitems/1/comments").contentType("application/json;charset=UTF-8")
+        .header("authorization",adminToken).content(requestJSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -72,7 +74,7 @@ public class CommentControllerTest {
         conclusion.setConclusion(true);
         String requestJSON=JacksonUtil.toJson(conclusion);
 
-        this.mvc.perform(put("/comment/shops/1/comments/2/confirm").contentType("application/json;charset=UTF-8").header(adminToken).content(requestJSON))
+        this.mvc.perform(put("/comment/shops/0/comments/2/confirm").contentType("application/json;charset=UTF-8").header("authorization",adminToken).content(requestJSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -89,7 +91,7 @@ public class CommentControllerTest {
         conclusion.setConclusion(false);
         String requestJSON=JacksonUtil.toJson(conclusion);
 
-        this.mvc.perform(put("/comment/shops/1/comments/1/confirm").contentType("application/json;charset=UTF-8").content(requestJSON))
+        this.mvc.perform(put("/comment/shops/0/comments/1/confirm").contentType("application/json;charset=UTF-8").header("authorization",adminToken).content(requestJSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -101,7 +103,7 @@ public class CommentControllerTest {
      */
     @Test
     public void getAllCommnetOfSku2() throws Exception{
-        this.mvc.perform(get("/comment/skus/1/comments").contentType("application/json;charset=UTF-8").queryParam("page","2").queryParam("pageSize","3"))
+        this.mvc.perform(get("/comment/skus/273/comments").contentType("application/json;charset=UTF-8").queryParam("page","2").queryParam("pageSize","3"))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -113,7 +115,7 @@ public class CommentControllerTest {
      */
     @Test
     public void getAllCommnetOfSku1() throws Exception{
-        this.mvc.perform(get("/comment/skus/1/comments").contentType("application/json;charset=UTF-8"))
+        this.mvc.perform(get("/comment/skus/273/comments").contentType("application/json;charset=UTF-8").queryParam("page","1").queryParam("pageSize","3"))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -126,7 +128,7 @@ public class CommentControllerTest {
      */
     @Test
     public void getAllCommnetOfUser1() throws Exception{
-         this.mvc.perform(get("/comment/comments?page=1&pageSize=3").contentType("application/json;charset=UTF-8"))
+         this.mvc.perform(get("/comment/comments?page=1&pageSize=3").contentType("application/json;charset=UTF-8").header("authorization",adminToken))
          .andExpect(status().isOk())
          .andExpect(content().contentType("application/json;charset=UTF-8"))
          .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -138,7 +140,7 @@ public class CommentControllerTest {
      */
     @Test
     public void getAllCommnetOfUser2() throws Exception{
-        this.mvc.perform(get("/comment/comments").contentType("application/json;charset=UTF-8").queryParam("page","2").queryParam("pageSize","10"))
+        this.mvc.perform(get("/comment/comments").contentType("application/json;charset=UTF-8").header("authorization",adminToken).queryParam("page","2").queryParam("pageSize","10"))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -150,7 +152,7 @@ public class CommentControllerTest {
      */
     @Test
     public void getAllUnauditedComment1() throws Exception{
-         this.mvc.perform(get("/comment/shops/0/comments/all").queryParam("state","0").queryParam("page","2").queryParam("pageSize","10"))
+         this.mvc.perform(get("/comment/shops/0/comments/all").contentType("application/json;charset=UTF-8").header("authorization",adminToken).queryParam("state","0").queryParam("page","2").queryParam("pageSize","3"))
          .andExpect(status().isOk())
          .andExpect(content().contentType("application/json;charset=UTF-8"))
          .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
@@ -162,10 +164,11 @@ public class CommentControllerTest {
      */
     @Test
     public void getAllAuditedComment1() throws Exception{
-         this.mvc.perform(get("/comment/shops/0/comments/all").queryParam("state","1").queryParam("page","2").queryParam("pageSize","10"))
+         this.mvc.perform(get("/comment/shops/0/comments/all").contentType("application/json;charset=UTF-8").header("authorization",adminToken).queryParam("state","1").queryParam("page","2").queryParam("pageSize","10"))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
         .andDo(MockMvcResultHandlers.print());
     }
+    
 }

@@ -20,12 +20,12 @@ public class FloatPriceVo {
     Long activityPrice;
 
     @ApiModelProperty(value = "生效开始时间")
-    @NotBlank
+    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime beginTime;
 
     @ApiModelProperty(value = "生效结束时间")
-    @NotBlank
+    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime endTime;
 

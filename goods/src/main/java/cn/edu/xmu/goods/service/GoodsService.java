@@ -13,13 +13,14 @@ import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.utility.OrderAdapter;
 import cn.edu.xmu.ooad.util.ImgHelper;
-import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
 import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
-import cn.edu.xmu.oomall.order.service.IFreightService;
+import cn.edu.xmu.oomall.dto.FreightModelDto;
+import cn.edu.xmu.oomall.service.IFreightService;
 import com.google.common.hash.Funnels;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,12 +29,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -43,12 +41,13 @@ import java.util.List;
  * @Date: 2020/11/25 16:41
  */
 
+//TODO disabled 字段 代表商店关门 正常查询需要过此条件 内部调用不用（包括state） 同时关店
 @Service
 public class GoodsService implements InitializingBean {
 
     private  static  final Logger logger = LoggerFactory.getLogger(GoodsService.class);
 
-//    @DubboReference(version = "0.0.1-SNAPSHOT")
+    //@DubboReference(version = "1.0.8-SNAPSHOT")
     private IFreightService freightService;
 
     @Autowired
@@ -91,6 +90,8 @@ public class GoodsService implements InitializingBean {
         this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
 //        SKUPoExample example = new SKUPoExample();
 //        List<SKUPo> skuPoList = goodsDao.getSkuList();
+//        redisTemplate.delete(skuBloomFilter);
+//        redisTemplate.delete(spuBloomFilter);
 //        for(SKUPo skuPo : skuPoList){
 //            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
 //        }
@@ -192,13 +193,13 @@ public class GoodsService implements InitializingBean {
      * @Date: 2020/11/26 16:35
      */
     @Transactional
-    public ReturnObject upLoadSkuImg(MultipartFile multipartFile, Integer shopId, Integer id) {
+    public ReturnObject upLoadSkuImg(MultipartFile multipartFile, Long shopId, Long id) {
         if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         //判断是否是属于自己商铺的SKU
         if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
+            ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id);
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
@@ -260,12 +261,12 @@ public class GoodsService implements InitializingBean {
      * @Date: 2020/11/26 20:36
      */
     @Transactional
-    public ReturnObject deleteSkuById(Integer shopId, Integer id) {
+    public ReturnObject deleteSkuById(Long shopId, Long id) {
         if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
-            ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
+            ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id);
             if(check.getCode()!=ResponseCode.OK){
                 return check;
             }
@@ -275,7 +276,7 @@ public class GoodsService implements InitializingBean {
         }
         Sku updateSku=new Sku();
         updateSku.setId(id.longValue());
-        updateSku.setDisable((byte)0);
+        updateSku.setState(Sku.State.FORBID.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSku(updateSku);
         return ret;
     }
@@ -323,8 +324,8 @@ public class GoodsService implements InitializingBean {
         }
         Spu spu=new Spu((SPUPo)ret.getData());
         SpuRetVo vo=spu.createVo();
-       // FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
-       // vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
+//        FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
+//        vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
         return new ReturnObject<>(vo);
     }
 
@@ -491,7 +492,6 @@ public class GoodsService implements InitializingBean {
         Spu spu=new Spu();
         spu.setId(id.longValue());
         spu.setDisabled((byte)1);
-//        spu.setState(Spu.State.DELETE.getCode().byteValue());
         ReturnObject ret=goodsDao.updateSpu(spu);
         return ret;
     }
@@ -587,9 +587,7 @@ public class GoodsService implements InitializingBean {
         if(ret.getCode() == ResponseCode.OK){
             FloatPrice floatPrice = ret.getData();
             FloatPriceRetVo retVo = floatPrice.createVo();
-            /** @problem  需要添加simpleUser
-             *
-             */
+            retVo.setModifiedBy(userId);
         }
         return ret;
     }
@@ -784,20 +782,21 @@ public class GoodsService implements InitializingBean {
             }
         }
         SKUPo po = new SKUPo();
+        po.setName(skuVo.getName());
+        po.setState(Sku.State.OFFSHELF.getCode().byteValue());
+        po.setConfiguration(skuVo.getConfiguration());
+        po.setDetail(skuVo.getDetail());
+        po.setInventory(skuVo.getInventory().intValue());
+        po.setWeight(skuVo.getWeight());
+        po.setOriginalPrice(skuVo.getOriginalPrice());
+        po.setImageUrl(skuVo.getImageUrl());
         ReturnObject ret = goodsDao.newSku(po);
         if(ret.getCode() != ResponseCode.OK){
             return ret;
         }
-        //redisBloomFilter.addByBloomFilter(skuBloomFilter,);
-        Spu spu=new Spu();
-        spu.setId(id.longValue());
-        ReturnObject spuRet=goodsDao.updateSpu(spu);
-        //TODO 需要更新spu的规格 但是规格参数不明;
-        /**ReturnObject spuRet=goodsDao.updateSpu(spu);
-        if(spuRet.getCode()!=ResponseCode.OK){
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        }**/
-        return spuRet;
+        SkuSimpleRetVo vo = (SkuSimpleRetVo)ret.getData();
+        redisBloomFilter.addByBloomFilter(skuBloomFilter,vo.getId());
+        return ret;
     }
 
     /**
@@ -822,7 +821,13 @@ public class GoodsService implements InitializingBean {
         return goodsDao.getShopIdBySkuId(id);
     }
 
-    // TODO 需要对区分是什么的库存
+    /**
+     * 功能描述: 修改sku库存
+     * @Param: [skuId, quantity]
+     * @Return: cn.edu.xmu.ooad.util.ReturnObject
+     * @Author: Yifei Wang
+     * @Date: 2020/12/14 10:30
+     */
     public ReturnObject changSkuInventory(Long skuId, Integer quantity){
         return goodsDao.changSkuInventory(skuId,quantity);
     }

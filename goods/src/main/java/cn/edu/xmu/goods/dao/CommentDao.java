@@ -84,22 +84,23 @@ public class CommentDao {
         //查看是否有此sku
         SKUPo skuPo=skuPoMapper.selectByPrimaryKey(skuId);
         if(skuPo==null){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject(null);
         }
 
         CommentPoExample example=new CommentPoExample();
         CommentPoExample.Criteria criteria=example.createCriteria();
         List<CommentPo> commentPos=new ArrayList<>();
-        //List<CommentRetVo> commentRetVos=new ArrayList<>();
 
-        //分页查询
-        PageHelper.startPage(pageNum,pageSize);
         logger.debug("page = " + pageNum + "pageSize = " + pageSize);
+        PageHelper.startPage(pageNum,pageSize);
         try{
             //按照skuId进行查询
             criteria.andGoodsSkuIdEqualTo(skuId);
             criteria.andStateEqualTo(Comment.State.PASS.getCode());
             commentPos=commentPoMapper.selectByExample(example);
+            if(commentPos.size()==0){
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
         }catch (DataAccessException e){
             logger.error("selectAllCommentBySkuId:DataAccessException:"+e.getMessage());
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
@@ -148,14 +149,12 @@ public class CommentDao {
     /**
      * 买家查看自己的评价记录，包括评论状态
      */
-    public List<CommentPo> selectAllCommentsOfUser(Integer pageNum, Integer pageSize){
+    public List<CommentPo> selectAllCommentsOfUser(Long userId,Integer pageNum, Integer pageSize){
         CommentPoExample example=new CommentPoExample();
         CommentPoExample.Criteria criteria=example.createCriteria();
-        List<CommentPo> commentPos=new ArrayList<>();
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
-
+        criteria.andCustomerIdEqualTo(userId);
+        List<CommentPo> commentPos;
         PageHelper.startPage(pageNum,pageSize);
-        logger.debug("page = " + pageNum + "pageSize = " + pageSize);
         commentPos=commentPoMapper.selectByExample(example);
 
         return commentPos;
@@ -178,8 +177,6 @@ public class CommentDao {
         CommentPoExample example=new CommentPoExample();
         CommentPoExample.Criteria criteria=example.createCriteria();
         List<CommentPo> commentPos=new ArrayList<>();
-        List<CommentRetVo> commentRetVos=new ArrayList<>();
-        List<Comment> comments=new ArrayList<>();
 
         PageHelper.startPage(pageNum,pageSize);
         logger.debug("page = " + pageNum + "pageSize = " + pageSize);

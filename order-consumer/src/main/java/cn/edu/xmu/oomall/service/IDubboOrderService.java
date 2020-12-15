@@ -1,8 +1,8 @@
-package cn.edu.xmu.oomall.order.service;
+package cn.edu.xmu.oomall.service;
 
-import cn.edu.xmu.oomall.order.dto.AfterSaleDto;
-import cn.edu.xmu.oomall.order.dto.EffectiveShareDto;
-import cn.edu.xmu.oomall.order.dto.OrderItemDto;
+import cn.edu.xmu.oomall.dto.AfterSaleDto;
+import cn.edu.xmu.oomall.dto.EffectiveShareDto;
+import cn.edu.xmu.oomall.dto.OrderItemDto;
 
 import java.util.List;
 

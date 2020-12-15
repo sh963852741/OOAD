@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -108,8 +109,14 @@ public class GoodsController {
     })
     @GetMapping("/skus/{id}")
     //TODO 查询后添加足迹
-    public Object getSkuDetails(@PathVariable Long id) {
+    public Object getSkuDetails(@PathVariable Long id,Long loginUser) {
         ReturnObject ret = goodsService.getSkuDetails(id);
+        if(ret.getCode() == ResponseCode.OK){
+            //rocketMQTemplate.sendOneWay("");
+        }
+        if(ret.getCode() == ResponseCode.RESOURCE_ID_NOTEXIST){
+            httpServletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        }
         return Common.decorateReturnObject(ret);
     }
 
@@ -130,6 +137,7 @@ public class GoodsController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
+    @Audit
     @PostMapping("/shops/{shopId}/spus/{id}/skus")
     public Object addSkutoSpu(@PathVariable Long shopId, @PathVariable Long id, @RequestBody SkuVo skuVo) {
         if (shopId == null || id == null) {
@@ -156,7 +164,8 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/skus/{id}/uploadImg")
-    public Object skuUploadImg(@RequestParam("img") MultipartFile multipartFile, @PathVariable Integer shopId, @PathVariable Integer id) {
+    @Audit
+    public Object skuUploadImg(@RequestParam("img") MultipartFile multipartFile, @PathVariable Long shopId, @PathVariable Long id) {
         logger.debug("uploadImg: id = " + id + " img :" + multipartFile.getOriginalFilename());
         ReturnObject returnObject = goodsService.upLoadSkuImg(multipartFile, shopId, id);
         return Common.getNullRetObj(returnObject, httpServletResponse);
@@ -179,7 +188,8 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/skus/{id}")
-    public Object deleteSku(@PathVariable Integer shopId, @PathVariable Integer id) {
+    @Audit
+    public Object deleteSku(@PathVariable Long shopId, @PathVariable Long id) {
         if (id == null || shopId ==null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -205,6 +215,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("/shops/{shopId}/skus/{id}")
+    @Audit
     public Object changeSku(@PathVariable Integer shopId, @PathVariable Integer id, @RequestBody @Validated SkuChangeVo skuChangeVo, BindingResult bindingResult) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -263,7 +274,7 @@ public class GoodsController {
     })
     @GetMapping("/share/{sid}/skus/{id}")
     @Audit
-    public Object getSharedSpu(@PathVariable Long sid, @PathVariable Long id) {
+    public Object getSharedSpu(@PathVariable Long sid, @PathVariable Long id,@LoginUser Long userId) {
         if (id == null || sid == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
@@ -273,10 +284,6 @@ public class GoodsController {
          */
 
         ReturnObject ret = goodsService.getSkuDetails(id);
-        if(ret.getData() == ResponseCode.OK){
-            //TODO 发送rocketMq消息
-            //rocketMQTemplate.sendOneWay("",);
-        }
         return Common.decorateReturnObject(ret);
 
     }
@@ -297,6 +304,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{id}/spus")
+    @Audit
     public Object addSpu(@PathVariable Long id, @RequestBody SpuVo spuVo) {
         if (id == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -323,6 +331,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{id}/uploadImg")
+    @Audit
     public Object uploadSpuImg(@RequestParam("img") MultipartFile multipartFile, @PathVariable Integer shopId, @PathVariable Integer id) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -351,6 +360,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("/shops/{shopId}/spus/{id}")
+    @Audit
     public Object changeSpu(@PathVariable Integer id, @PathVariable Integer shopId, @RequestBody SpuVo spuVo) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -377,6 +387,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/spus/{id}")
+    @Audit
     public Object deleteSpu(@PathVariable Integer id, @PathVariable Integer shopId) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -403,6 +414,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("/shops/{shopId}/skus/{id}/onshelves")
+    @Audit
     public Object onShelvesSpu(@PathVariable Long id, @PathVariable Long shopId) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -429,6 +441,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("/shops/{shopId}/skus/{id}/offshelves")
+    @Audit
     public Object offShelvesSpu(@PathVariable Long id, @PathVariable Long shopId) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -455,6 +468,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/skus/{id}/floatPrices")
+    @Audit
     public Object addFloatPrices(@PathVariable Long id, @PathVariable Long shopId, @LoginUser Long userId, @RequestBody @Validated FloatPriceVo floatPriceVo, BindingResult bindingResult) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -486,6 +500,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/floatPrices/{id}")
+    @Audit
     public Object deleteFloatPrices(@PathVariable Long id, @PathVariable Long shopId, @LoginUser Long userId) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -514,6 +529,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/categories/{id}")
+    @Audit
     public Object addSputoCategory(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -541,6 +557,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/spus/{spuId}/categories/{id}")
+    @Audit
     public Object deleteSpufromCategory(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -568,6 +585,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/brands/{id}")
+    @Audit
     public Object addSputoBrand(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -595,6 +613,7 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/spus/{spuId}/brands/{id}")
+    @Audit
     public Object deleteSpufromBrand(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
