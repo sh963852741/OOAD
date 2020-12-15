@@ -22,12 +22,12 @@ public class OrderServiceMock implements IDubboOrderService {
 
     @Override
     public Boolean isCustomerOwnOrder(Long customerId, Long orderId) {
-        return null;
+        return true;
     }
 
     @Override
     public Boolean isCustomerOwnOrderItem(Long customerId, Long orderItemId) {
-        return true;
+        return true; 
     }
 
     @Override
