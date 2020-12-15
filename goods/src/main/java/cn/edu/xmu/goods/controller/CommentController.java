@@ -66,8 +66,8 @@ public class CommentController {
     @PostMapping("orderitems/{id}/comments")
     @Audit
     public Object addCommentOnSku(
-            @LoginUser long uid,
-            @PathVariable long id,
+            @LoginUser Long uid,
+            @PathVariable Long id,
             @Validated @RequestBody CommentVo commentVo,
             BindingResult bindingResult){
         logger.debug("add comment by skuId:" + id);

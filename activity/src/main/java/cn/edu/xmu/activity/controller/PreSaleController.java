@@ -56,8 +56,20 @@ public class PreSaleController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/presales")
-    public Object queryPresale(@Valid @RequestBody ActivityFinderVo finderVo){
-        var x= activityService.getPresaleActivities(finderVo);
+    public Object queryPresale(
+            @RequestParam(name = "page",defaultValue = "1") Integer page,
+            @RequestParam(name = "pageSize",defaultValue = "1") Integer pageSize,
+            @RequestParam(name = "timeline",defaultValue = "1") Byte timeline,
+            @RequestParam(name = "skuId") Long skuId,
+            @RequestParam(name = "shopId") Long shopId){
+        ActivityFinderVo activityFinderVo =new ActivityFinderVo();
+        activityFinderVo.setPage(page);
+        activityFinderVo.setPageSize(pageSize);
+        activityFinderVo.setSkuId(skuId);
+        activityFinderVo.setShopId(shopId);
+        activityFinderVo.setTimeline(timeline);
+
+        var x= activityService.getPresaleActivities(activityFinderVo);
         return getPageRetObject(x);
     }
 
