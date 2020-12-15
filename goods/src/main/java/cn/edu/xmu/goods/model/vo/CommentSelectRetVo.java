@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.model.vo;
 
+import cn.edu.xmu.ooad.model.VoObject;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,5 +12,5 @@ public class CommentSelectRetVo {
     private Long pageSize;
     private Long total;
     private Long pages;
-    private List<CommentRetVo> list=new ArrayList<>();
+    private List<VoObject> list=new ArrayList<>();
 }

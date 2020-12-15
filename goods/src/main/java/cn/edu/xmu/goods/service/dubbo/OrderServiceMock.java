@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.service.dubbo;
 
+import cn.edu.xmu.ooad.order.bo.Order;
 import cn.edu.xmu.oomall.order.dto.AfterSaleDto;
 import cn.edu.xmu.oomall.order.dto.EffectiveShareDto;
 import cn.edu.xmu.oomall.order.dto.OrderItemDto;
@@ -32,7 +33,10 @@ public class OrderServiceMock implements IDubboOrderService {
 
     @Override
     public OrderItemDto getOrderItem(Long orderItemId) {
-        return null;
+        OrderItemDto orderItemDto=new OrderItemDto();
+        orderItemDto.setId(1L);
+        orderItemDto.setSkuId(1L);
+        return orderItemDto;
     }
 
     @Override

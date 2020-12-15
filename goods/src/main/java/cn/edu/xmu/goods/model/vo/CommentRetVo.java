@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.model.vo;
 
 import cn.edu.xmu.goods.model.bo.Comment;
 import cn.edu.xmu.goods.model.po.CommentPo;
+import cn.edu.xmu.ooad.model.VoObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 @ApiModel(value="查看评论视图")
 @Data
-public class CommentRetVo {
+public class CommentRetVo implements VoObject {
     @ApiModelProperty(value = "评论id")
     private Long id;
 
@@ -40,6 +41,17 @@ public class CommentRetVo {
         this.gmtModified=comment.getGmtModified();
     }
 
+    public CommentRetVo(CommentPo commentPo,String userName,String realName,Long goodsSkuId){
+        this.setId(commentPo.getId());
+        this.customer.set(commentPo.getId(),userName,realName);
+        this.setState(commentPo.getState());
+        this.setContent(commentPo.getContent());
+        this.setType(commentPo.getType());
+        this.setGoodsSkuId(goodsSkuId);
+        this.setGmtCreated(commentPo.getGmtCreate());
+        this.setGmtModified(commentPo.getGmtModified());
+    }
+
     public CommentRetVo(CommentPo commentPo,String userName,String realName){
         this.setId(commentPo.getId());
         this.customer.set(commentPo.getId(),userName,realName);
@@ -51,6 +63,15 @@ public class CommentRetVo {
         this.setGmtModified(commentPo.getGmtModified());
     }
 
+    @Override
+    public Object createVo() {
+        return this;
+    }
+
+    @Override
+    public Object createSimpleVo() {
+        return this;
+    }
     /*
     public CommentPo createPo(){
         CommentPo po=new CommentPo();
