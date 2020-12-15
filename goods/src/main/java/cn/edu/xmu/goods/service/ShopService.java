@@ -134,7 +134,7 @@ public class ShopService {
     /**
      * 功能描述: 管理员下线商铺
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Lei YangLong
+     * @Author: Lei Yang（测试）
      * @Date: 2020/12/1 20:36
      */
     public ReturnObject offShelfShop(Long id) {
