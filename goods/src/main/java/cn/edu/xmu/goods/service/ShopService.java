@@ -1,8 +1,10 @@
 package cn.edu.xmu.goods.service;
 
 import cn.edu.xmu.goods.dao.ShopDao;
+import cn.edu.xmu.goods.mapper.SPUPoMapper;
 import cn.edu.xmu.goods.model.bo.Shop;
 import cn.edu.xmu.goods.model.po.ShopPo;
+import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.model.vo.*;
@@ -12,6 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -83,7 +89,7 @@ public class ShopService {
     /**
      * 功能描述: 关闭商铺
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Lei YangLong
+     * @Author: Lei Yang
      * @Date: 2020/12/1 20:36
      */
     public ReturnObject deleteShopById(Long id) {
@@ -97,14 +103,13 @@ public class ShopService {
     /**
      * 功能描述: 管理员审核商铺
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
-     * @Author: Lei YangLong
+     * @Author: Lei Yang（测试）
      * @Date: 2020/12/1 20:36
      */
     public ReturnObject passShop(Long id, ShopConclusionVo conclusion) {
         Shop shop=new Shop();
         shop.setId(id.longValue());
         shop.setState(conclusion.getConclusion()==true? Shop.State.OFFLINE.getCode().byteValue() : Shop.State.NOTPASS.getCode().byteValue());
-
         ReturnObject ret=shopDao.updateShopState(shop);
         return ret;
     }
