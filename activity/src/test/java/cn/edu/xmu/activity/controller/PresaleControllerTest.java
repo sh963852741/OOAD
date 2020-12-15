@@ -30,6 +30,7 @@ public class PresaleControllerTest {
     private static String shopToken;
     @Autowired
     private MockMvc mvc;
+    //test
 
     @BeforeAll
     private static void login(){
