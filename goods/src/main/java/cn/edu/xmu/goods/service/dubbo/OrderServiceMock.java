@@ -1,10 +1,11 @@
 package cn.edu.xmu.goods.service.dubbo;
 
 import cn.edu.xmu.ooad.order.bo.Order;
-import cn.edu.xmu.oomall.order.dto.AfterSaleDto;
-import cn.edu.xmu.oomall.order.dto.EffectiveShareDto;
-import cn.edu.xmu.oomall.order.dto.OrderItemDto;
-import cn.edu.xmu.oomall.order.service.IDubboOrderService;
+import cn.edu.xmu.oomall.dto.AfterSaleDto;
+import cn.edu.xmu.oomall.dto.EffectiveShareDto;
+import cn.edu.xmu.oomall.dto.OrderItemDto;
+
+import cn.edu.xmu.oomall.service.IDubboOrderService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

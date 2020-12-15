@@ -6,17 +6,16 @@ import cn.edu.xmu.activity.dao.GrouponActivityDao;
 import cn.edu.xmu.activity.dao.PresaleActivityDao;
 import cn.edu.xmu.activity.model.Timeline;
 import cn.edu.xmu.activity.model.bo.Coupon;
+import cn.edu.xmu.activity.model.bo.CouponActivity;
+import cn.edu.xmu.activity.model.po.CouponActivityPo;
 import cn.edu.xmu.activity.model.po.CouponPo;
 import cn.edu.xmu.activity.model.po.CouponSKUPo;
 import cn.edu.xmu.goods.client.IGoodsService;
-import cn.edu.xmu.goods.client.dubbo.PriceDTO;
-import cn.edu.xmu.goods.client.dubbo.SkuDTO;
-import cn.edu.xmu.goods.client.dubbo.SpuDTO;
+import cn.edu.xmu.goods.client.dubbo.*;
 import cn.edu.xmu.goods.client.dubbo.PriceDTO;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IActivityService;
-import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -175,5 +174,27 @@ public class ActivityServiceImpl implements IActivityService {
             presaleActivityDao.updateActivity(p,presaleId);
         }
         return orderItemDTOS;
+    }
+
+    @Override
+    public Map<Long, List<CouponActivityDTO>> getSkuCouponActivity(List<Long> skuIds) {
+        Map<Long, List<CouponActivityDTO>> retMap=new HashMap<>();
+        for(Long skuId:skuIds){
+            var x = couponActivityDao.getActivitiesBySKUId(skuId);
+            List<CouponActivityDTO> dtoList = new ArrayList<>();
+            for(CouponActivityPo po:x){
+                if(po.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())
+                && po.getBeginTime().isBefore(LocalDateTime.now()) && po.getEndTime().isAfter(LocalDateTime.now())){
+                    CouponActivityDTO dto =new CouponActivityDTO();
+                    dto.setBeginTime(po.getBeginTime());
+                    dto.setEndTime(po.getEndTime());
+                    dto.setId(po.getId());
+                    dto.setName(po.getName());
+                    dtoList.add(dto);
+                }
+            }
+            retMap.put(skuId,dtoList);
+        }
+        return retMap;
     }
 }

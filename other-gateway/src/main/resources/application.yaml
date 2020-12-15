@@ -46,6 +46,21 @@ spring:
           filters:
             - PrefixPath=/coupon
 
+        - id: login
+          uri: http://localhost:8081/
+          predicates:
+            - Path=/adminusers,/privileges/login
+          filters:
+            - PrefixPath=/privilege
+
+        - id: adminusers
+          uri: http://localhost:8081/
+          predicates:
+            - Path=/adminusers/**,/shops/{shopid}/adminusers/**,/proxies/**,/shops/{shopid}/proxies/**,/shops/{shopid}/roles/**,/shops/{shopid}/roleprivileges/**,/privileges/**,/roles/**,/roles,/shops/{shopid}/roles
+          filters:
+            - PrefixPath=/privilege
+            - Auth=authorization
+
 
 #        - id: adminusers
 #          uri: http://localhost:9999/

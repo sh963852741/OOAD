@@ -666,10 +666,10 @@ public class ActivityService implements InitializingBean {
         CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
         if (couponActivityPo == null) {
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动不存在");
-        } else if (couponActivityPo.getBeginTime().isAfter(LocalDateTime.now())
+        } else if (couponActivityPo.getCouponTime().isAfter(LocalDateTime.now())
                 || couponActivityPo.getEndTime().isBefore(LocalDateTime.now())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动已结束或者未开始");
-        } else if (!couponActivityPo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())) {
+        } else if (!couponActivityPo.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "优惠活动状态不可用");
         }
         ActivityInCouponVo activityInCouponVo = new ActivityInCouponVo(couponActivityPo);
@@ -709,6 +709,7 @@ public class ActivityService implements InitializingBean {
                 return new ReturnObject(ResponseCode.COUPON_FINISH, "优惠券已售罄");
             }
 
+            redisBloomFilter.addByBloomFilter("Claimed" + activityId.toString(), activityId.toString() + userId.toString());
             if (couponActivityPo.getValidTerm() == 0) {
                 po.setBeginTime(couponActivityPo.getCouponTime());
                 po.setEndTime(couponActivityPo.getEndTime());

@@ -1,5 +1,6 @@
 package cn.edu.xmu.goods.service;
 
+import cn.edu.xmu.goods.client.dubbo.OrderItemDTO;
 import cn.edu.xmu.goods.dao.CommentDao;
 import cn.edu.xmu.goods.model.bo.Comment;
 import cn.edu.xmu.goods.model.po.CommentPo;
@@ -12,9 +13,9 @@ import cn.edu.xmu.goods.service.dubbo.OrderServiceMock;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.edu.xmu.oomall.order.service.IDubboOrderService;
-import cn.edu.xmu.other.impl.ICustomerService;
+import cn.edu.xmu.oomall.other.impl.ICustomerService;
 
+import cn.edu.xmu.oomall.service.IDubboOrderService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.Data;
@@ -73,7 +74,7 @@ public class CommentService {
         //var orderItem=orderService.getOrderItem(orderItemId);
 
         var orderItem=orderServiceMock.getOrderItem(orderItemId);
-        var customer=customerServiceMock.getCustomerById(userId);
+        var customer=customerServiceMock.getCustomer(userId);
 
         CommentPo commentPo=new CommentPo();
         commentPo.setOrderitemId(orderItemId);
@@ -102,7 +103,7 @@ public class CommentService {
         for(CommentPo po:ret.getData()){
             //var customer = customerService.getCustomerById(po.getCustomerId());
 
-            var customer=customerServiceMock.getCustomerById(po.getCustomerId());
+            var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
         }
@@ -146,7 +147,7 @@ public class CommentService {
         List<VoObject> commentRetVos=new ArrayList<>();
         for(CommentPo po:commentPos){
             //var customer = customerService.getCustomerById(po.getCustomerId());
-            var customer=customerServiceMock.getCustomerById(po.getCustomerId());
+            var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
         }
@@ -178,7 +179,7 @@ public class CommentService {
         List<VoObject> commentRetVos=new ArrayList<>();
         for(CommentPo po:commentPos){
             //var customer = customerService.getCustomerById(po.getCustomerId());
-            var customer=customerServiceMock.getCustomerById(po.getCustomerId());
+            var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
         }

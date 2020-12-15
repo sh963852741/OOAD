@@ -318,8 +318,8 @@ public class CouponController {
     @Audit
     public Object showCoupons(@LoginUser Long userId,
                               @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state,
-                              @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false) Integer page,
-                              @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize){
+                              @ApiParam(value = "页码") @Valid @RequestParam(value = "page", defaultValue = "1") Integer page,
+                              @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
         ReturnObject<PageInfo<VoObject>> ret = activityService.getCouponList(userId,state,page,pageSize);
 
         return Common.getPageRetObject(ret);
