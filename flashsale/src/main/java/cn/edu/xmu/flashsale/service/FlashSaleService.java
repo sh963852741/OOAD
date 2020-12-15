@@ -103,6 +103,7 @@ public class FlashSaleService implements InitializingBean {
         flashSalePo.setGmtCreate(LocalDateTime.now());
         flashSalePo.setFlashDate(flashDate);
         flashSalePo.setTimeSegId(timeSegId);
+        flashSalePo.setState(FlashState.FalshStatus.OFFLINE.getCode());
 
         if(flashSaleDao.addFlashSale(flashSalePo) == 1){
             return new ReturnObject(new FlashSaleRetVo(flashSalePo, time));

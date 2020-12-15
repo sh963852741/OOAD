@@ -69,10 +69,9 @@ public class FlashSaleControllerTest {
                 .andDo(MockMvcResultHandlers.print());
 
         mvc.perform(delete("/flashsale/flashsales/"+insertId).contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isOk())
+                .andExpect(status().is4xxClientError())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_NOTEXIST.getCode()))
-                .andExpect(jsonPath("$.errmsg").value("成功"))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(MockMvcResultHandlers.print());
     }
@@ -228,7 +227,7 @@ public class FlashSaleControllerTest {
           继续删，应当报错
          */
         mvc.perform(delete("/flashsale/flashsales/0").contentType("application/json;charset=UTF-8"))
-                .andExpect(status().isOk())
+                .andExpect(status().is4xxClientError())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_NOTEXIST.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
