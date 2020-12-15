@@ -27,6 +27,14 @@ public class FlashSaleDao {
         return flashSalePoMapper.insert(po);
     }
 
+    public int setFlashSaleStatus(long id, byte state){
+        FlashSalePo po = new FlashSalePo();
+        po.setId(id);
+        po.setGmtModified(LocalDateTime.now());
+        po.setState(state);
+        return flashSalePoMapper.updateByPrimaryKeySelective(po);
+    }
+
     public int deleteFlashSale(long id){
         return flashSalePoMapper.deleteByPrimaryKey(id);
     }

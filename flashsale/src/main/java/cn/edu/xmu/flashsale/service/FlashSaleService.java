@@ -1,6 +1,7 @@
 package cn.edu.xmu.flashsale.service;
 
 import cn.edu.xmu.flashsale.dao.FlashSaleDao;
+import cn.edu.xmu.flashsale.model.FlashState;
 import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
 import cn.edu.xmu.flashsale.model.bo.RedisFlash;
 import cn.edu.xmu.flashsale.model.bo.TimeSegment;
@@ -21,9 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 
-import javax.annotation.Resource;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,6 +56,40 @@ public class FlashSaleService implements InitializingBean {
     @Autowired
     FlashSaleDao flashSaleDao;
 
+    public ReturnObject onlineFlashSale(Long id){
+        FlashSalePo flashSalePo = flashSaleDao.getFlashSale(id);
+        if (flashSalePo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,"秒杀活动不存在");
+        }
+        if(!flashSalePo.getState().equals(FlashState.FalshStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "仅可上线下线的秒杀活动");
+        }
+
+        if(flashSaleDao.setFlashSaleStatus(id, FlashState.FalshStatus.ONLINE.getCode())==1){
+            return new ReturnObject<>();
+        } else {
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
+    public ReturnObject offlineFlashSale(Long id){
+        FlashSalePo flashSalePo = flashSaleDao.getFlashSale(id);
+        if (flashSalePo == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,"秒杀活动不存在");
+        }
+        if(!flashSalePo.getState().equals(FlashState.FalshStatus.ONLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "仅可上线下线的秒杀活动");
+        }
+
+        redisTemplate.delete("FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId());
+
+        if(flashSaleDao.setFlashSaleStatus(id, FlashState.FalshStatus.OFFLINE.getCode())==1){
+            return new ReturnObject<>();
+        } else {
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
     public ReturnObject addFlashSale(long timeSegId, LocalDateTime flashDate){
         var time = timeSegmentService.getTimeSegmentById(timeSegId);
         if(time == null){
@@ -87,8 +120,8 @@ public class FlashSaleService implements InitializingBean {
 
         redisTemplate.delete("FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId());
 
-        flashSaleDao.delFlashSaleItemByFlashSaleId(id);
-        if(flashSaleDao.deleteFlashSale(id)==1){
+//        flashSaleDao.delFlashSaleItemByFlashSaleId(id);
+        if(flashSaleDao.setFlashSaleStatus(id, FlashState.FalshStatus.DELETE.getCode())==1){
             return new ReturnObject();
         }else{
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "秒杀活动不存在");
@@ -210,6 +243,9 @@ public class FlashSaleService implements InitializingBean {
         ));
         log.debug("EffectFlashSaleToLoad:" + effectFlashSaleToLoad.toString());
         for (FlashSalePo flashSalePo : effectFlashSaleToLoad) {
+            // 忽略不是上线状态的秒杀
+            if(!flashSalePo.getState().equals(FlashState.FalshStatus.ONLINE.getCode()))continue;
+
             List<FlashSaleItemPo> flashSaleItemPos = flashSaleDao.getFlashSaleItemByFlashSaleId(flashSalePo.getId());
             String setKey ="FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId();
             String hashKey ="FlashSaleSKU" + flashSalePo.getFlashDate().toLocalDate().toString();
