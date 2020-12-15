@@ -1,9 +1,12 @@
 package cn.edu.xmu.activity.controller;
 
 import cn.edu.xmu.activity.model.vo.CouponActivityVo;
+import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.JacksonUtil;
 import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -26,6 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc
 public class CouponControllerTest {
+    @Autowired
+    private ObjectMapper mObjectMapper;
+
     private static String adminToken;
     private static String shopToken;
     @Autowired
@@ -351,7 +357,7 @@ public class CouponControllerTest {
      */
     @Test
     public void removeSkuFromActivity() throws Exception {
-        mvc.perform(delete("/coupon//shops/0/couponspus/1").contentType("application/json;charset=UTF-8")
+        mvc.perform(delete("/coupon/shops/0/couponspus/1").contentType("application/json;charset=UTF-8")
                 .header("authorization",adminToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -364,6 +370,76 @@ public class CouponControllerTest {
      */
     @Test
     public void claimCoupon() throws Exception{
+        // 活动过期了
+        mvc.perform(post("/coupon/couponactivities/1/usercoupons").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.COUPONACT_STATENOTALLOW.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+        // 活动没开始
+        mvc.perform(post("/coupon/couponactivities/5/usercoupons").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.COUPONACT_STATENOTALLOW.getCode()))
+                .andDo(MockMvcResultHandlers.print());
 
+        // 在领取之前查看数目
+        String a = mvc.perform(get("/coupon/coupons").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
+
+        JsonNode jsonNode = mObjectMapper.readTree(a).findPath("data").get("total");
+        int totalCouponCount = jsonNode.asInt();
+
+        // 领取
+        mvc.perform(post("/coupon/couponactivities/4/usercoupons").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+
+        // 重复领取
+        mvc.perform(post("/coupon/couponactivities/4/usercoupons").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.COUPON_FINISH.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+
+        // 查询是否真的领取
+        mvc.perform(get("/coupon/coupons").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andExpect(jsonPath("$.data.total").value(totalCouponCount + 1))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    /**
+     * 上下线优惠活动
+     * @throws Exception
+     */
+    @Test
+    public void lineActivity() throws Exception {
+        mvc.perform(put("/coupon/shops/0/couponactivities/1/onshelves").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+
+        mvc.perform(put("/coupon/shops/0/couponactivities/1/offshelves").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andDo(MockMvcResultHandlers.print());
     }
 }
