@@ -39,7 +39,7 @@ public class PresaleControllerTest {
     }
 
     @Test
-    //正确
+    //正确////
     public void addPresaleActivity1() throws Exception{
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
