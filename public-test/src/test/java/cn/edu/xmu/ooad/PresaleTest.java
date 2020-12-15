@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,7 +30,7 @@ public class PresaleTest {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
     }
-
+//this is a test
     @BeforeAll
     private static void login(){
         JwtHelper jwtHelper = new JwtHelper();
@@ -52,7 +52,7 @@ public class PresaleTest {
         String requireJson = "{ \"name\": \"预售活动\", \"advancePayPrice\": 20, \"restPayPrice\": 3000, \"quantity\": 10, \"beginTime\": \"" + beginTime.toString()
                 + "\", \"payTime\": \"" + payTime.toString()
                 +"\",\"endTime\": \""+ endTime.toString() +"\"}";
-        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/skus/290/presales")
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/shops/1/skus/290/presales")
                 .header("authorization", shopToken)
                 .bodyValue(requireJson);
 
@@ -359,5 +359,556 @@ public class PresaleTest {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+    @Test
+    /**
+     * 正常修改一个预售活动
+     */
+    public void modifyPresaleActivity1()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个预售活动  无名称
+     */
+    public void modifyPresaleActivity2()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson="{ \"name\": \"\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个预售活动  开始时间早于当前时间
+     */
+    public void modifyPresaleActivity3()throws Exception {
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.minusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson = "{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                + "\",\"endTime\": \"" + endTime.toString() + "\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个预售活动  结束时间早于当前时间
+     */
+    public void modifyPresaleActivity4()throws Exception {
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.minusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson = "{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                + "\",\"endTime\": \"" + endTime.toString() + "\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个预售活动  尾款支付时间早于当前时间
+     */
+    public void modifyPresaleActivity5()throws Exception {
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.minusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson = "{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                + "\",\"endTime\": \"" + endTime.toString() + "\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个预售活动  尾款是负数
+     */
+    public void modifyPresaleActivity6()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": -300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个已经开始的预售活动 （设2已经开始，不行换别的预售活动）（测试之后改错误码）
+     */
+    public void modifyPresaleActivity7()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/2")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改预售活动   尝试修改sku但无效 (sku加在requireJson上)
+     */
+    public void modifyPresaleActivity8()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\",\"sku\":\"289\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个已经取消的预售活动 （设3已经取消，不行换别的预售活动）（测试之后改错误码）
+     */
+    public void modifyPresaleActivity9()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/1/presales/3")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 修改一个预售活动  不属于自己店铺（设3， 测试之后改错误码）
+     */
+    public void modifyPresaleActivity10()throws Exception{
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(2);
+        LocalDateTime payTime = time.plusHours(3);
+        LocalDateTime endTime = time.plusHours(4);
+
+        byte[] responseBuffer = null;
+        String requireJson="{ \"name\": \"预售活动-改\", \"advancePayPrice\": 200, \"restPayPrice\": 300, \"quantity\": 110, \"beginTime\": \"" + beginTime.toString()
+                + "\", \"payTime\": \"" + payTime.toString()
+                +"\",\"endTime\": \""+ endTime.toString() +"\"}";
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/shops/3/presales/1")
+                .header("authorization", shopToken)
+                .bodyValue(requireJson);
+
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .returnResult()
+                .getResponseBodyContent();
+    }
+    @Test
+    /**
+     * 获取预售活动的所有状态
+     * .andExpect(jsonPath("$.data.size()").value(PresaleActivity.PresaleStatus.values().length)
+     * 这句不会改
+     */
+    public void getPresaleState()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales/states")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.data[0].code").isNumber()
+                .jsonPath("$.data[0].name").isNotEmpty()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  用户根据timeline
+     */
+    public void getPresaleActivity1()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?timeline=1&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  用户根据sku id
+     */
+    public void getPresaleActivity2()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?sku id=290&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  用户根据shop id
+     */
+    public void getPresaleActivity3()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?shop id=0&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  用户根据shop id sku id 应该返回sku id 的结果
+     */
+    public void getPresaleActivity4()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?shop id=0&sku id=290&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  店铺管理员查看其他店铺的活动 应返回错误码
+     */
+    public void getPresaleActivity5()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?shop id=2&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  店铺管理员查看各状态sku
+     */
+    public void getPresaleActivity6()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?state=1&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  店铺管理员查看各状态sku state 不正确
+     */
+    public void getPresaleActivity7()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?state=10&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
+    }
+    @Test
+    /**
+     * 获取预售活动
+     *  平台管理员查看其他店铺的预售活动
+     */
+    public void getPresaleActivity8()throws Exception{
+        byte[] responseBuffer = null;
+        WebTestClient.RequestHeadersSpec res = webClient.post().uri("/presale/presales?shop id=2&page=1&pageSize=3")
+                .header("authorization", shopToken);
+        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errmsg").isEqualTo("成功")
+                .jsonPath("$.data.page").isEqualTo(1)
+                .jsonPath("$.data.pageSize").isEqualTo(3)
+                .jsonPath("$.data.list[0].name").isNotEmpty()
+                .jsonPath("$.data.list[0].BeginTime").isNotEmpty()
+                .jsonPath("$.data.list[0].payTime").isNotEmpty()
+                .jsonPath("$.data.list[0].endTime").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.id").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.name").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.skuSn").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.imageUrl").isNotEmpty()
+                .jsonPath("$.data.list[0].goodsSpu.inventory").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.originalPrice").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.price").isNumber()
+                .jsonPath("$.data.list[0].goodsSpu.disable").isNumber()
+                .jsonPath("$.data").isArray()
+                .returnResult()
+                .getResponseBodyContent();
+
+
     }
 }
