@@ -30,6 +30,10 @@ public class GrouponControllerTest {
         shopToken =jwtHelper.createToken(59L,1L, 3600);
     }
 
+    /**
+     * 获取团购活动状态
+     * @throws Exception
+     */
     @Test
     public void getGrouponActivityState() throws Exception{
         mvc.perform(get("/groupon/groupons/states").contentType("application/json;charset=UTF-8").header("authorization", adminToken))
@@ -38,4 +42,8 @@ public class GrouponControllerTest {
                 .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
                 .andDo(MockMvcResultHandlers.print());
     }
+
+    /**
+     *
+     */
 }
