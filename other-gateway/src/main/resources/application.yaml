@@ -46,6 +46,13 @@ spring:
           filters:
             - PrefixPath=/coupon
 
+#        - id: groupon
+#          uri: http://localhost:8988/
+#          predicates:
+#            - Path=/coupons/states,/shops/{shopId}/couponactivities,/shops/{shopId}/couponactivities/{id}/uploadImg,/couponactivities,/shops/{id}/couponactivities/invalid,/couponactivities/{id}/skus,/shops/{shopId}/couponactivities/{id},/shops/{shopId}/couponactivities/{id}/skus,/shops/{shopId}/couponskus/{id},/coupons,/couponactivities/{id}/usercoupons,/shops/{shopId}/couponactivities/{id}/onshelves,/shops/{shopId}/couponactivities/{id}/offshelves
+#          filters:
+#            - PrefixPath=/coupon
+
         - id: login
           uri: http://localhost:8081/
           predicates:

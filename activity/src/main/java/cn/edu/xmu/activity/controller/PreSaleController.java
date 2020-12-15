@@ -60,8 +60,8 @@ public class PreSaleController {
             @RequestParam(name = "page",defaultValue = "1") Integer page,
             @RequestParam(name = "pageSize",defaultValue = "1") Integer pageSize,
             @RequestParam(name = "timeline",defaultValue = "1") Byte timeline,
-            @RequestParam(name = "skuId") Long skuId,
-            @RequestParam(name = "shopId") Long shopId){
+            @RequestParam(name = "skuId", required = false) Long skuId,
+            @RequestParam(name = "shopId", required = false) Long shopId){
         ActivityFinderVo activityFinderVo =new ActivityFinderVo();
         activityFinderVo.setPage(page);
         activityFinderVo.setPageSize(pageSize);
