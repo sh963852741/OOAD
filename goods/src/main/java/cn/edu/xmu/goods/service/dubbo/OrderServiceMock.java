@@ -27,7 +27,7 @@ public class OrderServiceMock implements IDubboOrderService {
 
     @Override
     public Boolean isCustomerOwnOrderItem(Long customerId, Long orderItemId) {
-        return true; 
+        return true;
     }
 
     @Override
