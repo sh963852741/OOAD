@@ -295,7 +295,7 @@ public class CouponControllerTest {
     }
 
     @Test
-    public void addSKUToActivity() throws Exception{
+    public void addSKUToActivity() throws Exception {
         List<Long> body=new ArrayList<>();
         body.add((long)275);
         body.add((long)276);
@@ -343,5 +343,27 @@ public class CouponControllerTest {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode()))
                 .andDo(MockMvcResultHandlers.print());
+    }
+
+    /**
+     * 移除SKU
+     * @throws Exception
+     */
+    @Test
+    public void removeSkuFromActivity() throws Exception {
+        mvc.perform(delete("/coupon//shops/0/couponspus/1").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    /**
+     * 用户领取优惠券
+     */
+    @Test
+    public void claimCoupon() throws Exception{
+
     }
 }

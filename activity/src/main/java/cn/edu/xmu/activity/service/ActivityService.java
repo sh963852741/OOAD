@@ -118,7 +118,7 @@ public class ActivityService implements InitializingBean {
         if(shopDTO == null || skuDTO == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺或SKU不存在");
         }
-        if(!skuDTO.getId().equals(shopId)){
+        if(!shopDTO.getId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不允许使用其他店铺的SKU");
         }
         if(presaleActivityDao.getSameSKU(skuId)){
