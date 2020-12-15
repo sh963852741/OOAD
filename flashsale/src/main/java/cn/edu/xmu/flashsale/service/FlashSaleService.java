@@ -114,7 +114,7 @@ public class FlashSaleService implements InitializingBean {
     @Transactional
     public ReturnObject delFlashSale(long id){
         FlashSalePo flashSalePo = flashSaleDao.getFlashSale(id);
-        if (flashSalePo == null){
+        if (flashSalePo == null || flashSalePo.getState().equals(FlashState.FalshStatus.DELETE.getCode())){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST,"秒杀活动不存在");
         }
 
