@@ -159,6 +159,7 @@ public class Sku implements VoObject {
         skuPo.setOriginalPrice(this.getOriginalPrice());
         skuPo.setSkuSn(this.getSkuSn());
         skuPo.setWeight(this.getWeight());
+        skuPo.setState(this.getState());
         if(this.getInventory()!=null)
         skuPo.setInventory(this.getInventory().intValue());
         return skuPo;

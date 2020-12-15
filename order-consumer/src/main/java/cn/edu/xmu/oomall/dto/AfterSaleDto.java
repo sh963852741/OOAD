@@ -1,4 +1,4 @@
-package cn.edu.xmu.oomall.order.dto;
+package cn.edu.xmu.oomall.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,18 +8,16 @@ import java.io.Serializable;
 
 /**
  * @author xincong yao
- * @date 2020-12-7
+ * @date 2020-11-27
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShareDto implements Serializable {
+public class AfterSaleDto implements Serializable {
 
-	private Long orderItemId;
-
-	private Long customerId;
-
+	private Long orderId;
+	private String orderSn;
 	private Long skuId;
-
-	private Long beSharedId;
+	private String skuName;
+	private Long shopId;
 }

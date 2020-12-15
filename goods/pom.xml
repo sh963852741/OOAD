@@ -173,10 +173,16 @@
 		</dependency>
 		<dependency>
 			<groupId>cn.edu.xmu</groupId>
-			<artifactId>other-client</artifactId>
+			<artifactId>other-consumer</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+		<!--		<dependency>-->
+<!--			<groupId>cn.edu.xmu</groupId>-->
+<!--			<artifactId>other-client</artifactId>-->
+<!--			<version>0.0.1-SNAPSHOT</version>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>

@@ -18,8 +18,8 @@ public class FloatPriceRetVo {
     private Integer quantity;
     private LocalDateTime beginTime;
     private LocalDateTime endTime;
-    private Map<String, Object> createBy;
-    private Map<String, Object> modifiedBy;
+    private Long createBy;
+    private Long modifiedBy;
     private Byte valid;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;

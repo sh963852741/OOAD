@@ -85,7 +85,7 @@ public class GoodsServiceImpl implements IGoodsService {
             return dto;
         }
         redisTemplate.delete("sku_"+skuId);
-        ReturnObject<Sku> skuRet=goodsDao.getSkuById(skuId);
+        ReturnObject<Sku> skuRet=goodsDao.getSkuByDubbo(skuId);
         if(skuRet.getCode()!=ResponseCode.OK){
             return null;
         }
@@ -108,6 +108,43 @@ public class GoodsServiceImpl implements IGoodsService {
         //String json = JacksonUtil.toJson(skuDTO);
         redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
         return skuDTO;
+    }
+
+    @Override
+    public List<SkuDTO> getSkus(List<Long> skuIds) {
+        List<SkuDTO> dtos = new ArrayList<>();
+        for(Long skuId : skuIds){
+            if(redisTemplate.hasKey("sku_"+skuId)){
+                SkuDTO dto = (SkuDTO) redisTemplate.opsForValue().get("sku_"+skuId);
+                dtos.add(dto);
+            } else{
+                redisTemplate.delete("sku_"+skuId);
+                ReturnObject<Sku> skuRet=goodsDao.getSkuByDubbo(skuId);
+                if(skuRet.getCode()!=ResponseCode.OK){
+                    return null;
+                }
+                SkuDTO skuDTO =new SkuDTO();
+                Sku sku=skuRet.getData();
+                skuDTO.setConfiguration(sku.getConfiguration());
+                skuDTO.setDisable(sku.getDisable());
+                skuDTO.setId(sku.getId());
+                skuDTO.setImageUrl(sku.getImageUrl());
+                skuDTO.setInventory(sku.getInventory());
+                skuDTO.setName(sku.getName());
+                skuDTO.setOriginalPrice(sku.getOriginalPrice());
+                skuDTO.setSkuSn(sku.getSkuSn());
+                skuDTO.setWeight(sku.getWeight());
+                skuDTO.setGmtCreate(sku.getGmtCreate());
+                skuDTO.setGmtModified(sku.getGmtModified());
+                skuDTO.setDetail(sku.getDetail());
+                skuDTO.setGoodsSpuId(sku.getGoodsSpuId());
+                skuDTO.setPrice(sku.getPrice());
+                //String json = JacksonUtil.toJson(skuDTO);
+                redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
+                dtos.add(skuDTO);
+            }
+        }
+        return dtos;
     }
 
 
