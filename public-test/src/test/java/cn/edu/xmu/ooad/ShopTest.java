@@ -108,6 +108,7 @@ public class ShopTest {
 
     /**
      * 新建商铺(名称是空格)
+     * TAPD
      */
     @Test
     public void applyShop_null() {
@@ -189,7 +190,7 @@ public class ShopTest {
     public void modifyShop_unaudit() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"它应该没通过审核吧\"}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/2")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/2")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -214,7 +215,7 @@ public class ShopTest {
     public void modifyShop_null() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"\"}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -239,7 +240,7 @@ public class ShopTest {
     public void modifyShop_ID() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"这个想改ID\",\"id\":\"123\"}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -265,7 +266,7 @@ public class ShopTest {
     public void modifyShop_STATE() {
         byte[] responseBuffer = null;
         String requestJson = "{\"name\": \"这个想改state\",\"state\":\"3\"}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/1")
                 .header("authorization", shopToken)
                 .bodyValue(requestJson);
 
@@ -290,7 +291,7 @@ public class ShopTest {
     public void auditShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": true}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/0/newshops/1/audit")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/0/newshops/1/audit")
                 .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
@@ -319,7 +320,7 @@ public class ShopTest {
     public void auditShop_abnormal() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": 1223}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/0/newshops/1/audit")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/0/newshops/1/audit")
                 .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
@@ -344,7 +345,7 @@ public class ShopTest {
     public void onshelfShop() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": true}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shop/shops/1/onshelves")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/1/onshelves")
                 .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
@@ -375,7 +376,7 @@ public class ShopTest {
         String requestJson = "{\"conclusion\": true}";
         WebTestClient.RequestHeadersSpec res = null;
         try {
-            res = manageClient.put().uri("/shop/shops/1/offshelves")
+            res = manageClient.put().uri("/shops/1/offshelves")
                     .header("authorization", adminToken)
                     .bodyValue(requestJson);
         } catch (Exception e) {
@@ -409,7 +410,7 @@ public class ShopTest {
         byte[] responseBuffer = null;
         WebTestClient.RequestHeadersSpec res = null;
         try {
-            res = manageClient.delete().uri("/shop/shops/1/offshelves")
+            res = manageClient.delete().uri("/shops/1/offshelves")
                     .header("authorization", adminToken);
         } catch (Exception e) {
             e.printStackTrace();

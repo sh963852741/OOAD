@@ -122,7 +122,13 @@ public class ShopController {
     })
     @DeleteMapping(value = "/shops/{id}")
     public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
-        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()||shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
+        var shop = shopService.getShopByShopId(id).getData();
+        if(shop == null) {
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在"));
+        }
+
+        if(shop.getState() == Shop.State.OFFLINE.getCode().byteValue()
+                ||shop.getState() == Shop.State.ONLINE.getCode().byteValue())
         {
             ReturnObject ret=shopService.deleteShopById(id);
             return Common.decorateReturnObject(ret);
@@ -149,7 +155,12 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{shopId}/newshops/{id}/audit")
     public Object auditShop(@PathVariable("shopId") Long shopId,@ApiParam(value = "新店 ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )   @RequestBody ShopConclusionVo conclusion){
-        if(shopService.getShopByShopId(id).getData().getState()==7)
+        var shop = shopService.getShopByShopId(id).getData();
+        if(shop == null) {
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在"));
+        }
+
+        if(shop.getState() == Shop.State.EXAME.getCode().byteValue())
         {
             ReturnObject ret=shopService.passShop(id,conclusion);
             return Common.decorateReturnObject(ret);
@@ -177,7 +188,7 @@ public class ShopController {
     @PutMapping(value = "/shops/{id}/onshelves")
     @Audit
     public Object shopsIdOnshelvesPut(@PathVariable("id") long id){
-        ReturnObject ret=shopService.onShelfShop(id);
+        ReturnObject ret= shopService.onShelfShop(id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -196,11 +207,14 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{id}/offshelves")
     public Object shopsIdOffshelvesPut(@PathVariable("id") long id){
-        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
-        {
+        var shop = shopService.getShopByShopId(id).getData();
+        if(shop == null) {
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在"));
+        }
+        if(shop.getState() == Shop.State.ONLINE.getCode().byteValue()) {
             ReturnObject ret=shopService.offShelfShop(id);
             return Common.decorateReturnObject(ret);
         }
-        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.OFFLINESHOP_ERROR));
+        else return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.OFFLINESHOP_ERROR));
     }
 }
