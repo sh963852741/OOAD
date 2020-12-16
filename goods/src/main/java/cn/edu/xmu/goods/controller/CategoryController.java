@@ -46,8 +46,8 @@ public class CategoryController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PostMapping("/categories/{id}/subcategories")
-    public Object addCategories(@PathVariable Integer id,@RequestBody String name){
+    @PostMapping("/shops/{shopId}/categories/{id}/subcategories")
+    public Object addCategories(@PathVariable("id") Integer id,@RequestBody String name){
         ReturnObject ret=categoryService.newCategory(id,name);
         return Common.decorateReturnObject(ret);
     }
@@ -86,8 +86,8 @@ public class CategoryController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @DeleteMapping("/categories/{id}")
-    public Object deleteCategories(@PathVariable Integer id){
+    @DeleteMapping("/shops/{shopId}/categories/{id}")
+    public Object deleteCategories(@PathVariable("id") Integer id){
         ReturnObject ret=categoryService.deleteCategoryById(id);
         return Common.decorateReturnObject(ret);
     }

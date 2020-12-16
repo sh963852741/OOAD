@@ -3,6 +3,7 @@ package cn.edu.xmu.goods.dao;
 import cn.edu.xmu.goods.mapper.BrandPoMapper;
 import cn.edu.xmu.goods.model.po.BrandPo;
 import cn.edu.xmu.goods.model.po.BrandPoExample;
+import cn.edu.xmu.goods.utility.MyPageHelper;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.goods.model.bo.Brand;
 import cn.edu.xmu.ooad.util.ResponseCode;
@@ -72,25 +73,28 @@ public class BrandDao {
         return retObj;
     }
     public ReturnObject<PageInfo<VoObject>> selectAllBrand(Integer pageNum, Integer pageSize) {
-        BrandPoExample example = new BrandPoExample();
-        BrandPoExample.Criteria criteria = example.createCriteria();
         //分页查询
         PageHelper.startPage(pageNum, pageSize);
+
+        BrandPoExample example = new BrandPoExample();
         List<BrandPo> brandPos = null;
+        PageInfo<BrandPo> rolePage = null;
         try {
             //不加限定条件查询所有
             brandPos = brandPoMapper.selectByExample(example);
+            rolePage = PageInfo.of(brandPos);
         }catch (DataAccessException e){
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
 
         List<VoObject> ret = new ArrayList<>(brandPos.size());
-        for (BrandPo po : brandPos) {
+        for (BrandPo po : rolePage.getList()) {
             Brand brand = new Brand(po);
             ret.add(brand);
         }
-        PageInfo<VoObject> rolePage = PageInfo.of(ret);
-        return new ReturnObject<>(rolePage);
+        PageInfo<VoObject> returnList = new PageInfo<>(ret);
+        MyPageHelper.transferPageParams(rolePage, returnList);
+        return new ReturnObject<>(returnList);
     }
     public ReturnObject<Object> deleteBrandById(Long id) {
         ReturnObject<Object> retObj = null;

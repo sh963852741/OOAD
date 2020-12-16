@@ -88,18 +88,18 @@ public class GoodsService implements InitializingBean {
                 Funnels.longFunnel(),
                 5000, 0.03);
         this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
-        SKUPoExample example = new SKUPoExample();
-        List<SKUPo> skuPoList = goodsDao.getSkuList();
-        redisTemplate.delete(skuBloomFilter);
-        redisTemplate.delete(spuBloomFilter);
-        for(SKUPo skuPo : skuPoList){
-            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
-        }
-        SPUPoExample example1 = new SPUPoExample();
-        List<SPUPo> spuPoList = goodsDao.getSpuList();
-        for(SPUPo spuPo : spuPoList){
-            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
-        }
+//        SKUPoExample example = new SKUPoExample();
+//        List<SKUPo> skuPoList = goodsDao.getSkuList();
+//        redisTemplate.delete(skuBloomFilter);
+//        redisTemplate.delete(spuBloomFilter);
+//        for(SKUPo skuPo : skuPoList){
+//            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
+//        }
+//        SPUPoExample example1 = new SPUPoExample();
+//        List<SPUPo> spuPoList = goodsDao.getSpuList();
+//        for(SPUPo spuPo : spuPoList){
+//            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
+//        }
     }
 
     /**

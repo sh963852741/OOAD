@@ -63,6 +63,7 @@ public class BrandService {
         ReturnObject<PageInfo<VoObject>> returnObject = brandDao.selectAllBrand(pageNum, pageSize);
         return returnObject;
     }
+
     public ReturnObject  uploadimage(Long id, MultipartFile multipartFile) {
         //查看是否存在brand
         ReturnObject<Brand> brandRetObject=brandDao.getBrandById(id.longValue());

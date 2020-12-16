@@ -2,6 +2,7 @@ package cn.edu.xmu.activity.model.vo;
 
 import cn.edu.xmu.activity.model.po.PresaleActivityPo;
 import cn.edu.xmu.ooad.model.VoObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,17 +40,17 @@ public class PresaleActivityVo implements VoObject {
     @ApiModelProperty(value = "预售数量")
     Integer quantity;
 
-    @DateTimeFormat
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @ApiModelProperty(value = "预售开始时间")
     LocalDateTime beginTime;
 
-    @DateTimeFormat
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @ApiModelProperty(value = "预售结束时间")
     LocalDateTime endTime;
 
-    @DateTimeFormat
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @ApiModelProperty(value = "付款时间")
     LocalDateTime payTime;

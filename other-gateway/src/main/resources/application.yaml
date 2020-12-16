@@ -21,7 +21,7 @@ spring:
         - id: presale
           uri: http://localhost:8988/
           predicates:
-            - Path=/presales/states,/presales,/shops/{shopId}/spus/{id}/presales,/shops/{shopId}/presales/{id}
+            - Path=/presales/states,/presales,/shops/{shopId}/skus/{id}/presales,/shops/{shopId}/presales/{id},/shops/{shopId}/presales
           filters:
             - PrefixPath=/presale
 
@@ -35,7 +35,7 @@ spring:
         - id: falshsale
           uri: http://localhost:8188/
           predicates:
-            - Path=/timesegments/{id}/flashsales,/flashsales/current,/flashsales/{id},/flashsales/{id}/flashitems,/flashsales/{fid}/flashitems/{id}
+            - Path=/timesegments/{id}/flashsales,/flashsales/current,/flashsales/{id},/flashsales/{id}/flashitems,/flashsales/{fid}/flashitems/{id},/shops/{did}/flashsales/{id}/**
           filters:
             - PrefixPath=/flashsale
 
@@ -63,7 +63,7 @@ spring:
         - id: goods
           uri: http://localhost:8907/
           predicates:
-            - Path=/skus/states,/skus,/skus/**,/spus/**,/shops/{shopId}/floatPrices/**,/shops/{shopId}/spus/**,/shops/{shopId}/skus/**,/categories/{id}/subcategories,/shops/{shopId}/categories/**
+            - Path=/skus/states,/skus,/brands,/shops/{shopId}/brands/**,/skus/**,/spus/**,/shops/{shopId}/floatPrices/**,/shops/{shopId}/spus/**,/shops/{shopId}/skus/**,/categories/{id}/subcategories,/shops/{shopId}/categories/**
           filters:
             - PrefixPath=/goods
 

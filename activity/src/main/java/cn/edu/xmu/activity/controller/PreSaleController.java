@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 
 import static cn.edu.xmu.ooad.util.Common.*;
 
@@ -85,7 +86,7 @@ public class PreSaleController {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/{shopId}/presales")
     @Audit
-    public Object queryPresaleActivity(@ApiParam(value = "商品SPUid",required=true) @RequestParam("skuId") Long skuId,
+    public Object queryPresaleActivity(@ApiParam(value = "商品SPUid") @RequestParam(value = "skuId",required = false) Long skuId,
                                        @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state){
         ActivityFinderVo activityFinderVo = new ActivityFinderVo();
         activityFinderVo.setSkuId(skuId);
