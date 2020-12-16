@@ -32,6 +32,7 @@ public class PresaleActivityDao {
         PresaleActivityPoExample.Criteria criteria = example.createCriteria();
         criteria.andEndTimeGreaterThan(LocalDateTime.now());
         criteria.andStateNotEqualTo(PresaleActivity.PresaleStatus.DELETE.getCode());
+        criteria.andGoodsSkuIdEqualTo(skuId);
 
         return presaleActivityPoMapper.selectByExample(example).size() > 0;
     }

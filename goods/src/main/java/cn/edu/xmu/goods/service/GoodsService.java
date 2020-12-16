@@ -88,18 +88,18 @@ public class GoodsService implements InitializingBean {
                 Funnels.longFunnel(),
                 5000, 0.03);
         this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
-//        SKUPoExample example = new SKUPoExample();
-//        List<SKUPo> skuPoList = goodsDao.getSkuList();
-//        redisTemplate.delete(skuBloomFilter);
-//        redisTemplate.delete(spuBloomFilter);
-//        for(SKUPo skuPo : skuPoList){
-//            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
-//        }
-//        SPUPoExample example1 = new SPUPoExample();
-//        List<SPUPo> spuPoList = goodsDao.getSpuList();
-//        for(SPUPo spuPo : spuPoList){
-//            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
-//        }
+        SKUPoExample example = new SKUPoExample();
+        List<SKUPo> skuPoList = goodsDao.getSkuList();
+        redisTemplate.delete(skuBloomFilter);
+        redisTemplate.delete(spuBloomFilter);
+        for(SKUPo skuPo : skuPoList){
+            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
+        }
+        SPUPoExample example1 = new SPUPoExample();
+        List<SPUPo> spuPoList = goodsDao.getSpuList();
+        for(SPUPo spuPo : spuPoList){
+            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
+        }
     }
 
     /**
@@ -324,8 +324,11 @@ public class GoodsService implements InitializingBean {
         }
         Spu spu=new Spu((SPUPo)ret.getData());
         SpuRetVo vo=spu.createVo();
-//        FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
-//        vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
+        if(spu.getFreightId() != null){
+            //FreightModelDto dto = freightService.getFreightModel(spu.getFreightId());
+            FreightModelDto dto = freightService.getFreightModel(1000L);
+            vo.setFreight(OrderAdapter.adapterFreigthModel(dto));
+        }
         return new ReturnObject<>(vo);
     }
 

@@ -76,7 +76,7 @@ public class CategoryDao {
             int ret;
             ret=categoryPoMapper.updateByPrimaryKeySelective(po);
             if(ret ==0){
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
             }else{
                 return new ReturnObject(ResponseCode.OK);
             }
@@ -95,8 +95,14 @@ public class CategoryDao {
      */
     public ReturnObject deleteCategoryById(Long id){
         try{
+            CategoryPoExample example = new CategoryPoExample();
+            CategoryPoExample.Criteria criteria1 = example.createCriteria();
+            criteria1.andIdEqualTo(id);
+            CategoryPoExample.Criteria criteria2 = example.createCriteria();
+            criteria2.andPidEqualTo(id);
+            example.or(criteria2);
             int ret;
-            ret= categoryPoMapper.deleteByPrimaryKey(id);
+            ret= categoryPoMapper.deleteByExample(example);
             if(ret==0){
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
             }else{

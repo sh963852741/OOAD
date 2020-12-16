@@ -47,7 +47,7 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/groupons/states")
-    public Object getgrouponState(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization){
+    public Object getgrouponState(){
         return Common.decorateReturnObject(activityService.grouponActivityStatus());
     }
 

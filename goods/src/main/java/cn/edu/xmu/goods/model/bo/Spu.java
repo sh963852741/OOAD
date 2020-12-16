@@ -108,7 +108,7 @@ public class Spu {
         this.setSpec(po.getSpec());
         this.setGmtCreate(po.getGmtCreate());
         this.setGmtModified(po.getGmtModified());
-//        this.setDisabled(po.getState());
+        this.setDisabled(po.getDisabled());
     }
 
     public SPUPo createPo(){
@@ -126,7 +126,7 @@ public class Spu {
         po.setSpec(this.getSpec());
         po.setGmtCreate(this.getGmtCreate());
         po.setGmtModified(this.getGmtModified());
-//        po.setDisabled(this.getState());
+        po.setDisabled(this.getDisabled());
         return po;
     }
 

@@ -7,7 +7,9 @@ import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.oomall.other.impl.IBeShareService;
 import io.swagger.annotations.*;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,9 @@ public class GoodsController {
 
 
     private static final Logger logger = LoggerFactory.getLogger(GoodsController.class);
+
+   // @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
+    private IBeShareService beShareService;
 
     @Autowired
     private GoodsService goodsService;
@@ -279,10 +284,9 @@ public class GoodsController {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        /** TODO 此处需要查看skuid是否是分享活动的id;
-         *
-         */
-
+        if(!beShareService.createBeShare(userId,sid,id)){
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE));
+        }
         ReturnObject ret = goodsService.getSkuDetails(id);
         return Common.decorateReturnObject(ret);
 

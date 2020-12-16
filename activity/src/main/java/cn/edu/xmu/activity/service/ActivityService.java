@@ -101,7 +101,24 @@ public class ActivityService implements InitializingBean {
             po = presaleActivityDao.getEffectiveActivities(
                     activityFinderVo.getPage(), activityFinderVo.getPageSize(), activityFinderVo.getShopId(), activityFinderVo.getTimeline());
         }
-        List<PresaleActivityVo> retList = po.getList().stream().map(PresaleActivityVo::new).collect(Collectors.toList());
+
+        List<PresaleActivityVo> retList = new ArrayList<>();
+        for (PresaleActivityPo presaleActivityPo:po.getList()){
+            var skuDTO = goodsService.getSku(presaleActivityPo.getGoodsSkuId());
+            var shopDTO = goodsService.getShopBySKUId(presaleActivityPo.getGoodsSkuId());
+            PresaleActivityVo presaleActivityVo = new PresaleActivityVo(presaleActivityPo);
+            presaleActivityVo.shop.put("id", shopDTO.getId());
+            presaleActivityVo.shop.put("name", shopDTO.getName());
+            presaleActivityVo.goodsSku.put("id", skuDTO.getId());
+            presaleActivityVo.goodsSku.put("name", skuDTO.getName());
+            presaleActivityVo.goodsSku.put("skuSn", skuDTO.getSkuSn());
+            presaleActivityVo.goodsSku.put("imageUrl", skuDTO.getImageUrl());
+            presaleActivityVo.goodsSku.put("inventory", skuDTO.getInventory());
+            presaleActivityVo.goodsSku.put("originalPrice", skuDTO.getOriginalPrice());
+            presaleActivityVo.goodsSku.put("price", skuDTO.getPrice());
+            presaleActivityVo.goodsSku.put("disable", skuDTO.getDisable());
+            retList.add(presaleActivityVo);
+        }
 
         PageInfo<PresaleActivityVo> ret = new PageInfo<>(retList);
         MyPageHelper.transferPageParams(po, ret);

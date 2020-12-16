@@ -139,7 +139,7 @@ public class GoodsServiceImpl implements IGoodsService {
                 skuDTO.setDetail(sku.getDetail());
                 skuDTO.setGoodsSpuId(sku.getGoodsSpuId());
                 skuDTO.setPrice(sku.getPrice());
-                //String json = JacksonUtil.toJson(skuDTO);
+
                 redisTemplate.opsForValue().set("sku_"+skuId,skuDTO);
                 dtos.add(skuDTO);
             }
@@ -162,7 +162,8 @@ public class GoodsServiceImpl implements IGoodsService {
        dto.setName((String)ret.getData().get("name"));
        dto.setGoodsSn((String)ret.getData().get("goodsSn"));
        dto.setImageUrl((String)ret.getData().get("imageUrl"));
-       dto.setDisable((Byte)ret.getData().get(""));
+       dto.setDisable((Byte)ret.getData().get("disable"));
+       dto.setShopId((Long)ret.getData().get("shopId"));
        return dto;
     }
 
@@ -262,5 +263,17 @@ public class GoodsServiceImpl implements IGoodsService {
             retData.add(priceDTO);
         }
         return retData;
+    }
+
+    @Override
+    public Long getPrice(Long skuId) {
+        if(skuId == null){
+            return null;
+        }
+        ReturnObject<Sku> skuRet=goodsDao.getSkuByDubbo(skuId);
+        if(skuRet.getCode()!=ResponseCode.OK){
+            return null;
+        }
+        return skuRet.getData().getPrice();
     }
 }
