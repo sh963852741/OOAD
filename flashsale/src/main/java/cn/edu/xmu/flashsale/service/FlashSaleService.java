@@ -261,5 +261,9 @@ public class FlashSaleService implements InitializingBean {
         String key ="FlashSale" + LocalDate.now().toString();
         redisTemplate.expire(key,24, TimeUnit.HOURS);
     }
+
+    private int updateQuantity(Long skuId){
+        return 0;
+    }
 }
 

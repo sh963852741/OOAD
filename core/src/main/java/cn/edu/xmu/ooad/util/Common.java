@@ -179,6 +179,16 @@ public class Common {
      */
     public static Object decorateReturnObject(ReturnObject returnObject) {
         switch (returnObject.getCode()) {
+            case RESOURCE_ID_OUTSCOPE:
+                // 403：字段不合法
+                return new ResponseEntity(
+                        ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg()),
+                        HttpStatus.FORBIDDEN);
+            case FIELD_NOTVALID:
+                // 400：字段不合法
+                return new ResponseEntity(
+                        ResponseUtil.fail(returnObject.getCode(), returnObject.getErrmsg()),
+                        HttpStatus.BAD_REQUEST);
             case RESOURCE_ID_NOTEXIST:
                 // 404：资源不存在
                 return new ResponseEntity(

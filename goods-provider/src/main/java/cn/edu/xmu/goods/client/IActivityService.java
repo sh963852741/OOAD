@@ -56,5 +56,12 @@ public interface IActivityService {
 	 */
 	List<OrderItemDTO> modifyPresaleInventory(List<OrderItemDTO> orderItemDTOS, Long presaleId);
 
+	/**
+	 * 获取SKU对应的优惠活动
+	 * @param skuIds
+	 * @return
+	 */
 	Map<Long, List<CouponActivityDTO>> getSkuCouponActivity(List<Long> skuIds);
+
+	List<CouponActivityDTO> getSkuCouponActivity(Long skuId);
 }

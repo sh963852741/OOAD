@@ -9,6 +9,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,18 +21,22 @@ import java.util.Map;
 public class GrouponActivityVo {
 
     @ApiModelProperty(value = "活动名称")
+    @NotBlank
     String name;
 
     @JsonDeserialize(using = MyDeserializer.class)
     @ApiModelProperty(value = "团购规则")
+    @NotBlank
     String strategy;
 
     @ApiModelProperty(value = "团购开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
     LocalDateTime beginTime;
 
     @ApiModelProperty(value = "团购结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
     LocalDateTime endTime;
 
     Long id;
