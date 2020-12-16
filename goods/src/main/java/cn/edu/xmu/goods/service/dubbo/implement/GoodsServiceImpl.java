@@ -266,6 +266,24 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
+    public List<PriceDTO> getPriceAndNameByOther(List<Long> skuIds) {
+        List<PriceDTO> retData = new ArrayList<>();
+        for(Long skuId : skuIds){
+            SkuDTO sku = this.getSku(skuId);
+            if(sku == null){
+                return null;
+            }
+            PriceDTO priceDTO = new PriceDTO();
+            priceDTO.setSkuId(sku.getId());
+            priceDTO.setName(sku.getName());
+            priceDTO.setPrePrice(sku.getOriginalPrice());
+            priceDTO.setFinalPrice(null);
+            retData.add(priceDTO);
+        }
+        return retData;
+    }
+
+    @Override
     public PriceDTO getPrice(Long skuId) {
         if(skuId == null){
             return null;
