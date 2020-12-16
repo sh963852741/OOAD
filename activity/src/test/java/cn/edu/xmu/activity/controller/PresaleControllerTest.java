@@ -550,7 +550,6 @@ public class PresaleControllerTest {
                 .contentType("application/json;charset=UTF-8")
                 .header("authorization", shopToken))
                 .andExpect((status().isOk()))
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
@@ -561,7 +560,6 @@ public class PresaleControllerTest {
                 .contentType("application/json;charset=UTF-8")
                 .header("authorization", shopToken))
                 .andExpect((status().isNotFound()))
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_NOTEXIST.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
