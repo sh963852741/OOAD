@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping(value = "/", produces = "application/json;charset=UTF-8")
+@RequestMapping(value = "/goods", produces = "application/json;charset=UTF-8")
 public class BrandController {
 
     @Autowired

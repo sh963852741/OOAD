@@ -82,7 +82,7 @@ public class ActivityService implements InitializingBean {
      */
     public ReturnObject<List<PresaleActivityVo>> getAllPresaleActivities(ActivityFinderVo activityFinderVo) {
         List<PresaleActivityPo> presaleList;
-        presaleList = presaleActivityDao.getAllActivityBySKUId(activityFinderVo.getTimeline(),activityFinderVo.getSkuId());
+        presaleList = presaleActivityDao.getAllActivityBySKUId(activityFinderVo.getState(),activityFinderVo.getSkuId());
         List<PresaleActivityVo> retList = presaleList.stream().map(PresaleActivityVo::new).collect(Collectors.toList());
         return new ReturnObject<>(retList);
     }

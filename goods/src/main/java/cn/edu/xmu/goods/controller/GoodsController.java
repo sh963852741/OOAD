@@ -87,13 +87,19 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/skus")
-    public Object getSkus(@Validated  SkuSelectVo vo, @RequestParam(required = false, defaultValue = "1") Integer page, @RequestParam(required = false, defaultValue = "10") Integer pageSize, BindingResult bindingResult) {
+    public Object getSkus(@RequestParam(value = "shopId",required = false) Long shopId,
+                          @RequestParam(value = "skuSn",required = false) String skuSn,
+                          @RequestParam(value = "spuId",required = false) Long spuId,
+                          @RequestParam(value = "spuSn",required = false) String spuSn,
+                          @RequestParam(required = false, defaultValue = "1") Integer page,
+                          @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         logger.debug("getAllSkus: page = " + page + "  pageSize =" + pageSize);
-        Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if (null != obj) {
-            logger.info("validate fail");
-            return obj;
-        }
+
+        SkuSelectVo vo = new SkuSelectVo();
+        vo.setShopId(shopId);
+        vo.setSkuSn(skuSn);
+        vo.setSpuId(spuId);
+        vo.setSpuSn(spuSn);
         ReturnObject returnObject = goodsService.getAllSkus(vo, page, pageSize);
         return Common.decorateReturnObject(returnObject);
     }
