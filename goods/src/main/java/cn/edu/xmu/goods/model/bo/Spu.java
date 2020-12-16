@@ -135,7 +135,7 @@ public class Spu {
         vo.setId(this.getId());
         vo.setDetail(this.getDetail());
         vo.setGoodsSn(this.getGoodsSn());
-        vo.setDisable(this.getDisabled());
+        vo.setDisable(this.getDisabled() == 1);
         vo.setImageUrl(this.getImageUrl());
         vo.setName(this.getName());
         vo.setGmtCreate(this.getGmtCreate());
