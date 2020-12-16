@@ -546,10 +546,10 @@ public class PresaleControllerTest {
     }
     @Test
     public void delPresaleActivity1()throws Exception {
-        ResultActions response = mvc.perform(delete("presale/shops/1/presales/1")
+                mvc.perform(delete("presale/shops/1/presales/1")
                 .contentType("application/json;charset=UTF-8")
-                .header("authorization", shopToken));
-        String responseString = response.andExpect((status().isOk()))
+                .header("authorization", shopToken))
+                .andExpect((status().isOk()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
