@@ -66,8 +66,8 @@ public class CategoryController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PutMapping("/categories/{id}")
-    public Object changeCategories(@PathVariable Integer id,@RequestBody String name){
+    @PutMapping("/shops/{shopId}/categories/{id}")
+    public Object changeCategories(@PathVariable("id") Integer id,@RequestBody String name){
         ReturnObject ret=categoryService.changeCategory(id,name);
         return Common.decorateReturnObject(ret);
     }
