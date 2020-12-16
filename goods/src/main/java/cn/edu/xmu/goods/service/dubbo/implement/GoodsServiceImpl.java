@@ -266,7 +266,7 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public Long getPrice(Long skuId) {
+    public PriceDTO getPrice(Long skuId) {
         if(skuId == null){
             return null;
         }
@@ -274,6 +274,10 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuRet.getCode()!=ResponseCode.OK){
             return null;
         }
-        return skuRet.getData().getPrice();
+        PriceDTO dto = new PriceDTO();
+        dto.setSkuId(skuId);
+        dto.setName(skuRet.getData().getName());
+        dto.setPrePrice(skuRet.getData().getPrice());
+        return dto;
     }
 }

@@ -102,6 +102,7 @@ public class Sku implements VoObject {
         vo.setPrice(this.getPrice());
         vo.setSkuSn(this.getSkuSn());
         vo.setWeight(this.getWeight());
+        vo.setDisable(this.getDisable() == 1);
         return vo;
     }
 
@@ -110,7 +111,7 @@ public class Sku implements VoObject {
         SkuSimpleRetVo ret=new SkuSimpleRetVo();
         ret.setId(this.getId());
         ret.setImageUrl(this.getImageUrl());
-        ret.setDisable(this.getDisable());
+        ret.setDisable(this.getDisable() == 1);
         ret.setInventory(this.getInventory());
         ret.setName(this.getName());
         ret.setOriginalPrice(this.getOriginalPrice());
