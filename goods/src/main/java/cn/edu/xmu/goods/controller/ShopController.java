@@ -45,7 +45,7 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/states")
-    public Object getShopState()
+    public Object getshopState()
     {
         ReturnObject<List> returnObject=shopService.getShopStates();
         return Common.decorateReturnObject(returnObject);
@@ -53,7 +53,7 @@ public class ShopController {
 
     /**
      * 店家申请店铺
-     * @paramTAPD
+     * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
      */
@@ -74,7 +74,7 @@ public class ShopController {
             ReturnObject ret=shopService.newShop(shopvo);
             return Common.decorateReturnObject(ret);
         }
-        else if(did != -1 && did !=0) return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR, "您已经拥有店铺，无法重新申请"));
+        else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR, "您已经拥有店铺，无法重新申请"));
         else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "商铺名称不能为空"));
     }
 
@@ -121,11 +121,16 @@ public class ShopController {
             @ApiImplicitParam(name = "authorization", value = "shopToken", required = true, dataType = "String", paramType = "header")
     })
     @DeleteMapping(value = "/shops/{id}")
-    public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id,@Depart Long did){
-        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()||shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
+    public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
+        var shop = shopService.getShopByShopId(id).getData();
+        if(shop == null) {
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在"));
+        }
+
+        if(shop.getState() == Shop.State.OFFLINE.getCode().byteValue()
+                ||shop.getState() == Shop.State.ONLINE.getCode().byteValue())
         {
             ReturnObject ret=shopService.deleteShopById(id);
-            did= Long.valueOf(-1);
             return Common.decorateReturnObject(ret);
         }
         else
@@ -150,7 +155,12 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{shopId}/newshops/{id}/audit")
     public Object auditShop(@PathVariable("shopId") Long shopId,@ApiParam(value = "新店 ID",required=true) @PathVariable("id") Long id,@ApiParam(value = "" ,required=true )   @RequestBody ShopConclusionVo conclusion){
-        if(shopService.getShopByShopId(id).getData().getState()==7)
+        var shop = shopService.getShopByShopId(id).getData();
+        if(shop == null) {
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在"));
+        }
+
+        if(shop.getState() == Shop.State.EXAME.getCode().byteValue())
         {
             ReturnObject ret=shopService.passShop(id,conclusion);
             return Common.decorateReturnObject(ret);
@@ -178,7 +188,7 @@ public class ShopController {
     @PutMapping(value = "/shops/{id}/onshelves")
     @Audit
     public Object shopsIdOnshelvesPut(@PathVariable("id") long id){
-        ReturnObject ret=shopService.onShelfShop(id);
+        ReturnObject ret= shopService.onShelfShop(id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -197,11 +207,14 @@ public class ShopController {
     })
     @PutMapping(value = "/shops/{id}/offshelves")
     public Object shopsIdOffshelvesPut(@PathVariable("id") long id){
-        if(shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
-        {
+        var shop = shopService.getShopByShopId(id).getData();
+        if(shop == null) {
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在"));
+        }
+        if(shop.getState() == Shop.State.ONLINE.getCode().byteValue()) {
             ReturnObject ret=shopService.offShelfShop(id);
             return Common.decorateReturnObject(ret);
         }
-        else return Common.decorateReturnObject(new ReturnObject(ResponseCode.OFFLINESHOP_ERROR));
+        else return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.OFFLINESHOP_ERROR));
     }
 }

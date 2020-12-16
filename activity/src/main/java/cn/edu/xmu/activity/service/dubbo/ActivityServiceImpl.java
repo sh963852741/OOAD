@@ -197,4 +197,22 @@ public class ActivityServiceImpl implements IActivityService {
         }
         return retMap;
     }
+
+    @Override
+    public List<CouponActivityDTO> getSkuCouponActivity(Long skuId) {
+        var x = couponActivityDao.getActivitiesBySKUId(skuId);
+        List<CouponActivityDTO> dtoList = new ArrayList<>();
+        for(CouponActivityPo po:x){
+            if(po.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())
+                    && po.getBeginTime().isBefore(LocalDateTime.now()) && po.getEndTime().isAfter(LocalDateTime.now())){
+                CouponActivityDTO dto =new CouponActivityDTO();
+                dto.setBeginTime(po.getBeginTime());
+                dto.setEndTime(po.getEndTime());
+                dto.setId(po.getId());
+                dto.setName(po.getName());
+                dtoList.add(dto);
+            }
+        }
+        return dtoList;
+    }
 }
