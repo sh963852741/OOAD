@@ -546,7 +546,7 @@ public class PresaleControllerTest {
     }
     @Test
     public void delPresaleActivity1()throws Exception {
-        ResultActions response = mvc.perform(delete("/shops/1/presales/1")
+        ResultActions response = mvc.perform(delete("presale/shops/1/presales/1")
                 .contentType("application/json;charset=UTF-8")
                 .header("authorization", shopToken));
         String responseString = response.andExpect((status().isOk()))
@@ -557,10 +557,10 @@ public class PresaleControllerTest {
     }
     @Test
     public void delPresaleActivity2()throws Exception {
-        ResultActions response = mvc.perform(delete("/shops/1/presales/290")
+                mvc.perform(delete("presale/shops/1/presales/290")
                 .contentType("application/json;charset=UTF-8")
-                .header("authorization", shopToken));
-        String responseString = response.andExpect((status().isNotFound()))
+                .header("authorization", shopToken))
+                .andExpect((status().isNotFound()))
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_NOTEXIST.getCode()))
                 .andExpect(jsonPath("$.data").doesNotExist())
