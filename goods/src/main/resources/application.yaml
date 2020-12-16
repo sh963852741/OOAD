@@ -92,7 +92,7 @@ dubbo:
   protocol:
     name: dubbo
     port: 28091
-#    host: 172.20.10.4
+    host: 192.168.43.132
 
 # 配置rocketmq
 rocketmq:

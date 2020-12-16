@@ -57,5 +57,6 @@ public interface IGoodsService {
 	//下单获取名字和价格 用户普通订单
 	List<PriceDTO> getPriceAndName(List<OrderItemDTO> orderItemDTOS);
 
+	Long getPrice(Long skuId);
 
 }

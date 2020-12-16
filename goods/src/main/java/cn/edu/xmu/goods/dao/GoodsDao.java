@@ -342,13 +342,11 @@ public class GoodsDao {
         }
         Sku sku = new Sku(skuPo);
         ReturnObject<Long> priceRet = getActivityPrice(id);
-        if(priceRet.getCode() != ResponseCode.OK){
+        if(priceRet.getCode() != ResponseCode.OK || priceRet.getData() == null){
             sku.setPrice(sku.getOriginalPrice());
+        }else {
+            sku.setPrice(priceRet.getData());
         }
-        if(priceRet.getData() == null){
-            sku.setPrice(sku.getOriginalPrice());
-        }
-        sku.setPrice(priceRet.getData());
         return new ReturnObject<>(sku);
     }
 
