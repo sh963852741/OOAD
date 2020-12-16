@@ -76,7 +76,7 @@ public class CategoryDao {
             int ret;
             ret=categoryPoMapper.updateByPrimaryKeySelective(po);
             if(ret ==0){
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
             }else{
                 return new ReturnObject(ResponseCode.OK);
             }
