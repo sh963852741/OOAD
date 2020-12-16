@@ -45,7 +45,7 @@ public class ShopController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @GetMapping(value = "/shops/states")
-    public Object getshopState()
+    public Object getShopState()
     {
         ReturnObject<List> returnObject=shopService.getShopStates();
         return Common.decorateReturnObject(returnObject);
@@ -53,7 +53,7 @@ public class ShopController {
 
     /**
      * 店家申请店铺
-     * @param
+     * @paramTAPD
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
      */
@@ -74,7 +74,7 @@ public class ShopController {
             ReturnObject ret=shopService.newShop(shopvo);
             return Common.decorateReturnObject(ret);
         }
-        else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR, "您已经拥有店铺，无法重新申请"));
+        else if(did != -1 && did !=0) return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR, "您已经拥有店铺，无法重新申请"));
         else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "商铺名称不能为空"));
     }
 
@@ -121,10 +121,11 @@ public class ShopController {
             @ApiImplicitParam(name = "authorization", value = "shopToken", required = true, dataType = "String", paramType = "header")
     })
     @DeleteMapping(value = "/shops/{id}")
-    public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
+    public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id,@Depart Long did){
         if(shopService.getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()||shopService.getShopByShopId(id).getData().getState()==Shop.State.ONLINE.getCode().byteValue())
         {
             ReturnObject ret=shopService.deleteShopById(id);
+            did= Long.valueOf(-1);
             return Common.decorateReturnObject(ret);
         }
         else
