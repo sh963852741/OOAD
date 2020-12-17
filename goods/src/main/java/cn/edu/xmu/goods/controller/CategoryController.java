@@ -2,10 +2,15 @@ package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.service.CategoryService;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/goods", produces = "application/json;charset=UTF-8")
@@ -38,6 +43,7 @@ public class CategoryController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     * modifiedBy xuyue 2020/12/17 11:33
      */
     @ApiOperation(value = "管理员新增商品类目")
     @ApiImplicitParams({
@@ -47,8 +53,15 @@ public class CategoryController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/categories/{id}/subcategories")
-    public Object addCategories(@PathVariable("id") Integer id,@RequestBody String name){
-        ReturnObject ret=categoryService.newCategory(id,name);
+    public Object addCategories(@PathVariable("id") Integer id, @RequestBody String name,
+                                BindingResult bindingResult, HttpServletResponse httpServletResponse){
+
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+        var ret = categoryService.newCategory(id,name);
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
