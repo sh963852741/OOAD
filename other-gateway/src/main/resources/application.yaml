@@ -35,7 +35,7 @@ spring:
         - id: falshsale
           uri: http://localhost:8188/
           predicates:
-            - Path=/timesegments/{id}/flashsales,/flashsales/current,/flashsales/{id},/flashsales/{id}/flashitems,/flashsales/{fid}/flashitems/{id},/shops/{did}/flashsales/{id}/**
+            - Path=/timesegments/{id}/flashsales,/flashsales/current,/shops/{did}/timesegments/{id}/flashsales,/shops/{did}/flashsales/{id},/shops/{did}/flashsales/{id}/flashitems,/shops/{did}/flashsales/{fid}/flashitems/{id},/shops/{did}/flashsales/{id}/**
           filters:
             - PrefixPath=/flashsale
 
