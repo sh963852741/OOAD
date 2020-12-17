@@ -60,7 +60,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PostMapping("timesegments/{id}/flashsales")
+    @PostMapping("/shops/{did}/timesegments/{id}/flashsales")
     public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate){
         var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
 
@@ -81,9 +81,9 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("flashsales/current")
+    @GetMapping("/flashsales/current")
     public Mono<Object> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
-        log.debug("flashsales/current");
+        log.debug("/flashsales/current");
         return flashSaleService.getFlashSale(1L).map(x->{
             log.debug(x.toString());
             return x;
@@ -104,7 +104,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @DeleteMapping("flashsales/{id}")
+    @DeleteMapping("/shops/{did}/flashsales/{id}")
     public Object deleteFlashsale(@PathVariable Integer id){
         var ret = flashSaleService.delFlashSale(id);
         return Common.decorateReturnObject(ret);
@@ -125,7 +125,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PutMapping("flashsales/{id}")
+    @PutMapping("/shops/{did}/flashsales/{id}")
     public Object changeFlashsale(@PathVariable Long id,@RequestBody FlashSaleVo flashDate){
         var ret = flashSaleService.modifyFlashSale(id, flashDate.getFlashDate().atStartOfDay());
         return Common.decorateReturnObject(ret);
@@ -145,7 +145,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PostMapping("flashsales/{id}/flashitems")
+    @PostMapping("/shops/{did}/flashsales/{id}/flashitems")
     public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo){
         var ret = flashSaleService.addSkuToFlashSale(id, flashsaleVo);
         return Common.decorateReturnObject(ret);
@@ -185,7 +185,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @DeleteMapping("flashsales/{fid}/flashitems/{id}")
+    @DeleteMapping("/shops/{did}/flashsales/{fid}/flashitems/{id}")
     public Object deleteFlashitems(@PathVariable("fid") Long flashSaleId, @PathVariable("id") Long itemId){
         var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
         return Common.decorateReturnObject(ret);
