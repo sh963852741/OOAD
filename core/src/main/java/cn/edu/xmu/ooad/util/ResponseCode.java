@@ -76,6 +76,11 @@ public enum ResponseCode {
     FREIGHTNAME_SAME(802,"运费模板名重复"),
     REGION_SAME(803,"运费模板中该地区已经定义"),
     REFUND_MORE(804,"退款金额超过支付金额"),
+    REGION_NOT_REACH(805,"该地区不可达"),
+    SHOP_ID_NOTEXIST(825,"不存在对应的shopid"),
+    DEFAULTMODEL_EXISTED(826,"已经存在对应的默认模板"),
+    MODEL_ID_NOTEXIST(827,"shopid不存在对应的模板id"),
+
     /***************************************************
      *    商品模块错误码
      **************************************************/
@@ -93,6 +98,11 @@ public enum ResponseCode {
     COUPON_END(911,"优惠卷活动终止"),
     CATEGORY_SET_ERROR(912,"不能向一级目录中添加商品"),
     TIMEFORMAT_ERROR(913,"时间参数不合法"),
+    STATE_NOCHANGE(920,"状态未改变"),
+    DELETE_ONLINE_NOTALLOW(931, "不允许删除已上线状态的活动"),
+    DELETE_CHANGAE_NOTALLOW(932, "不允许修改已删除活动的状态"),
+    BRAND_NAME_SAME(990,"品牌名称已存在"),
+    CATEGORY_NAME_SAME(991, "类目名称已存在"),
     MODIFYSHOP_ERROR(140,"该店铺无法修改"),
     SHUTSHOP_ERROR(180,"该店铺无法被执行关闭操作"),
     ONLINESHOP_ERROR(160,"该店铺无法上线"),

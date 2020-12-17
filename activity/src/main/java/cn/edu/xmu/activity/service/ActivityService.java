@@ -55,9 +55,9 @@ public class ActivityService implements InitializingBean {
 
     private RedisBloomFilter redisBloomFilter;
 
-    @DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     IGoodsService goodsService;
-    @DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     IShopService shopService;
 
     @Autowired
@@ -559,6 +559,10 @@ public class ActivityService implements InitializingBean {
      * @return
      */
     public ReturnObject<PageInfo<VoObject>> getSKUInCouponActivity(long activityId, int page, int pageSize){
+        CouponActivityPo po = couponActivityDao.getActivityById(activityId);
+        if(po == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         PageInfo<CouponSKUPo> couponSPUPoPageInfo = couponActivityDao.getSKUsInActivity(activityId, page, pageSize);
         List<VoObject> simpleSkuList = new ArrayList<>();
         for(CouponSKUPo couponSPUPo:couponSPUPoPageInfo.getList()){

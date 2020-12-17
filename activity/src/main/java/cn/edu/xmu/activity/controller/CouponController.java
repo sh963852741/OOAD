@@ -155,6 +155,9 @@ public class CouponController {
                                          @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
         ReturnObject<PageInfo<VoObject>> ret = activityService.getSKUInCouponActivity(id,page,pageSize);
 
+        if(ret.getCode() !=ResponseCode.OK){
+            return Common.decorateReturnObject(ret);
+        }
         return Common.getPageRetObject(ret);
     }
 
