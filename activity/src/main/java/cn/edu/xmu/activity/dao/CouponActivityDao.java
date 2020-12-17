@@ -97,7 +97,7 @@ public class CouponActivityDao {
         CouponActivityPoExample example = new CouponActivityPoExample();
         CouponActivityPoExample.Criteria criteria = example.createCriteria();
         criteria.andShopIdEqualTo(shopId);
-        criteria.andStateNotEqualTo(CouponActivity.CouponStatus.ONLINE.getCode());
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.OFFLINE.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);

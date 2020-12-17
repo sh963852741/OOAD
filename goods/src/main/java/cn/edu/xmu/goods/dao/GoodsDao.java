@@ -72,7 +72,7 @@ public class GoodsDao {
      */
     public ReturnObject getGoodState(){
         List<Map<String, Object>> stateList=new ArrayList<>();
-        for (Good.State enum1 : Good.State.values()) {
+        for (Sku.State enum1 : Sku.State.values()) {
             Map<String,Object> temp=new HashMap<>();
             temp.put("code",enum1.getCode());
             temp.put("name",enum1.getDescription());

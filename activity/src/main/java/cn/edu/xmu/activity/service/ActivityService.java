@@ -82,7 +82,7 @@ public class ActivityService implements InitializingBean {
      */
     public ReturnObject<List<PresaleActivityVo>> getAllPresaleActivities(ActivityFinderVo activityFinderVo) {
         List<PresaleActivityPo> presaleList;
-        presaleList = presaleActivityDao.getAllActivityBySKUId(activityFinderVo.getTimeline(),activityFinderVo.getSkuId());
+        presaleList = presaleActivityDao.getAllActivityBySKUId(activityFinderVo.getState(),activityFinderVo.getSkuId());
         List<PresaleActivityVo> retList = presaleList.stream().map(PresaleActivityVo::new).collect(Collectors.toList());
         return new ReturnObject<>(retList);
     }
@@ -559,6 +559,11 @@ public class ActivityService implements InitializingBean {
      * @return
      */
     public ReturnObject<PageInfo<VoObject>> getSKUInCouponActivity(long activityId, int page, int pageSize){
+        var activity = couponActivityDao.getActivityById(activityId);
+        if(activity == null || !activity.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+
         PageInfo<CouponSKUPo> couponSPUPoPageInfo = couponActivityDao.getSKUsInActivity(activityId, page, pageSize);
         List<VoObject> simpleSkuList = new ArrayList<>();
         for(CouponSKUPo couponSPUPo:couponSPUPoPageInfo.getList()){

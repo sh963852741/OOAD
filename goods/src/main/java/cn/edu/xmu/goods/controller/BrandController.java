@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping(value = "/", produces = "application/json;charset=UTF-8")
+@RequestMapping(value = "/goods", produces = "application/json;charset=UTF-8")
 public class BrandController {
 
     @Autowired
@@ -102,10 +102,9 @@ public class BrandController {
         if (null != returnObject) {
             return returnObject;
         }
-        departId= Long.valueOf(0);//平台
-        if(shopId.equals(departId)) {
+        if(shopId.equals(0L)) {
             ReturnObject<VoObject> retObject = brandService.addBrand(vo);
-            httpServletResponse.setStatus(HttpStatus.OK.value());
+            if (retObject.getCode() == ResponseCode.OK) httpServletResponse.setStatus(HttpStatus.CREATED.value());
             return Common.decorateReturnObject(retObject);
         }
         else return Common.getNullRetObj(new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE,String.format("无权限操作：" + shopId)), httpServletResponse);

@@ -15,5 +15,5 @@ public class SkuSimpleRetVo {
     private Integer inventory;
     private Long originalPrice;
     private Long price;
-    private Byte disable;
+    private Boolean disable;
 }

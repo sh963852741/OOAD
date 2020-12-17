@@ -104,7 +104,7 @@ public class CategoryDao {
             int ret;
             ret= categoryPoMapper.deleteByExample(example);
             if(ret==0){
-                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+                return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
             }else{
                 return new ReturnObject(ResponseCode.OK);
             }
@@ -133,4 +133,12 @@ public class CategoryDao {
         }
     }
 
+    public boolean hasSameName(String name){
+        CategoryPoExample example = new CategoryPoExample();
+        CategoryPoExample.Criteria criteria = example.createCriteria();
+        criteria.andNameEqualTo(name);
+
+        var ret = categoryPoMapper.selectByExample(example);
+        return !ret.isEmpty();
+    }
 }

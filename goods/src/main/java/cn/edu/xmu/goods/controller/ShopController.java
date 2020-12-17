@@ -74,7 +74,7 @@ public class ShopController {
             ReturnObject ret=shopService.newShop(shopvo);
             return Common.decorateReturnObject(ret);
         }
-        else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.APPLYAGAIN_ERROR, "您已经拥有店铺，无法重新申请"));
+        else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.USER_HASSHOP, "您已经拥有店铺，无法重新申请"));
         else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "商铺名称不能为空"));
     }
 
@@ -135,7 +135,7 @@ public class ShopController {
         }
         else
         {
-            return Common.decorateReturnObject(new ReturnObject(ResponseCode.SHUTSHOP_ERROR));
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST));
         }
     }
 
@@ -167,7 +167,7 @@ public class ShopController {
         }
         else
         {
-            return Common.decorateReturnObject(new ReturnObject(ResponseCode.PASSSHOP_ERROR));
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST));
         }
     }
 
@@ -215,6 +215,6 @@ public class ShopController {
             ReturnObject ret=shopService.offShelfShop(id);
             return Common.decorateReturnObject(ret);
         }
-        else return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.OFFLINESHOP_ERROR));
+        else return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST));
     }
 }

@@ -30,6 +30,6 @@ public class SpuRetVo {
     private List<SkuSimpleRetVo> skuList;
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
-    private Byte disable;
+    private Boolean disable;
 
 }

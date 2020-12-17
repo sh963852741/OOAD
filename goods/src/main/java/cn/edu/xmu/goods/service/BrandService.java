@@ -34,6 +34,10 @@ public class BrandService {
     }
 
     public ReturnObject<VoObject> addBrand(BrandVo vo) {
+        if(brandDao.hasSameName(vo.getName())){
+            return new ReturnObject<>(ResponseCode.BRAND_NAME_SAME);
+        }
+
         Brand brand = vo.createBrand();
         ReturnObject<Brand> retObj = brandDao.addBrand(brand);
         ReturnObject<VoObject> retBrand = null;
@@ -44,7 +48,10 @@ public class BrandService {
         }
         return retBrand;
     }
-    public ReturnObject <Object> setBrand( Long id, BrandVo vo) {
+    public ReturnObject <Object> setBrand(Long id, BrandVo vo) {
+        if(brandDao.hasSameName(vo.getName())){
+            return new ReturnObject<>(ResponseCode.BRAND_NAME_SAME);
+        }
         Brand brand = vo.createBrand();
         brand.setId(id);
         brand.setGmtModified(LocalDateTime.now());
@@ -63,6 +70,7 @@ public class BrandService {
         ReturnObject<PageInfo<VoObject>> returnObject = brandDao.selectAllBrand(pageNum, pageSize);
         return returnObject;
     }
+
     public ReturnObject  uploadimage(Long id, MultipartFile multipartFile) {
         //查看是否存在brand
         ReturnObject<Brand> brandRetObject=brandDao.getBrandById(id.longValue());

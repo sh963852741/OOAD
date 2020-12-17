@@ -266,7 +266,25 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public Long getPrice(Long skuId) {
+    public List<PriceDTO> getPriceAndNameByOther(List<Long> skuIds) {
+        List<PriceDTO> retData = new ArrayList<>();
+        for(Long skuId : skuIds){
+            SkuDTO sku = this.getSku(skuId);
+            if(sku == null){
+                return null;
+            }
+            PriceDTO priceDTO = new PriceDTO();
+            priceDTO.setSkuId(sku.getId());
+            priceDTO.setName(sku.getName());
+            priceDTO.setPrePrice(sku.getOriginalPrice());
+            priceDTO.setFinalPrice(null);
+            retData.add(priceDTO);
+        }
+        return retData;
+    }
+
+    @Override
+    public PriceDTO getPrice(Long skuId) {
         if(skuId == null){
             return null;
         }
@@ -274,6 +292,10 @@ public class GoodsServiceImpl implements IGoodsService {
         if(skuRet.getCode()!=ResponseCode.OK){
             return null;
         }
-        return skuRet.getData().getPrice();
+        PriceDTO dto = new PriceDTO();
+        dto.setSkuId(skuId);
+        dto.setName(skuRet.getData().getName());
+        dto.setPrePrice(skuRet.getData().getPrice());
+        return dto;
     }
 }

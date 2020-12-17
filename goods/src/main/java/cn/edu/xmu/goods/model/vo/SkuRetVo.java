@@ -20,5 +20,6 @@ public class SkuRetVo {
     private Long weight;
     private String gmtCreate;
     private String gmtModified;
+    private Boolean disable;
     private SpuRetVo spu;
 }

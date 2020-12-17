@@ -3,6 +3,7 @@ package cn.edu.xmu.activity.model.vo;
 import cn.edu.xmu.activity.model.po.CouponActivityPo;
 import cn.edu.xmu.activity.utility.MyDeserializer;
 import cn.edu.xmu.ooad.model.VoObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -39,17 +40,17 @@ public class CouponActivityVo implements VoObject {
     @ApiModelProperty(value = "优惠券时长，0表示与活动相同，否则表示自领取后几日内有效")
     Byte validTerm;
 
-    @DateTimeFormat
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @ApiModelProperty(value = "开始领优惠券时间")
     LocalDateTime couponTime;
 
-    @DateTimeFormat
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @ApiModelProperty(value = "活动开始时间")
     LocalDateTime beginTime;
 
-    @DateTimeFormat
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @ApiModelProperty(value = "活动结束时间")
     LocalDateTime endTime;

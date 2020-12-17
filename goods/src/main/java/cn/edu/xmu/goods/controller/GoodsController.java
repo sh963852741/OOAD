@@ -87,13 +87,19 @@ public class GoodsController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @GetMapping("/skus")
-    public Object getSkus(@Validated  SkuSelectVo vo, @RequestParam(required = false, defaultValue = "1") Integer page, @RequestParam(required = false, defaultValue = "10") Integer pageSize, BindingResult bindingResult) {
+    public Object getSkus(@RequestParam(value = "shopId",required = false) Long shopId,
+                          @RequestParam(value = "skuSn",required = false) String skuSn,
+                          @RequestParam(value = "spuId",required = false) Long spuId,
+                          @RequestParam(value = "spuSn",required = false) String spuSn,
+                          @RequestParam(required = false, defaultValue = "1") Integer page,
+                          @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         logger.debug("getAllSkus: page = " + page + "  pageSize =" + pageSize);
-        Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if (null != obj) {
-            logger.info("validate fail");
-            return obj;
-        }
+
+        SkuSelectVo vo = new SkuSelectVo();
+        vo.setShopId(shopId);
+        vo.setSkuSn(skuSn);
+        vo.setSpuId(spuId);
+        vo.setSpuSn(spuSn);
         ReturnObject returnObject = goodsService.getAllSkus(vo, page, pageSize);
         return Common.decorateReturnObject(returnObject);
     }
@@ -132,6 +138,7 @@ public class GoodsController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     *  modifiedby xuyue 2020/12/17 11:37
      */
     @ApiOperation(value = "管理员添加新的SKU到SPU里")
     @ApiImplicitParams({
@@ -144,11 +151,19 @@ public class GoodsController {
     })
     @Audit
     @PostMapping("/shops/{shopId}/spus/{id}/skus")
-    public Object addSkutoSpu(@PathVariable Long shopId, @PathVariable Long id, @RequestBody SkuVo skuVo) {
+    public Object addSkutoSpu(@PathVariable Long shopId, @PathVariable Long id,
+                              @RequestBody SkuVo skuVo,BindingResult bindingResult) {
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
         if (shopId == null || id == null) {
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        ReturnObject ret = goodsService.addSkuToSpu(shopId, id, skuVo);
+
+
+        var ret = goodsService.addSkuToSpu(shopId, id, skuVo);
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
@@ -298,6 +313,7 @@ public class GoodsController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     * modifiedBy xuyue 2020/12/17 11:40
      */
     @ApiOperation(value = "店家新建商品SPU")
     @ApiImplicitParams({
@@ -309,12 +325,21 @@ public class GoodsController {
     })
     @PostMapping("/shops/{id}/spus")
     @Audit
-    public Object addSpu(@PathVariable Long id, @RequestBody SpuVo spuVo) {
+    public Object addSpu(@PathVariable Long id, @RequestBody SpuVo spuVo,
+                         BindingResult bindingResult) {
         if (id == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        ReturnObject ret = goodsService.newSpu(id, spuVo);
+
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
+        var ret = goodsService.newSpu(id, spuVo);
+
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 

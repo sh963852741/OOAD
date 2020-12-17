@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +33,8 @@ public class CouponController {
 
     @Autowired
     private ActivityService activityService;
-
+    @Autowired
+    HttpServletResponse httpServletResponse;
     /**
      * 获得优惠卷的所有状态
      * @param
@@ -53,6 +55,7 @@ public class CouponController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     * modifiedBy xuyue 2020/12/17 10:38
      */
     @ApiOperation(value = "管理员新建己方优惠活动", nickname = "addCouponactivity", notes = "- `管理员`新建己方的优惠活动，此时可批量添加限定范围 - 活动状态即`待上线`", tags={ "coupon", })
     @ApiResponses(value = {
@@ -72,8 +75,9 @@ public class CouponController {
         if(couponActivityVo.getBeginTime().isAfter(couponActivityVo.getEndTime())||couponActivityVo.getCouponTime().isAfter(couponActivityVo.getEndTime())){
             return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "活动开始时间必须小于活动结束时间，优惠券一定要在活动结束前发放");
         }
+        var ret = activityService.addCouponActivity(couponActivityVo, shopId, userId);
 
-        ReturnObject ret = activityService.addCouponActivity(couponActivityVo, shopId, userId);
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
@@ -87,7 +91,13 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "") })
     @PostMapping(value = "/shops/{shopId}/couponactivities/{id}/uploadImg")
-    public Object shopsShopIdCouponactivitiesIdUploadImgPost(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization,@ApiParam(value = "店铺id",required=true) @PathVariable("shopId") Integer shopId,@ApiParam(value = "活动id",required=true) @PathVariable("id") Integer id,@ApiParam(value = "文件") @Valid @RequestPart(value="img", required=true) MultipartFile img){
+    public Object shopsShopIdCouponactivitiesIdUploadImgPost(@ApiParam(value = "用户token" ,required=true)
+                                                                 @RequestHeader(value="authorization", required=true) String authorization,
+                                                             @ApiParam(value = "店铺id",required=true)
+                                                             @PathVariable("shopId") Integer shopId,
+                                                             @ApiParam(value = "活动id",required=true)
+                                                                 @PathVariable("id") Integer id,@ApiParam(value = "文件")
+                                                                 @Valid @RequestPart(value="img", required=true) MultipartFile img){
         return null;
     }
 
@@ -155,7 +165,11 @@ public class CouponController {
                                          @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
         ReturnObject<PageInfo<VoObject>> ret = activityService.getSKUInCouponActivity(id,page,pageSize);
 
-        return Common.getPageRetObject(ret);
+        if (ret.getCode() == ResponseCode.OK){
+            return Common.getPageRetObject(ret);
+        } else {
+            return Common.decorateReturnObject(ret);
+        }
     }
 
     /**
@@ -274,6 +288,7 @@ public class CouponController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     * modifiedBy xuyue 2020/12/17 10:37
      */
     @ApiOperation(value = "管理员为己方某优惠券活动新增限定范围", nickname = "shopsShopIdCouponactivitiesIdSpusPost", notes = "`管理员`可为己方某优惠券活动新增某限定范围", tags={ "coupon", })
     @ApiResponses(value = {
@@ -282,8 +297,16 @@ public class CouponController {
     public Object shopsShopIdCouponactivitiesIdSpusPost(
             @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
             @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityId,
-            @ApiParam(value = "SPU的ID列表" ,required=true )  @RequestBody List<Long> ids){
+            @ApiParam(value = "SPU的ID列表" ,required=true )  @RequestBody List<Long> ids,
+            BindingResult bindingResult){
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
         var ret = activityService.addSKUToCouponActivity(ids, shopId, activityId);
+
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
@@ -363,6 +386,7 @@ public class CouponController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     * modifiedBy xuyue 2020/12/17 10：40
      */
     @ApiOperation(value = "买家领取活动优惠券", nickname = "couponactivitiesIdUsercouponsPost", notes = "- 判断优惠活动的quantityType为0，且用户无此优惠卷，生成优惠卷的数目为quantity - 判断优惠活动的quantityType为1，且用户无此优惠卷，去从优惠卷中领一张优惠卷", tags={ "coupon", })
     @ApiResponses(value = {
@@ -374,9 +398,17 @@ public class CouponController {
     @Audit
     public Object couponactivitiesIdUsercouponsPost(
             @LoginUser Long userId,
-            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,
+            @RequestBody BindingResult bindingResult){
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
         var ret = activityService.claimCouponQuickly(id,userId);
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
+
     }
 
     /**
