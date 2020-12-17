@@ -40,17 +40,17 @@ public class PresaleActivityVo implements VoObject {
     @ApiModelProperty(value = "预售数量")
     Integer quantity;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     @Future
     @ApiModelProperty(value = "预售开始时间")
     LocalDateTime beginTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     @Future
     @ApiModelProperty(value = "预售结束时间")
     LocalDateTime endTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     @Future
     @ApiModelProperty(value = "付款时间")
     LocalDateTime payTime;

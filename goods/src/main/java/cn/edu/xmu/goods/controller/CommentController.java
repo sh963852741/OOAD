@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 /**
  * 评论控制器
@@ -47,7 +48,7 @@ public class CommentController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("comments/states")
+    @GetMapping("/comments/states")
     public Object getCommentStates(){
         ReturnObject ret=commentService.getCommentStates();
         return Common.decorateReturnObject(ret);
@@ -68,7 +69,7 @@ public class CommentController {
             @ApiResponse(code = 0, message = "成功"),
             @ApiResponse(code = 903, message = "用户没有购买此商品")
     })
-    @PostMapping("orderitems/{id}/comments")
+    @PostMapping("/orderitems/{id}/comments")
     @ResponseBody
     @Audit
     public Object addCommentOnSku(
@@ -102,7 +103,7 @@ public class CommentController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("skus/{id}/comments")
+    @GetMapping("/skus/{id}/comments")
     public Object selectSkuComments(@PathVariable long id, @RequestParam(required = false,defaultValue = "1") Integer page, @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         logger.debug("selectSkuComments: page = "+ page +"  pageSize ="+pageSize);
         /*Object obj=Common.processFieldErrors(bindingResult,httpServletResponse);
@@ -126,8 +127,15 @@ public class CommentController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PutMapping("shops/{did}/comments/{id}/confirm")
-    public Object confirmComment(@PathVariable long did,@PathVariable long id,@RequestBody CommentConclusionVo commentConclusionVo){
+    @PutMapping("/shops/{did}/comments/{id}/confirm")
+    @Audit
+    public Object confirmComment(@PathVariable long did,@PathVariable long id,
+                                 @Valid @RequestBody CommentConclusionVo commentConclusionVo,
+                                 BindingResult bindingResult){
+        var res =  Common.processFieldErrors(bindingResult, httpServletResponse);
+        if(res != null){
+            return null;
+        }
         logger.debug("confirm Comment:" + id);
         ReturnObject ret=commentService.confirmCommnets(did,id,commentConclusionVo);
         return Common.decorateReturnObject(ret);
@@ -145,8 +153,7 @@ public class CommentController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("comments")
-    @ResponseBody
+    @GetMapping("/comments")
     @Audit
     public Object getOwnComments(
             @LoginUser Long uid,
@@ -169,7 +176,8 @@ public class CommentController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("shops/{id}/comments/all")
+    @GetMapping("/shops/{id}/comments/all")
+    @Audit
     public Object getAllComments(
             @PathVariable Long id,
             @RequestParam(required = false) Integer state,
