@@ -56,7 +56,7 @@ spring:
         - id: login
           uri: http://localhost:8081/
           predicates:
-            - Path=/adminusers,/privileges/login
+            - Path=/adminusers,/adminusers/login
           filters:
             - PrefixPath=/privilege
 

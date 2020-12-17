@@ -6,12 +6,18 @@ import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.patterns.HasThisTypePatternTriedToSneakInSomeGenericOrParameterizedTypePatternMatchingStuffAnywhereVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 秒杀控制器
@@ -27,6 +33,8 @@ public class FlashSaleController {
     @Autowired
     FlashSaleService flashSaleService;
 
+    @Autowired
+    HttpServletResponse httpServletResponse;
     /**
      * 查询某一时段秒杀活动详情
      * @param
@@ -61,9 +69,16 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{did}/timesegments/{id}/flashsales")
-    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate){
+    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate,
+                                  BindingResult bindingResult){
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
         var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
 
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
