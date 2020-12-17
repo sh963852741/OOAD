@@ -60,12 +60,21 @@ spring:
           filters:
             - PrefixPath=/privilege
 
+        - id: comment
+          uri: http://localhost:8907/
+          predicates:
+            - Path=/comments/states,/orderitems/{id}/comments,/skus/{id}/comments,/shops/{did}/comments/{id}/confirm,/comments,/shops/{id}/comments/all
+          filters:
+            - PrefixPath=/comment
+
         - id: goods
           uri: http://localhost:8907/
           predicates:
             - Path=/skus/states,/skus,/brands,/shops/{shopId}/brands/**,/skus/**,/spus/**,/shops/{shopId}/floatPrices/**,/shops/{shopId}/spus/**,/shops/{shopId}/skus/**,/categories/{id}/subcategories,/shops/{shopId}/categories/**
           filters:
             - PrefixPath=/goods
+
+
 
         - id: adminusers
           uri: http://localhost:8081/

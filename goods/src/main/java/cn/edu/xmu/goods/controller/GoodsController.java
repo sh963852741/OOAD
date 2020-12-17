@@ -508,8 +508,11 @@ public class GoodsController {
             logger.info("validate fail");
             return obj;
         }
-        ReturnObject ret = goodsService.newFloatPrice(id, shopId, floatPriceVo, userId);
+        var ret =  goodsService.newFloatPrice(id, shopId, floatPriceVo, userId);
+
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
+
     }
 
     /**
@@ -559,13 +562,22 @@ public class GoodsController {
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/categories/{id}")
     @Audit
-    public Object addSputoCategory(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
+    public Object addSputoCategory(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id,
+                                   BindingResult bindingResult) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        ReturnObject ret = goodsService.addSpuToCategory(shopId, spuId, id);
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
+        var ret = goodsService.addSpuToCategory(shopId, spuId, id);
+
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
+
     }
 
     /**
@@ -615,13 +627,21 @@ public class GoodsController {
     })
     @PostMapping("/shops/{shopId}/spus/{spuId}/brands/{id}")
     @Audit
-    public Object addSputoBrand(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id) {
+    public Object addSputoBrand(@PathVariable Long shopId, @PathVariable Long spuId, @PathVariable Long id,
+                                @RequestBody BindingResult bindingResult) {
         if(shopId==null || spuId==null || id==null){
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        ReturnObject ret = goodsService.addSpuToBrand(shopId, spuId, id);
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
+        var ret = goodsService.addSpuToBrand(shopId, spuId, id);
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
+
     }
 
     /**

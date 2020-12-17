@@ -12,6 +12,7 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -71,11 +72,15 @@ public class ShopController {
         }
         if(did == -1)
         {
-            ReturnObject ret=shopService.newShop(shopvo);
+            var ret = shopService.newShop(shopvo);
+
+            if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
             return Common.decorateReturnObject(ret);
+
         }
         else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.USER_HASSHOP, "您已经拥有店铺，无法重新申请"));
         else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "商铺名称不能为空"));
+
     }
 
     /**
