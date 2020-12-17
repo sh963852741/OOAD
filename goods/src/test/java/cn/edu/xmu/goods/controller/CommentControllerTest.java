@@ -40,10 +40,11 @@ public class CommentControllerTest {
      */
     @Test
     public void getCommentState() throws Exception{
-        String responseString=this.mvc.perform(get("/comment/comments/states"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn().getResponse().getContentAsString();
+        this.mvc.perform(get("/comment/comments/states"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("application/json;charset=UTF-8"))
+        .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+        .andDo(MockMvcResultHandlers.print());
     }
 
     /**
@@ -171,5 +172,5 @@ public class CommentControllerTest {
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
         .andDo(MockMvcResultHandlers.print());
     }
-    
+
 }

@@ -4,8 +4,10 @@ import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.util.*;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -19,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.lang.*;
 
+@AutoConfigureWebTestClient(timeout = "36000")
 @SpringBootTest
 public class CommentTest {
     private String managementGate = "http://localhost:8080";
@@ -33,6 +36,7 @@ public class CommentTest {
     private static String adminToken;
     private static String shopToken;
     private static String userToken;
+
 
     public CommentTest(){
         this.manageClient = WebTestClient.bindToServer()
@@ -57,10 +61,11 @@ public class CommentTest {
     /**
      * 获取评论状态
      */
+    @Test
     public void getAllState() {
         byte[] responseBuffer = null;
-        WebTestClient.RequestHeadersSpec res = manageClient.get().uri("/comments/states");
-        responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
+        WebTestClient.RequestHeadersSpec res = manageClient.get().uri("/comment/comments/states");
+        responseBuffer = res.exchange().expectHeader().contentType("application/json")
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
@@ -75,11 +80,16 @@ public class CommentTest {
      * 买家新增SKU的评论
      */
     @Test
-    public void addGoodCommentGoodType(){
+    public void addComment(){
         byte[] responseBuffer = null;
         String requestJson="{\"type\":0 ,\"content\":\"这个真不错\"}";
+<<<<<<< Updated upstream
         WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/orderitems/1/comments")
                 .header("authorization", adminToken)
+=======
+        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/comment/orderitems/1/comments")
+                .header("authorization", shopToken)
+>>>>>>> Stashed changes
                 .bodyValue(requestJson);
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
@@ -94,8 +104,6 @@ public class CommentTest {
                 .jsonPath("$.data.type").isEqualTo(0)
                 .jsonPath("$.data.content").isEqualTo("这个真不错")
                 .jsonPath("$.data.state").isEqualTo(0)
-                .jsonPath("$.data.gmtCreate").isNotEmpty()
-                .jsonPath("$.data.gmtModified").isNotEmpty()
                 .returnResult()
                 .getResponseBodyContent();
         try {
@@ -180,7 +188,7 @@ public class CommentTest {
     public void auditComment_abnormal() {
         byte[] responseBuffer = null;
         String requestJson = "{\"conclusion\": 123}";
-        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/comment/shops/0/comments/1/confirm")
+        WebTestClient.RequestHeadersSpec res = manageClient.put().uri("/shops/0/comments/1/confirm")
                 .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
@@ -204,7 +212,7 @@ public class CommentTest {
     @Test
     public void getAllCommnetOfSku1(){
         byte[] responseBuffer = null;
-        responseBuffer=manageClient.get().uri("/skus/1/comments?page=1&pageSize=3").exchange()
+        responseBuffer=mallClient.get().uri("/skus/273/comments?page=1&pageSize=3").exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -223,7 +231,7 @@ public class CommentTest {
     @Test
     public void getAllCommnetOfSku2(){
         byte[] responseBuffer = null;
-        responseBuffer=manageClient.get().uri("/skus/1/comments?page=2&pageSize=3").exchange()
+        responseBuffer=mallClient.get().uri("/skus/273/comments?page=2&pageSize=3").exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -242,7 +250,7 @@ public class CommentTest {
     @Test
     public void getAllCommnetOfUser1(){
         byte[] responseBuffer = null;
-        responseBuffer=manageClient.get().uri("/skus/1/comments?page=1&pageSize=3")
+        responseBuffer=mallClient.get().uri("/skus/273/comments?page=1&pageSize=3")
                 .header("authorization", shopToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
@@ -262,7 +270,7 @@ public class CommentTest {
     @Test
     public void getAllCommnetOfUser2(){
         byte[] responseBuffer = null;
-        responseBuffer=manageClient.get().uri("/skus/1/comments?page=2&pageSize=3")
+        responseBuffer=mallClient.get().uri("/skus/273/comments?page=2&pageSize=3")
                 .header("authorization", shopToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
@@ -283,7 +291,7 @@ public class CommentTest {
     public void getAllUnauditedComment1(){
         byte[] responseBuffer = null;
         responseBuffer=manageClient.get().uri("/shops/0/comments/all?state=0&page=1&pageSize=3")
-                .header("authorization", shopToken).exchange()
+                .header("authorization", adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -303,7 +311,7 @@ public class CommentTest {
     public void getAllUnauditedComment2(){
         byte[] responseBuffer = null;
         responseBuffer=manageClient.get().uri("/shops/0/comments/all?state=0&page=2&pageSize=3")
-                .header("authorization", shopToken).exchange()
+                .header("authorization", adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -323,7 +331,7 @@ public class CommentTest {
     public void getAllAuditedComment1(){
         byte[] responseBuffer = null;
         responseBuffer=manageClient.get().uri("/shops/0/comments/all?state=1&page=1&pageSize=3")
-                .header("authorization", shopToken).exchange()
+                .header("authorization", adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -343,7 +351,7 @@ public class CommentTest {
     public void getAllAuditedComment2(){
         byte[] responseBuffer = null;
         responseBuffer=manageClient.get().uri("/shops/0/comments/all?state=1&page=2&pageSize=3")
-                .header("authorization", shopToken).exchange()
+                .header("authorization", adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -363,7 +371,7 @@ public class CommentTest {
     public void getAllUnAuditedComment1(){
         byte[] responseBuffer = null;
         responseBuffer=manageClient.get().uri("/shops/0/comments/all?state=2&page=1&pageSize=3")
-                .header("authorization", shopToken).exchange()
+                .header("authorization", adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -383,7 +391,7 @@ public class CommentTest {
     public void getAllUnAuditedComment2(){
         byte[] responseBuffer = null;
         responseBuffer=manageClient.get().uri("/shops/0/comments/all?state=2&page=2&pageSize=3")
-                .header("authorization", shopToken).exchange()
+                .header("authorization", adminToken).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()
@@ -395,4 +403,8 @@ public class CommentTest {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 管理员企图查看state不存在的评论列表
+     */
 }
