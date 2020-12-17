@@ -98,9 +98,10 @@ public class ShopDao {
         int ret;
         ShopPo shopPo=shopPoMapper.selectByPrimaryKey(id);
         shopPo.setName(shop.getName());
-        if(shopPo.getState()==Shop.State.NOTPASS.getCode().byteValue()||shopPo.getState()==Shop.State.FORBID.getCode().byteValue())
+        if(shopPo.getState()==Shop.State.NOTPASS.getCode().byteValue()
+                ||shopPo.getState()==Shop.State.FORBID.getCode().byteValue())
         {
-            return new ReturnObject(ResponseCode.MODIFYSHOP_ERROR);
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         else
         {

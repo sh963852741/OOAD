@@ -116,4 +116,13 @@ public class BrandDao {
         return new ReturnObject<>(brand);
     }
 
+    public boolean hasSameName(String name){
+        BrandPoExample example =new BrandPoExample();
+        BrandPoExample.Criteria criteria = example.createCriteria();
+        criteria.andNameEqualTo(name);
+
+        var res = brandPoMapper.selectByExample(example);
+        return !res.isEmpty();
+    }
+
 }

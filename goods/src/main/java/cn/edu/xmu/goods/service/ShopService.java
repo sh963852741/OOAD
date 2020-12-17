@@ -128,7 +128,7 @@ public class ShopService {
             ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
         }
-        else return new ReturnObject(ResponseCode.PASSSHOP_ERROR);
+        else return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
     }
 
     /**
@@ -144,6 +144,6 @@ public class ShopService {
         if (getShopByShopId(id).getData().getState() == 4) {
             ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
-        } else return new ReturnObject(ResponseCode.PASSSHOP_ERROR);
+        } else return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
     }
 }

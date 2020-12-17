@@ -670,7 +670,7 @@ public class GoodsService implements InitializingBean {
         }
         Category category = ret.getData();
         if(category.getPid() == 0){
-            return new ReturnObject(ResponseCode.CATEGORY_SET_ERROR);
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "不可在一级分类下新建商品");
         }
         Spu spu=new Spu();
         spu.setId(spuId);
