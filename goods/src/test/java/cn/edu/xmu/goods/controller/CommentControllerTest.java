@@ -57,6 +57,7 @@ public class CommentControllerTest {
         String requestJSON= JacksonUtil.toJson(commentVo);*/
         String requestJSON="{\"type\":0 ,\"content\":\"这个真不错\"}";
 
+
         mvc.perform(post("/comment/orderitems/1/comments").contentType("application/json;charset=UTF-8")
         .header("authorization",adminToken).content(requestJSON))
         .andExpect(status().isOk())

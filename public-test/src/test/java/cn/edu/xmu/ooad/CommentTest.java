@@ -32,6 +32,7 @@ public class CommentTest {
 
     private static String adminToken;
     private static String shopToken;
+    private static String userToken;
 
     public CommentTest(){
         this.manageClient = WebTestClient.bindToServer()
@@ -50,6 +51,7 @@ public class CommentTest {
         JwtHelper jwtHelper = new JwtHelper();
         adminToken =jwtHelper.createToken(1L,0L, 3600);
         shopToken =jwtHelper.createToken(59L,1L, 3600);
+        //userToken=jwtHelper.createToken(59L,1L, 3600);
     }
 
     /**
@@ -77,7 +79,7 @@ public class CommentTest {
         byte[] responseBuffer = null;
         String requestJson="{\"type\":0 ,\"content\":\"这个真不错\"}";
         WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/orderitems/1/comments")
-                .header("authorization", shopToken)
+                .header("authorization", adminToken)
                 .bodyValue(requestJson);
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
