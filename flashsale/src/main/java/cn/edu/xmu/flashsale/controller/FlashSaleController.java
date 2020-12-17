@@ -161,8 +161,16 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{did}/flashsales/{id}/flashitems")
-    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo){
+    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo,
+                                BindingResult bindingResult){
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
         var ret = flashSaleService.addSkuToFlashSale(id, flashsaleVo);
+
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
