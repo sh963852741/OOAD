@@ -6,12 +6,14 @@ import cn.edu.xmu.activity.model.vo.GrouponActivityVo;
 import cn.edu.xmu.activity.service.ActivityService;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -128,6 +130,7 @@ public class GrouponController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     * modifiedBy Xuyue 2020/12/17 21:37
      */
     @ApiOperation(value = "管理员对SPU新增团购活动", nickname = "createGrouponofSPU", notes = "",  tags={ "groupon", })
     @ApiResponses(value = {
@@ -141,8 +144,11 @@ public class GrouponController {
         if (null != obj) {
             return obj;
         }
-        ReturnObject<GrouponActivityVo> ret=activityService.addGrouponActivity(grouponActivityVo,id,shopId);
+        var ret = activityService.addGrouponActivity(grouponActivityVo,id,shopId);
+
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
+
     }
 
 
