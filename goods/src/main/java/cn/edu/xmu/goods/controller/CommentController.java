@@ -7,12 +7,14 @@ import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +56,7 @@ public class CommentController {
 
     /**
      * 买家新增SKU的评论
+     * modifiedby xuyue 2020/12/17 11:35
      */
     @ApiOperation(value = "买家新增SKU的评论")
     @ApiImplicitParams({
@@ -80,7 +83,9 @@ public class CommentController {
             logger.debug("validate fail");
             return returnObject;
         }
-        ReturnObject ret=commentService.newComment(id,commentVo, uid);
+
+        var ret = commentService.newComment(id,commentVo, uid);
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 

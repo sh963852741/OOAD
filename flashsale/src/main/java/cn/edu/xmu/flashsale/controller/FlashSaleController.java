@@ -6,12 +6,18 @@ import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.patterns.HasThisTypePatternTriedToSneakInSomeGenericOrParameterizedTypePatternMatchingStuffAnywhereVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 秒杀控制器
@@ -27,6 +33,8 @@ public class FlashSaleController {
     @Autowired
     FlashSaleService flashSaleService;
 
+    @Autowired
+    HttpServletResponse httpServletResponse;
     /**
      * 查询某一时段秒杀活动详情
      * @param
@@ -60,10 +68,17 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PostMapping("timesegments/{id}/flashsales")
-    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate){
+    @PostMapping("/shops/{did}/timesegments/{id}/flashsales")
+    public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate,
+                                  BindingResult bindingResult){
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
         var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
 
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
@@ -81,9 +96,9 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @GetMapping("flashsales/current")
+    @GetMapping("/flashsales/current")
     public Mono<Object> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
-        log.debug("flashsales/current");
+        log.debug("/flashsales/current");
         return flashSaleService.getFlashSale(1L).map(x->{
             log.debug(x.toString());
             return x;
@@ -104,7 +119,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @DeleteMapping("flashsales/{id}")
+    @DeleteMapping("/shops/{did}/flashsales/{id}")
     public Object deleteFlashsale(@PathVariable Integer id){
         var ret = flashSaleService.delFlashSale(id);
         return Common.decorateReturnObject(ret);
@@ -125,7 +140,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PutMapping("flashsales/{id}")
+    @PutMapping("/shops/{did}/flashsales/{id}")
     public Object changeFlashsale(@PathVariable Long id,@RequestBody FlashSaleVo flashDate){
         var ret = flashSaleService.modifyFlashSale(id, flashDate.getFlashDate().atStartOfDay());
         return Common.decorateReturnObject(ret);
@@ -145,9 +160,17 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @PostMapping("flashsales/{id}/flashitems")
-    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo){
+    @PostMapping("/shops/{did}/flashsales/{id}/flashitems")
+    public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo,
+                                BindingResult bindingResult){
+        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
+        if(res != null){
+            return res;
+        }
+
         var ret = flashSaleService.addSkuToFlashSale(id, flashsaleVo);
+
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
     }
 
@@ -185,7 +208,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
-    @DeleteMapping("flashsales/{fid}/flashitems/{id}")
+    @DeleteMapping("/shops/{did}/flashsales/{fid}/flashitems/{id}")
     public Object deleteFlashitems(@PathVariable("fid") Long flashSaleId, @PathVariable("id") Long itemId){
         var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
         return Common.decorateReturnObject(ret);

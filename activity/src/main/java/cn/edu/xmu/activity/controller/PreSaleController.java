@@ -10,6 +10,7 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -100,6 +101,7 @@ public class PreSaleController {
      * @param
      * @return Object
      * createdBy Yifei Wang 2020/11/17 21:37
+     * modiffiedBy xuyue 2020/12/17 11:26
      */
     @ApiOperation(value = "管理员新增SKU预售活动", nickname = "createPresaleofSPU", notes = "", tags={ "presale", })
     @ApiResponses(value = {
@@ -118,9 +120,11 @@ public class PreSaleController {
         if(presaleActivityVo.getBeginTime().isAfter(presaleActivityVo.getPayTime()) || presaleActivityVo.getPayTime().isAfter(presaleActivityVo.getEndTime())){
             return decorateReturnObject(new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "预售开始时间必然大于尾款支付时间，必然大于结束时间"));
         }
+        var ret = activityService.addPresaleActivity(presaleActivityVo, spuId, shopId);
 
-        ReturnObject ret = activityService.addPresaleActivity(presaleActivityVo, spuId, shopId);
-        return decorateReturnObject(ret);
+        if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
+        return Common.decorateReturnObject(ret);
+
     }
 
     /**
