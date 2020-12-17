@@ -55,7 +55,10 @@ public class CategoryService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 16:40
      */
-    public ReturnObject changeCategory(Integer id, String name) {
+    public ReturnObject changeCategory(Long id, String name) {
+        if(categoryDao.getCategoryById(id).getData() == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if(categoryDao.hasSameName(name)){
             return new ReturnObject<>(ResponseCode.CATEGORY_NAME_SAME);
         }
@@ -73,7 +76,7 @@ public class CategoryService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 16:52
      */
-    public ReturnObject deleteCategoryById(Integer id) {
+    public ReturnObject deleteCategoryById(Long id) {
         ReturnObject ret=categoryDao.deleteCategoryById(id.longValue());
         return ret;
     }

@@ -88,7 +88,7 @@ public class CategoryController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("/shops/{shopId}/categories/{id}")
-    public Object changeCategories(@PathVariable("id") Integer id, @Valid @RequestBody CategoryVo vo, BindingResult bindingResult){
+    public Object changeCategories(@PathVariable("id") Long id, @Valid @RequestBody CategoryVo vo, BindingResult bindingResult){
         var res = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(res != null){
             return res;
@@ -113,7 +113,7 @@ public class CategoryController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/categories/{id}")
-    public Object deleteCategories(@PathVariable("id") Integer id){
+    public Object deleteCategories(@PathVariable("id") Long id){
         ReturnObject ret=categoryService.deleteCategoryById(id);
         return Common.decorateReturnObject(ret);
     }
