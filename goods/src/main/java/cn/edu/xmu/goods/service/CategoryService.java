@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.service;
 
 import cn.edu.xmu.goods.dao.CategoryDao;
 import cn.edu.xmu.goods.model.po.CategoryPo;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,12 @@ public class CategoryService {
      * @Author: Yifei Wang
      * @Date: 2020/11/26 22:13
      */
-    public ReturnObject getSubCategories(Integer id) {
-        return categoryDao.getSubCategories(id.longValue());
+    public ReturnObject getSubCategories(Long id) {
+        if(categoryDao.getCategoryById(id).getData() == null && id!=0){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+
+        return categoryDao.getSubCategories(id);
     }
 
     /**
@@ -29,7 +34,13 @@ public class CategoryService {
      * @Author: Yifei Wang
      * @Date: 2020/11/27 8:51
      */
-    public ReturnObject newCategory(Integer id, String name) {
+    public ReturnObject newCategory(Long id, String name) {
+        if(categoryDao.getCategoryById(id).getData() == null && id !=0 ){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(categoryDao.hasSameName(name)){
+            return new ReturnObject(ResponseCode.CATEGORY_NAME_SAME);
+        }
         CategoryPo categoryPo=new CategoryPo();
         categoryPo.setPid(id.longValue());
         categoryPo.setName(name);
@@ -45,6 +56,9 @@ public class CategoryService {
      * @Date: 2020/11/27 16:40
      */
     public ReturnObject changeCategory(Integer id, String name) {
+        if(categoryDao.hasSameName(name)){
+            return new ReturnObject<>(ResponseCode.CATEGORY_NAME_SAME);
+        }
         CategoryPo po=new CategoryPo();
         po.setId(id.longValue());
         po.setName(name);
