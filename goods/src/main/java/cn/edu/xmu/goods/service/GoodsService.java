@@ -793,6 +793,7 @@ public class GoodsService implements InitializingBean {
         po.setWeight(skuVo.getWeight());
         po.setOriginalPrice(skuVo.getOriginalPrice());
         po.setImageUrl(skuVo.getImageUrl());
+        po.setDisabled((byte)0);
         ReturnObject ret = goodsDao.newSku(po);
         if(ret.getCode() != ResponseCode.OK){
             return ret;

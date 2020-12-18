@@ -298,4 +298,20 @@ public class GoodsServiceImpl implements IGoodsService {
         dto.setPrePrice(skuRet.getData().getPrice());
         return dto;
     }
+
+    @Override
+    public Boolean isSkuEqualSpu(Long skuId, Long skuId2) {
+        ReturnObject<Sku> ret1 = goodsDao.getSkuById(skuId);
+        if(ret1.getData().getGoodsSpuId() == null){
+            return false;
+        }
+        ReturnObject<Sku> ret2 = goodsDao.getSkuById(skuId2);
+        if(ret2.getData().getGoodsSpuId() == null){
+            return false;
+        }
+        if(ret1.getData().getGoodsSpuId().equals(ret2.getData().getGoodsSpuId())){
+            return true;
+        }
+        return false;
+    }
 }
