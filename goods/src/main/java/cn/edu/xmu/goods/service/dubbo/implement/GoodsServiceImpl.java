@@ -32,7 +32,7 @@ import java.util.Map;
 @DubboService(version = "0.0.1-SNAPSHOT")
 public class GoodsServiceImpl implements IGoodsService {
 
-//    @DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IActivityService activityService;
 
     @Autowired
