@@ -83,14 +83,9 @@ public class CommentTest {
     public void addComment(){
         byte[] responseBuffer = null;
         String requestJson="{\"type\":0 ,\"content\":\"这个真不错\"}";
-<<<<<<< Updated upstream
         WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/orderitems/1/comments")
-                .header("authorization", adminToken)
-=======
-        WebTestClient.RequestHeadersSpec res = manageClient.post().uri("/comment/orderitems/1/comments")
-                .header("authorization", shopToken)
->>>>>>> Stashed changes
-                .bodyValue(requestJson);
+                .header("authorization", adminToken);
+
 
         responseBuffer = res.exchange().expectHeader().contentType("application/json;charset=UTF-8")
                 .expectBody()

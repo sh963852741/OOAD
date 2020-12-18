@@ -55,6 +55,7 @@ public class Comment implements VoObject {
         }
     }
 
+
     private Long id;
     private Long customerId;
     private String userName;
