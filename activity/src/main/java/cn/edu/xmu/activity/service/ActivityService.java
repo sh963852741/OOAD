@@ -534,6 +534,9 @@ public class ActivityService implements InitializingBean {
      */
     public ReturnObject addSKUToCouponActivity(List<Long> skuIds, long shopId, long activityId){
         CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
+        if(couponActivityPo == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "没有这样的SKU");
+        }
         if(!couponActivityPo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "只允许修改下线的活动");
         }

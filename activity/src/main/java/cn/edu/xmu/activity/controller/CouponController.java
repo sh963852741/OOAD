@@ -324,7 +324,7 @@ public class CouponController {
     @ApiOperation(value = "店家删除己方某优惠券活动的某限定范围", nickname = "shopsShopIdCouponspusIdDelete", notes = "`商店管理员`可删除己方`待上线`的某优惠券活动对应的限定范围", tags={ "coupon", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @DeleteMapping(value = "/shops/{shopId}/couponspus/{id}")
+    @DeleteMapping(value = "/shops/{shopId}/couponskus/{id}")
     public Object removeSPUFromCouponActivity(
             @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
             @ApiParam(value = "CouponSpu的id",required=true) @PathVariable("id") Long id){
