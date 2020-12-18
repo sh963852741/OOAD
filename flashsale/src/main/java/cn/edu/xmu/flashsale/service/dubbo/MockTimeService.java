@@ -32,9 +32,9 @@ public class MockTimeService implements ITimeSegmentService {
     @Override
     public TimeSegment getTimeSegmentById(long id) {
         TimeSegment timeSegment = new TimeSegment();
-        timeSegment.setId(1L);
-        timeSegment.setStartTime(LocalTime.MIDNIGHT);
-        timeSegment.setEndTime(LocalTime.NOON);
+        timeSegment.setId(9L);
+        timeSegment.setStartTime(LocalTime.of(9,0));
+        timeSegment.setEndTime(LocalTime.of(10,0));
         return timeSegment;
     }
 }

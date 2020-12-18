@@ -60,8 +60,8 @@ public class PreSaleController {
     @GetMapping(value = "/presales")
     public Object queryPresale(
             @RequestParam(name = "page",defaultValue = "1") Integer page,
-            @RequestParam(name = "pageSize",defaultValue = "1") Integer pageSize,
-            @RequestParam(name = "timeline",defaultValue = "1") Byte timeline,
+            @RequestParam(name = "pageSize",defaultValue = "10") Integer pageSize,
+            @RequestParam(name = "timeline",required = false) Byte timeline,
             @RequestParam(name = "skuId", required = false) Long skuId,
             @RequestParam(name = "shopId", required = false) Long shopId){
         ActivityFinderVo activityFinderVo =new ActivityFinderVo();

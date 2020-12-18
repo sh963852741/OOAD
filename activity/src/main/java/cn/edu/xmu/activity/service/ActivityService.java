@@ -342,6 +342,18 @@ public class ActivityService implements InitializingBean {
         if(activityPo == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "团购活动不存在");
         }
+        if(status.equals(GrouponActivity.GrouponStatus.OFFLINE.getCode())
+        &&!activityPo.getState().equals(GrouponActivity.GrouponStatus.ONLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.GROUPON_STATENOTALLOW, "只能上线下线的活动");
+        }
+        if(status.equals(GrouponActivity.GrouponStatus.ONLINE.getCode())
+                &&!activityPo.getState().equals(GrouponActivity.GrouponStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.GROUPON_STATENOTALLOW, "只能下线上线的活动");
+        }
+        if(status.equals(GrouponActivity.GrouponStatus.DELETE.getCode())
+                &&!activityPo.getState().equals(GrouponActivity.GrouponStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.GROUPON_STATENOTALLOW, "只能删除下线的活动");
+        }
         if(!activityPo.getShopId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不能修改其他的店铺的团购活动");
         }
