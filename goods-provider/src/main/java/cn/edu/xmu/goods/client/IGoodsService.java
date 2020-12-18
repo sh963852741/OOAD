@@ -62,5 +62,4 @@ public interface IGoodsService {
 	PriceDTO getPrice(Long skuId);
 
 	Boolean isSkuEqualSpu(Long id1, Long id2);
-
 }

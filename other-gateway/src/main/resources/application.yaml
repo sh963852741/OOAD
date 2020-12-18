@@ -1,5 +1,10 @@
 server:
-  port: 8080
+  port: 8078
+
+gateway:
+  activity: http://localhost:8988/
+  goods: http://localhost:8907/
+  falshsale: http://localhost:8188/
 
 spring:
   application:
@@ -19,56 +24,49 @@ spring:
               - OPTIONS
       routes:
         - id: presale
-          uri: http://localhost:8988/
+          uri: ${gateway.activity}
           predicates:
             - Path=/presales/states,/presales,/shops/{shopId}/skus/{id}/presales,/shops/{shopId}/presales/{id},/shops/{shopId}/presales,/shops/{shopId}/presales/{id}/**
           filters:
             - PrefixPath=/presale
 
         - id: shop
-          uri: http://localhost:8907/
+          uri: ${gateway.goods}
           predicates:
             - Path=/shops/states,/shops,/shops/{id},/shops/{shopId}/newshops/{id}/audit,/shops/{id}/onshelves,/shops/{id}/offshelves
           filters:
             - PrefixPath=/shop
 
         - id: falshsale
-          uri: http://localhost:8188/
+          uri: ${gateway.falshsale}
           predicates:
             - Path=/timesegments/{id}/flashsales,/flashsales/current,/shops/{did}/timesegments/{id}/flashsales,/shops/{did}/flashsales/{id},/shops/{did}/flashsales/{id}/flashitems,/shops/{did}/flashsales/{fid}/flashitems/{id},/shops/{did}/flashsales/{id}/**
           filters:
             - PrefixPath=/flashsale
 
         - id: coupon
-          uri: http://localhost:8988/
+          uri: ${gateway.activity}
           predicates:
             - Path=/coupons/states,/shops/{shopId}/couponactivities,/shops/{shopId}/couponactivities/{id}/uploadImg,/couponactivities,/shops/{id}/couponactivities/invalid,/couponactivities/{id}/skus,/shops/{shopId}/couponactivities/{id},/shops/{shopId}/couponactivities/{id}/skus,/shops/{shopId}/couponskus/{id},/coupons,/couponactivities/{id}/usercoupons,/shops/{shopId}/couponactivities/{id}/onshelves,/shops/{shopId}/couponactivities/{id}/offshelves
           filters:
             - PrefixPath=/coupon
 
         - id: groupon
-          uri: http://localhost:8988/
+          uri: ${gateway.activity}
           predicates:
             - Path=/groupons/states,/groupons,/shops/{id}/groupons,/shops/{shopId}/spus/{id}/groupons,/shops/{shopId}/groupons/{id},/shops/{shopId}/groupons/{id}/onshelves,/shops/{shopId}/groupons/{id}/offshelves
           filters:
             - PrefixPath=/groupon
 
-        - id: login
-          uri: http://localhost:8081/
-          predicates:
-            - Path=/adminusers,/adminusers/login
-          filters:
-            - PrefixPath=/privilege
-
         - id: comment
-          uri: http://localhost:8907/
+          uri: ${gateway.goods}
           predicates:
             - Path=/comments/states,/orderitems/{id}/comments,/skus/{id}/comments,/shops/{did}/comments/{id}/confirm,/comments,/shops/{id}/comments/all
           filters:
             - PrefixPath=/comment
 
         - id: goods
-          uri: http://localhost:8907/
+          uri: ${gateway.goods}
           predicates:
             - Path=/skus/states,/skus,/brands,/shops/{shopId}/brands/**,/skus/**,/spus/**,/shops/{shopId}/floatPrices/**,/shops/{shopId}/spus/**,/shops/{shopId}/skus/**,/categories/{id}/subcategories,/shops/{shopId}/categories/**
           filters:

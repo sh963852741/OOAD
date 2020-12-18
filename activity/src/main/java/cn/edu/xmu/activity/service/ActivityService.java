@@ -15,6 +15,7 @@ import cn.edu.xmu.goods.client.dubbo.SkuDTO;
 import cn.edu.xmu.goods.client.dubbo.SpuDTO;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.goods.client.IGoodsService;
@@ -27,10 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,6 +54,12 @@ public class ActivityService implements InitializingBean {
     CouponActivityDao couponActivityDao;
     @Autowired
     CouponDao couponDao;
+    @Value("${goodsservice.webdav.username}")
+    private String davUsername;
+    @Value("${goodsservice.webdav.password}")
+    private String davPassWord;
+    @Value("${goodsservice.webdav.baseUrl}")
+    private String baseUrl;
 
     private RedisTemplate redisTemplate;
 
@@ -868,5 +878,38 @@ public class ActivityService implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
 
     }
+
     //endregion
+
+    public ReturnObject upLoadCouponImg(MultipartFile multipartFile, Long shopId, Long id) {
+        CouponActivityPo po = couponActivityDao.getActivityById(id);
+        if(po == null || po.getState().equals(CouponActivity.CouponStatus.DELETE)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(!po.getShopId().equals(shopId)){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
+        ReturnObject returnObject=new ReturnObject();
+        try{
+            returnObject = ImgHelper.remoteSaveImg(multipartFile,2,davUsername, davPassWord,baseUrl);
+            //文件上传错误
+            if(returnObject.getCode()!=ResponseCode.OK){
+                return returnObject;
+            }
+            String oldImg = po.getImageUrl();
+            CouponActivityPo updatePo = new CouponActivityPo();
+            updatePo.setId(po.getId());
+            updatePo.setImageUrl(returnObject.getData().toString());
+            boolean updateRet = couponActivityDao.updateActivity(updatePo,id,shopId);
+            if(!updateRet){
+                ImgHelper.deleteRemoteImg(returnObject.getData().toString(),davUsername, davPassWord,baseUrl);
+                return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            }else{
+                ImgHelper.deleteRemoteImg(oldImg,davUsername,davPassWord,baseUrl);
+                return new ReturnObject(ResponseCode.OK);
+            }
+        }catch (IOException e){
+            return new ReturnObject(ResponseCode.FILE_NO_WRITE_PERMISSION);
+        }
+    }
 }

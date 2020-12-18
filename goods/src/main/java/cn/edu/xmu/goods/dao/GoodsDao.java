@@ -282,7 +282,6 @@ public class GoodsDao {
     public ReturnObject newSku(SKUPo po){
         po.setGmtCreate(LocalDateTime.now());
         po.setGmtModified(po.getGmtCreate());
-        po.setSkuSn(Common.genSeqNum());
         po.setState(Sku.State.OFFSHELF.getCode().byteValue());
         try{
             int ret;

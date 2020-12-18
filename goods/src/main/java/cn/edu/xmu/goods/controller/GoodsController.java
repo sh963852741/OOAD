@@ -368,7 +368,10 @@ public class GoodsController {
         }
         logger.debug("uploadImg: id = " + id + " img :" + multipartFile.getOriginalFilename());
         ReturnObject returnObject = goodsService.upLoadSpuImg(multipartFile, shopId, id);
-        return Common.getNullRetObj(returnObject, httpServletResponse);
+        if(returnObject.getCode() == ResponseCode.OK){
+            httpServletResponse.setStatus(HttpStatus.CREATED.value());
+        }
+        return Common.decorateReturnObject(returnObject);
     }
 
 
