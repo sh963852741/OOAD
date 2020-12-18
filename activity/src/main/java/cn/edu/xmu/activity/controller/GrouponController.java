@@ -94,23 +94,20 @@ public class GrouponController {
             @ApiResponse(code = 200, message = "") })
     @GetMapping(value = "/shops/{id}/groupons")
     @Audit
-    public Object queryGrouponByAdmin(@ApiParam(value = "根据商铺id查询",required=true) @PathVariable("id") Long id, @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state, @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuId", required = false) Long spuid, @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false,defaultValue = "1") Integer page, @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false,defaultValue = "10") Integer pageSize, @RequestParam(value = "beginTime", required = false) String beginTime, @RequestParam(value = "endTime", required = false) String endTime){
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public Object queryGrouponByAdmin(
+            @ApiParam(value = "根据商铺id查询",required=true) @PathVariable("id") Long id,
+            @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state,
+            @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuid", required = false) Long spuid,
+            @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false,defaultValue = "1") Integer page,
+            @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false,defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "beginTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime beginTime,
+            @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime){
         ActivityFinderVo vo=new ActivityFinderVo();
         vo.setSpuId(spuid);
         vo.setState(state);
         vo.setShopId(id);
-        try{
-            if(beginTime != null){
-                vo.setBeginTime(LocalDateTime.parse(beginTime,df));
-            }
-            if(endTime != null){
-                vo.setEndTime(LocalDateTime.parse(endTime,df));
-            }
-        }catch (Exception e){
-            ReturnObject ret = new ReturnObject(ResponseCode.FIELD_NOTVALID);
-            return Common.decorateReturnObject(ret);
-        }
+        vo.setBeginTime(beginTime);
+        vo.setEndTime(endTime);
         vo.setPage(page);
         vo.setPageSize(pageSize);
         ReturnObject ret=activityService.getGrouponActivitiesByAdmin(vo);

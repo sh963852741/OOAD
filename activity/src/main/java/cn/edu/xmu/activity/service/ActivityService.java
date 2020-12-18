@@ -452,7 +452,7 @@ public class ActivityService implements InitializingBean {
         if (couponActivityDao.addActivity(po, shopId)) {
             var ret = new CouponActivityVo(po);
             ret.createdBy = new UserVo(userDTO);
-            return new ReturnObject<>();
+            return new ReturnObject<>(ret);
         } else {
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
         }
@@ -475,6 +475,18 @@ public class ActivityService implements InitializingBean {
         }
         if(!activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
             return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改未下线的优惠活动");
+        }
+        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())
+        && !activity.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许下线未上线的活动");
+        }
+        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())
+                && !activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许上线未下线的活动");
+        }
+        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())
+                && !activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许删除未下线的活动");
         }
 //        if(activity.getBeginTime().isAfter(LocalDateTime.now())){
 //            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经开始的优惠活动");

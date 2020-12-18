@@ -51,6 +51,27 @@ public class GoodsDao {
     @Autowired
     RedisTemplate redisTemplate;
 
+    public int setBrandToZero(long brandId){
+        SPUPoExample example = new SPUPoExample();
+        SPUPoExample.Criteria criteria = example.createCriteria();
+        criteria.andBrandIdEqualTo(brandId);
+
+        SPUPo spuPo = new SPUPo();
+        spuPo.setBrandId(0L);
+        return spuPoMapper.updateByExampleSelective(spuPo, example);
+    }
+
+    public int setCategoryToZero(long cId){
+        SPUPoExample example = new SPUPoExample();
+        SPUPoExample.Criteria criteria = example.createCriteria();
+        criteria.andCategoryIdEqualTo(cId);
+
+        SPUPo spuPo = new SPUPo();
+        spuPo.setCategoryId(0L);
+        return spuPoMapper.updateByExampleSelective(spuPo, example);
+    }
+
+
     public List<SKUPo> getSkuList(){
         SKUPoExample example = new SKUPoExample();
         List<SKUPo> skuPoList = skuPoMapper.selectByExample(example);

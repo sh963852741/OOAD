@@ -136,7 +136,7 @@ public class CouponActivityDao {
         if(shopId != null){
             criteria.andShopIdEqualTo(shopId);
         }
-        criteria.andStateEqualTo(CouponActivity.CouponStatus.OFFLINE.getCode());
+        criteria.andStateEqualTo(CouponActivity.CouponStatus.ONLINE.getCode());
 
         List<CouponActivityPo> activityPoList = couponActivityPoMapper.selectByExample(example);
         return new PageInfo<>(activityPoList);

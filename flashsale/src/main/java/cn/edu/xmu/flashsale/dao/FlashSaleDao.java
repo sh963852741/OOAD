@@ -2,6 +2,8 @@ package cn.edu.xmu.flashsale.dao;
 
 import cn.edu.xmu.flashsale.mapper.FlashSaleItemPoMapper;
 import cn.edu.xmu.flashsale.mapper.FlashSalePoMapper;
+import cn.edu.xmu.flashsale.model.FlashState;
+import cn.edu.xmu.flashsale.model.bo.FlashSaleItem;
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPo;
 import cn.edu.xmu.flashsale.model.po.FlashSaleItemPoExample;
 import cn.edu.xmu.flashsale.model.po.FlashSalePo;
@@ -21,6 +23,16 @@ public class FlashSaleDao {
     FlashSaleItemPoMapper flashSaleItemPoMapper;
     @Autowired
     FlashSalePoMapper flashSalePoMapper;
+
+    public boolean hasSameFlashSale(long timeSeg, LocalDateTime date){
+        FlashSalePoExample example = new FlashSalePoExample();
+        FlashSalePoExample.Criteria criteria=example.createCriteria();
+        criteria.andTimeSegIdEqualTo(timeSeg);
+        criteria.andFlashDateBetween(date.toLocalDate().atStartOfDay(), date.toLocalDate().atStartOfDay().plusDays(1));
+        criteria.andStateNotEqualTo(FlashState.FalshStatus.DELETE.getCode());
+
+        return !flashSalePoMapper.selectByExample(example).isEmpty();
+    }
 
     public int addFlashSale(FlashSalePo po){
         po.setGmtCreate(LocalDateTime.now());
