@@ -31,10 +31,22 @@ public class MockTimeService implements ITimeSegmentService {
 
     @Override
     public TimeSegment getTimeSegmentById(long id) {
-        TimeSegment timeSegment = new TimeSegment();
-        timeSegment.setId(9L);
-        timeSegment.setStartTime(LocalTime.of(9,0));
-        timeSegment.setEndTime(LocalTime.of(10,0));
-        return timeSegment;
+        if(id == 8){
+            TimeSegment timeSegment = new TimeSegment();
+            timeSegment.setId(8L);
+            timeSegment.setStartTime(LocalTime.of(7,0));
+            timeSegment.setEndTime(LocalTime.of(8,0));
+            return timeSegment;
+        }
+        else if(id == 9){
+            TimeSegment timeSegment = new TimeSegment();
+            timeSegment.setId(9L);
+            timeSegment.setStartTime(LocalTime.of(9,0));
+            timeSegment.setEndTime(LocalTime.of(10,0));
+            return timeSegment;
+        }else{
+            return null;
+        }
+
     }
 }

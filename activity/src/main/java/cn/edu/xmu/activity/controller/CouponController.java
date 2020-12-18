@@ -403,13 +403,7 @@ public class CouponController {
     @Audit
     public Object couponactivitiesIdUsercouponsPost(
             @LoginUser Long userId,
-            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,
-            @RequestBody BindingResult bindingResult){
-        var res = Common.processFieldErrors(bindingResult,httpServletResponse);
-        if(res != null){
-            return res;
-        }
-
+            @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id){
         var ret = activityService.claimCouponQuickly(id,userId);
         if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);

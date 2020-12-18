@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 @Data
@@ -40,19 +41,19 @@ public class CouponActivityVo implements VoObject {
     @ApiModelProperty(value = "优惠券时长，0表示与活动相同，否则表示自领取后几日内有效")
     Byte validTerm;
 
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "开始领优惠券时间")
     LocalDateTime couponTime;
 
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "活动开始时间")
     LocalDateTime beginTime;
 
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "活动结束时间")
@@ -87,6 +88,7 @@ public class CouponActivityVo implements VoObject {
     }
 
     public CouponActivityVo(CouponActivityPo po){
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         id = po.getId();
         name = po.getName();
         quantity = po.getQuantity();
@@ -94,7 +96,7 @@ public class CouponActivityVo implements VoObject {
         validTerm = po.getValidTerm();
         couponTime = po.getCouponTime();
         beginTime = po.getBeginTime();
-        endTime =po.getEndTime();
+        endTime = po.getEndTime();
         strategy = po.getStrategy();
         gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();

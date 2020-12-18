@@ -836,4 +836,12 @@ public class GoodsService implements InitializingBean {
         return goodsDao.changSkuInventory(skuId,quantity);
     }
 
+    public void setBrandToZero(long brandId){
+        goodsDao.setBrandToZero(brandId);
+    }
+
+    public void setCategoryZero(long categoryId){
+        goodsDao.setCategoryToZero(categoryId);
+    }
+
 }

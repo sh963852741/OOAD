@@ -10,6 +10,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -17,7 +18,8 @@ import java.time.LocalDateTime;
 
 @Service
 public class BrandService {
-
+    @Autowired
+    GoodsService goodsService;
 
     @Autowired
     private BrandDao brandDao;
@@ -29,7 +31,10 @@ public class BrandService {
 
     @Value("${brandservice.webdav.baseUrl}")
     private String baseUrl;
+
+    @Transactional
     public ReturnObject<Object> deleteBrand(Long id) {
+        goodsService.setBrandToZero(id);
         return brandDao.deleteBrandById(id);
     }
 

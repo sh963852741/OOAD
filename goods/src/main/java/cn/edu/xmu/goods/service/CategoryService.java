@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 public class CategoryService {
     @Autowired
     private CategoryDao categoryDao;
+    @Autowired
+    private GoodsService goodsService;
 
     /**
      * 功能描述: 获取商品分类关系
@@ -77,6 +79,7 @@ public class CategoryService {
      * @Date: 2020/11/27 16:52
      */
     public ReturnObject deleteCategoryById(Long id) {
+        goodsService.setCategoryZero(id);
         ReturnObject ret=categoryDao.deleteCategoryById(id.longValue());
         return ret;
     }
