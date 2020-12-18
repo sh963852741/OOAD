@@ -122,7 +122,11 @@ public class GoodsDao {
         }
         //TODO 查询所有sku disable 现在是4  应该是0 1  现在不涉及此条件 下面的查询也是一样
         //criteria.andDisabledEqualTo((byte)0);
-        criteria.andStateEqualTo(Sku.State.NORM.getCode().byteValue());
+        if(criteria.isValid()){
+            criteria.andStateEqualTo(Sku.State.NORM.getCode().byteValue());
+        }else{
+            example.clear();
+        }
         if(null != vo.getShopId()){
             List<SPUPo> list = getSpusByShopId(vo.getShopId());
             if(list != null){
@@ -143,7 +147,9 @@ public class GoodsDao {
         List<SkuSimpleRetVo> skuSimpleRetVos = new ArrayList<>();
         try {
             PageHelper.startPage(page, pageSize);
-            skuPoList = skuPoMapper.selectByExample(example);
+            if(example.getOredCriteria().size() != 0 || vo.isNull()){
+                skuPoList = skuPoMapper.selectByExample(example);
+            }
             for (SKUPo po : skuPoList) {
                 Sku sku = new Sku(po);
 

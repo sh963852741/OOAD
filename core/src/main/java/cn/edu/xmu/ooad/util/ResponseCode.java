@@ -24,6 +24,7 @@ public enum ResponseCode {
     RESOURCE_FALSIFY(507, "信息签名不正确"),
     IMG_FORMAT_ERROR(508,"图片格式不正确"),
     IMG_SIZE_EXCEED(509,"图片大小超限"),
+    ABNORMAL_MODIFY(510,"无权改动该参数"),
     //--------------------------------------------
 
 
@@ -94,6 +95,8 @@ public enum ResponseCode {
     COUPON_NOTBEGIN(909,"未到优惠卷领取时间"),
     COUPON_FINISH(910,"优惠卷领罄"),
     COUPON_END(911,"优惠卷活动终止"),
+    CATEGORY_SET_ERROR(912,"不能向一级目录中添加商品"),
+    TIMEFORMAT_ERROR(913,"时间参数不合法"),
     STATE_NOCHANGE(920,"状态未改变"),
     ACTIVITYALTER_INVALID(923,"对活动的无效操作"),
     DELETE_ONLINE_NOTALLOW(931, "不允许删除已上线状态的活动"),
@@ -101,7 +104,13 @@ public enum ResponseCode {
     COMMENT_EXISTED(941,"该订单条目已评论"),
     BRAND_NAME_SAME(990,"品牌名称已存在"),
     CATEGORY_NAME_SAME(991, "类目名称已存在"),
-    SHOP_STATENOTALLOW(980, "当前店铺状态不允许进行此类操作");
+    SHOP_STATENOTALLOW(980, "当前店铺状态不允许进行此类操作"),
+    MODIFYSHOP_ERROR(140,"该店铺无法修改"),
+    SHUTSHOP_ERROR(180,"该店铺无法被执行关闭操作"),
+    ONLINESHOP_ERROR(160,"该店铺无法上线"),
+    PASSSHOP_ERROR(150,"该店铺不是待审核状态"),
+    OFFLINESHOP_ERROR(170,"该店铺无法下线"),
+    APPLYAGAIN_ERROR(190,"您已拥有店铺，无法重新申请店铺");
 
     private int code;
     private String message;

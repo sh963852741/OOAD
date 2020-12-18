@@ -55,9 +55,9 @@ public class ActivityService implements InitializingBean {
 
     private RedisBloomFilter redisBloomFilter;
 
-    @DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     IGoodsService goodsService;
-    @DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     IShopService shopService;
 
     @Autowired
@@ -172,6 +172,9 @@ public class ActivityService implements InitializingBean {
         if(activity.getBeginTime().isBefore(LocalDateTime.now())){
             return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW,"仅可修改未开始的预售活动");
         }
+        if(!activity.getState().equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW,"仅可以修改下线的预售活动");
+        }
 
         PresaleActivityPo po = presaleActivityVo.createPo();
         if (presaleActivityDao.updateActivity(po, id)) {
@@ -189,11 +192,23 @@ public class ActivityService implements InitializingBean {
         if(presaleActivityPo.getShopId() != shopId){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "当前预售活动不属于您的店铺");
         }
+        if(state.equals(PresaleActivity.PresaleStatus.DELETE.getCode())
+                &&!presaleActivityPo.getState().equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW, "不允许删除未下线的活动");
+        }
+        if(state.equals(PresaleActivity.PresaleStatus.ONLINE.getCode())
+                &&!presaleActivityPo.getState().equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW, "不允许上线未下线的活动");
+        }
+        if(state.equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())
+                &&!presaleActivityPo.getState().equals(PresaleActivity.PresaleStatus.ONLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW, "不允许下线未上线的活动");
+        }
 
         if (presaleActivityDao.changeActivityStatus(id, state)) {
             return new ReturnObject<>();
         } else {
-            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法删除预售活动");
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法修改预售活动");
         }
     }
     //endregion
@@ -327,6 +342,18 @@ public class ActivityService implements InitializingBean {
         if(activityPo == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "团购活动不存在");
         }
+        if(status.equals(GrouponActivity.GrouponStatus.OFFLINE.getCode())
+        &&!activityPo.getState().equals(GrouponActivity.GrouponStatus.ONLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.GROUPON_STATENOTALLOW, "只能上线下线的活动");
+        }
+        if(status.equals(GrouponActivity.GrouponStatus.ONLINE.getCode())
+                &&!activityPo.getState().equals(GrouponActivity.GrouponStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.GROUPON_STATENOTALLOW, "只能下线上线的活动");
+        }
+        if(status.equals(GrouponActivity.GrouponStatus.DELETE.getCode())
+                &&!activityPo.getState().equals(GrouponActivity.GrouponStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.GROUPON_STATENOTALLOW, "只能删除下线的活动");
+        }
         if(!activityPo.getShopId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不能修改其他的店铺的团购活动");
         }
@@ -367,7 +394,7 @@ public class ActivityService implements InitializingBean {
         couponActivityVo.shop.put("id", shopDTO.getId());
         couponActivityVo.shop.put("name", shopDTO.getName());
         couponActivityVo.createdBy = new UserVo(createdBy);
-        couponActivityVo.modiBy = new UserVo(modiBy);
+        couponActivityVo.ModiBy = new UserVo(modiBy);
 
         return new ReturnObject<>(couponActivityVo);
     }
@@ -559,11 +586,10 @@ public class ActivityService implements InitializingBean {
      * @return
      */
     public ReturnObject<PageInfo<VoObject>> getSKUInCouponActivity(long activityId, int page, int pageSize){
-        var activity = couponActivityDao.getActivityById(activityId);
-        if(activity == null || !activity.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())){
+        CouponActivityPo po = couponActivityDao.getActivityById(activityId);
+        if(po == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-
         PageInfo<CouponSKUPo> couponSPUPoPageInfo = couponActivityDao.getSKUsInActivity(activityId, page, pageSize);
         List<VoObject> simpleSkuList = new ArrayList<>();
         for(CouponSKUPo couponSPUPo:couponSPUPoPageInfo.getList()){

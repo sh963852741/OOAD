@@ -60,8 +60,8 @@ public class PreSaleController {
     @GetMapping(value = "/presales")
     public Object queryPresale(
             @RequestParam(name = "page",defaultValue = "1") Integer page,
-            @RequestParam(name = "pageSize",defaultValue = "1") Integer pageSize,
-            @RequestParam(name = "timeline",defaultValue = "1") Byte timeline,
+            @RequestParam(name = "pageSize",defaultValue = "10") Integer pageSize,
+            @RequestParam(name = "timeline",required = false) Byte timeline,
             @RequestParam(name = "skuId", required = false) Long skuId,
             @RequestParam(name = "shopId", required = false) Long shopId){
         ActivityFinderVo activityFinderVo =new ActivityFinderVo();
@@ -170,6 +170,7 @@ public class PreSaleController {
     @Audit
     public Object delPresaleActivity(@ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Long shopId,
                                       @ApiParam(value = "预售活动id",required=true) @PathVariable("id") Long id){
+
         ReturnObject ret = activityService.modifyPresaleActivity(id,shopId, PresaleActivity.PresaleStatus.DELETE.getCode());
 
         return decorateReturnObject(ret);

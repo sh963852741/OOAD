@@ -3,6 +3,7 @@ package cn.edu.xmu.activity.controller;
 import cn.edu.xmu.activity.model.bo.Coupon;
 import cn.edu.xmu.activity.model.bo.CouponActivity;
 import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
+import cn.edu.xmu.activity.model.vo.CouponActicityChangeVo;
 import cn.edu.xmu.activity.model.vo.CouponActivityVo;
 import cn.edu.xmu.activity.service.ActivityService;
 import cn.edu.xmu.ooad.annotation.Audit;
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -212,18 +214,21 @@ public class CouponController {
             @ApiResponse(code = 200, message = "成功") })
     @PutMapping(value = "/shops/{shopId}/couponactivities/{id}")
     public Object modifyCouponActivity(@ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
-                                                   @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,
-                                                   @ApiParam(value = "可修改的优惠活动信息" ,required=true )  @Valid @RequestBody CouponActivityVo couponActivityVo,
-                                                   BindingResult bindingResult, HttpServletResponse httpServletResponse){
+                                       @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long id,
+                                       @ApiParam(value = "可修改的优惠活动信息" ,required=true )  @Validated @RequestBody CouponActicityChangeVo couponActivityChangeVo,
+                                       BindingResult bindingResult, HttpServletResponse httpServletResponse){
         var res = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(res != null){
             return res;
         }
-
-        if(couponActivityVo.getBeginTime().isAfter(couponActivityVo.getEndTime())||couponActivityVo.getCouponTime().isAfter(couponActivityVo.getEndTime())){
+        CouponActivityVo couponActivityVo = new CouponActivityVo();
+        couponActivityVo.setBeginTime(couponActivityChangeVo.getBeginTime());
+        couponActivityVo.setEndTime(couponActivityChangeVo.getEndTime());
+        couponActivityVo.setStrategy(couponActivityChangeVo.getStrategy());
+        couponActivityVo.setName(couponActivityChangeVo.getName());
+        if(couponActivityVo.getBeginTime().isAfter(couponActivityVo.getEndTime()) || (couponActivityVo.getCouponTime() != null&&couponActivityVo.getCouponTime().isAfter(couponActivityVo.getEndTime()))){
             return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, "活动开始时间必须小于活动结束时间，优惠券一定要在活动结束前发放");
         }
-
         ReturnObject ret = activityService.modifyCouponActivity(id, couponActivityVo, shopId);
 
         return Common.decorateReturnObject(ret);

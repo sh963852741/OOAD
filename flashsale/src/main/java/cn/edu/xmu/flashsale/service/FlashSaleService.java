@@ -238,10 +238,12 @@ public class FlashSaleService implements InitializingBean {
                 LocalDate.now(),
                 timeSegmentsForToday.stream().map(TimeSegment::getId).collect(Collectors.toList())
         ));
-        effectFlashSaleToLoad.addAll(flashSaleDao.selectFlashSaleByTimeAndDate(
-                LocalDate.now().plusDays(1),
-                timeSegmentsForTomorrow.stream().map(TimeSegment::getId).collect(Collectors.toList())
-        ));
+        if(!timeSegmentsForTomorrow.isEmpty()){
+            effectFlashSaleToLoad.addAll(flashSaleDao.selectFlashSaleByTimeAndDate(
+                    LocalDate.now().plusDays(1),
+                    timeSegmentsForTomorrow.stream().map(TimeSegment::getId).collect(Collectors.toList())
+            ));
+        }
         log.debug("EffectFlashSaleToLoad:" + effectFlashSaleToLoad.toString());
         for (FlashSalePo flashSalePo : effectFlashSaleToLoad) {
             // 忽略不是上线状态的秒杀
