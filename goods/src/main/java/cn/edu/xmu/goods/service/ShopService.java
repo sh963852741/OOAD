@@ -141,7 +141,7 @@ public class ShopService {
         Shop shop = new Shop();
         shop.setId(id.longValue());
         shop.setState(Shop.State.OFFLINE.getCode().byteValue());
-        if (getShopByShopId(id).getData().getState() == 4) {
+        if (getShopByShopId(id).getData().getState() == 4 || getShopByShopId(id).getData().getState() == 2) {
             ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
         } else return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);

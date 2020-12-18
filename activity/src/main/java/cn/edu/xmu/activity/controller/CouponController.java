@@ -93,14 +93,21 @@ public class CouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "") })
     @PostMapping(value = "/shops/{shopId}/couponactivities/{id}/uploadImg")
-    public Object shopsShopIdCouponactivitiesIdUploadImgPost(@ApiParam(value = "用户token" ,required=true)
-                                                                 @RequestHeader(value="authorization", required=true) String authorization,
-                                                             @ApiParam(value = "店铺id",required=true)
-                                                             @PathVariable("shopId") Integer shopId,
+    @Audit
+    public Object shopsShopIdCouponactivitiesIdUploadImgPost(@ApiParam(value = "店铺id",required=true)
+                                                             @PathVariable("shopId") Long shopId,
                                                              @ApiParam(value = "活动id",required=true)
-                                                                 @PathVariable("id") Integer id,@ApiParam(value = "文件")
-                                                                 @Valid @RequestPart(value="img", required=true) MultipartFile img){
-        return null;
+                                                                 @PathVariable("id") Long id,@ApiParam(value = "文件")
+                                                                 @Valid @RequestPart(value="img", required=true) MultipartFile multipartFile){
+        if (id == null || shopId == null) {
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        ReturnObject returnObject = activityService.upLoadCouponImg(multipartFile, shopId, id);
+        if(returnObject.getCode() == ResponseCode.OK){
+            httpServletResponse.setStatus(HttpStatus.CREATED.value());
+        }
+        return Common.decorateReturnObject(returnObject);
     }
 
     /**
@@ -324,7 +331,7 @@ public class CouponController {
     @ApiOperation(value = "店家删除己方某优惠券活动的某限定范围", nickname = "shopsShopIdCouponspusIdDelete", notes = "`商店管理员`可删除己方`待上线`的某优惠券活动对应的限定范围", tags={ "coupon", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
-    @DeleteMapping(value = "/shops/{shopId}/couponspus/{id}")
+    @DeleteMapping(value = "/shops/{shopId}/couponskus/{id}")
     public Object removeSPUFromCouponActivity(
             @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
             @ApiParam(value = "CouponSpu的id",required=true) @PathVariable("id") Long id){
