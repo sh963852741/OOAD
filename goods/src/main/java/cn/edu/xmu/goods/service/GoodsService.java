@@ -290,7 +290,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject updateSku(Integer shopId, Integer id, SkuChangeVo skuChangeVo) {
-        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id.longValue())){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -578,6 +578,15 @@ public class GoodsService implements InitializingBean {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
+        ReturnObject<Sku> skuRet = goodsDao.getSkuById(id);
+        if(skuRet.getData().getInventory()< floatPriceVo.getQuantity()){
+            return new ReturnObject(ResponseCode.SKU_NOTENOUGH);
+        }
+        skuRet.getData().setInventory(skuRet.getData().getInventory() - floatPriceVo.getQuantity());
+        ReturnObject updateSku = goodsDao.updateSku(skuRet.getData());
+        if(updateSku.getCode() != ResponseCode.OK){
+            return updateSku;
+        }
         FloatPricePo po=new FloatPricePo();
         po.setActivityPrice(floatPriceVo.getActivityPrice());
         po.setCreatedBy(userId);
@@ -793,6 +802,7 @@ public class GoodsService implements InitializingBean {
         po.setWeight(skuVo.getWeight());
         po.setOriginalPrice(skuVo.getOriginalPrice());
         po.setImageUrl(skuVo.getImageUrl());
+        po.setSkuSn(skuVo.getSn());
         po.setDisabled((byte)0);
         ReturnObject ret = goodsDao.newSku(po);
         if(ret.getCode() != ResponseCode.OK){
