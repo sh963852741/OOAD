@@ -69,8 +69,7 @@ public class CommentController {
             @ApiResponse(code = 0, message = "成功"),
             @ApiResponse(code = 903, message = "用户没有购买此商品")
     })
-    @PostMapping("/orderitems/{id}/comments")
-    @ResponseBody
+    @PostMapping("orderitems/{id}/comments")
     @Audit
     public Object addCommentOnSku(
             @LoginUser Long uid,

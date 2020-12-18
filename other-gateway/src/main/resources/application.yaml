@@ -25,13 +25,6 @@ spring:
           filters:
             - PrefixPath=/presale
 
-        - id: comment
-          uri: http://localhost:8988/
-          predicates:
-            - Path=/comments/states,/orderitems/{id}/comments,/skus/{id}/comments,/shops/{did}/comments/{id}/confirm,/comments,/shops/{id}/comments/all
-          filters:
-            - PrefixPath=/comment
-
         - id: shop
           uri: http://localhost:8907/
           predicates:
