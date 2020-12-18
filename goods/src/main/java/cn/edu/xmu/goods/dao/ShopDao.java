@@ -104,7 +104,7 @@ public class ShopDao {
         if(shopPo.getState()==Shop.State.NOTPASS.getCode().byteValue()
                 ||shopPo.getState()==Shop.State.FORBID.getCode().byteValue())
         {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject(ResponseCode.SHOP_STATENOTALLOW);
         }
         else
         {

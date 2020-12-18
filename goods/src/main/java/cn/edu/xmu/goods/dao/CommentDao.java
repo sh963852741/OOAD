@@ -138,7 +138,7 @@ public class CommentDao {
         }
         if (ret == 0) {
             logger.debug("updateSku: update fail ! " + commentPo.toString());
-            return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         } else {
             logger.debug("updateSku: update sku success ! " + commentPo.toString());
             return new ReturnObject();

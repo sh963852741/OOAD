@@ -133,4 +133,12 @@ public class CategoryDao {
         }
     }
 
+    public boolean hasSameName(String name){
+        CategoryPoExample example = new CategoryPoExample();
+        CategoryPoExample.Criteria criteria = example.createCriteria();
+        criteria.andNameEqualTo(name);
+
+        var ret = categoryPoMapper.selectByExample(example);
+        return !ret.isEmpty();
+    }
 }

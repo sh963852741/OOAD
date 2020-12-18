@@ -172,6 +172,9 @@ public class ActivityService implements InitializingBean {
         if(activity.getBeginTime().isBefore(LocalDateTime.now())){
             return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW,"仅可修改未开始的预售活动");
         }
+        if(!activity.getState().equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW,"仅可以修改下线的预售活动");
+        }
 
         PresaleActivityPo po = presaleActivityVo.createPo();
         if (presaleActivityDao.updateActivity(po, id)) {
@@ -189,11 +192,23 @@ public class ActivityService implements InitializingBean {
         if(presaleActivityPo.getShopId() != shopId){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "当前预售活动不属于您的店铺");
         }
+        if(state.equals(PresaleActivity.PresaleStatus.DELETE.getCode())
+                &&!presaleActivityPo.getState().equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW, "不允许删除未下线的活动");
+        }
+        if(state.equals(PresaleActivity.PresaleStatus.ONLINE.getCode())
+                &&!presaleActivityPo.getState().equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW, "不允许上线未下线的活动");
+        }
+        if(state.equals(PresaleActivity.PresaleStatus.OFFLINE.getCode())
+                &&!presaleActivityPo.getState().equals(PresaleActivity.PresaleStatus.ONLINE.getCode())){
+            return new ReturnObject<>(ResponseCode.PRESALE_STATENOTALLOW, "不允许下线未上线的活动");
+        }
 
         if (presaleActivityDao.changeActivityStatus(id, state)) {
             return new ReturnObject<>();
         } else {
-            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法删除预售活动");
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法修改预售活动");
         }
     }
     //endregion
