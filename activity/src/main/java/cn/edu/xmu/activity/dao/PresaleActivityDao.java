@@ -81,7 +81,7 @@ public class PresaleActivityDao {
         po.setId(id);
         po.setState(state);
         po.setGmtModified(LocalDateTime.now());
-        return presaleActivityPoMapper.updateByPrimaryKey(po) == 1;
+        return presaleActivityPoMapper.updateByPrimaryKeySelective(po) == 1;
     }
 
     public PresaleActivityPo getActivityById(long activityId){

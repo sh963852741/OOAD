@@ -18,11 +18,12 @@ import java.util.Map;
 @NoArgsConstructor
 public class Shop implements VoObject {
     public enum State {
-        FORBID(3, "关闭"),
-        ONLINE(2, "上线"),
+        EXAME(0,"未审核"),
         OFFLINE(1,"未上线"),
-        NOTPASS(4,"审核未通过"),
-        EXAME(0,"未审核");
+        ONLINE(2, "上线"),
+        FORBID(3, "关闭"),
+        NOTPASS(4,"审核未通过");
+
         private static final Map<Integer, Shop.State> stateMap;
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
             stateMap = new HashMap();
