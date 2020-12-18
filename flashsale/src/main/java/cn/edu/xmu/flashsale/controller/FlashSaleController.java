@@ -99,7 +99,7 @@ public class FlashSaleController {
     @GetMapping("/flashsales/current")
     public Mono<Object> getCurrentFlashsales(@RequestParam Integer page, @RequestParam Integer pageSize){
         log.debug("/flashsales/current");
-        return flashSaleService.getFlashSale(1L).map(x->{
+        return flashSaleService.getFlashSale(9L).map(x->{
             log.debug(x.toString());
             return x;
         });
