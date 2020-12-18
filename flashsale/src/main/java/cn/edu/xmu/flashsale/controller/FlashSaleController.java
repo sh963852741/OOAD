@@ -5,6 +5,7 @@ import cn.edu.xmu.flashsale.model.vo.FlashSaleItemVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleRetVo;
 import cn.edu.xmu.flashsale.model.vo.FlashSaleVo;
 import cn.edu.xmu.flashsale.service.FlashSaleService;
+import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import io.swagger.annotations.*;
@@ -69,6 +70,7 @@ public class FlashSaleController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{did}/timesegments/{id}/flashsales")
+    @Audit
     public Object createFlashSale(@PathVariable long id, @RequestBody FlashSaleVo flashDate,
                                   BindingResult bindingResult){
         var res = Common.processFieldErrors(bindingResult,httpServletResponse);
@@ -119,6 +121,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
+    @Audit
     @DeleteMapping("/shops/{did}/flashsales/{id}")
     public Object deleteFlashsale(@PathVariable Integer id){
         var ret = flashSaleService.delFlashSale(id);
@@ -140,6 +143,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
+    @Audit
     @PutMapping("/shops/{did}/flashsales/{id}")
     public Object changeFlashsale(@PathVariable Long id,@RequestBody FlashSaleVo flashDate){
         var ret = flashSaleService.modifyFlashSale(id, flashDate.getFlashDate().atStartOfDay());
@@ -160,6 +164,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
+    @Audit
     @PostMapping("/shops/{did}/flashsales/{id}/flashitems")
     public Object addFlashitems(@PathVariable Long id, @RequestBody FlashSaleItemVo flashsaleVo,
                                 BindingResult bindingResult){
@@ -208,6 +213,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
+    @Audit
     @DeleteMapping("/shops/{did}/flashsales/{fid}/flashitems/{id}")
     public Object deleteFlashitems(@PathVariable("fid") Long flashSaleId, @PathVariable("id") Long itemId){
         var ret = flashSaleService.removeSkuFromFlashSale(flashSaleId, itemId);
@@ -229,6 +235,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
+    @Audit
     @PutMapping("/shops/{did}/flashsales/{id}/onshelves")
     public Object onlineFlashSale(@PathVariable("id") Long flashSaleId){
         var ret = flashSaleService.onlineFlashSale(flashSaleId);
@@ -250,6 +257,7 @@ public class FlashSaleController {
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功"),
     })
+    @Audit
     @PutMapping("/shops/{did}/flashsales/{id}/offshelves")
     public Object offlineFlashSale(@PathVariable("id") Long flashSaleId){
         var ret = flashSaleService.offlineFlashSale(flashSaleId);

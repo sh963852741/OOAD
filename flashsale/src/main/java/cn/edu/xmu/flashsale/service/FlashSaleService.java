@@ -119,7 +119,10 @@ public class FlashSaleService implements InitializingBean {
     @Transactional
     public ReturnObject delFlashSale(long id){
         FlashSalePo flashSalePo = flashSaleDao.getFlashSale(id);
-        if (flashSalePo == null || !flashSalePo.getState().equals(FlashState.FalshStatus.OFFLINE.getCode())){
+        if (flashSalePo == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if (!flashSalePo.getState().equals(FlashState.FalshStatus.OFFLINE.getCode())){
             return new ReturnObject(ResponseCode.DELETE_ONLINE_NOTALLOW);
         }
 
