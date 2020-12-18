@@ -71,7 +71,7 @@ public class CouponActivityVo implements VoObject {
     private String imageUrl;
     public HashMap<String, Object> shop = new HashMap<>();
     public UserVo createdBy;
-    public UserVo ModiBy;
+    public UserVo modiBy;
 
     public CouponActivityPo createPo() {
         CouponActivityPo po = new CouponActivityPo();

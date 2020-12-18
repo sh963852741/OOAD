@@ -92,11 +92,7 @@ dubbo:
   protocol:
     name: dubbo
     port: 28091
-<<<<<<< Updated upstream
 #    host: 192.168.43.132
-=======
-    #host: 192.168.43.132
->>>>>>> Stashed changes
 
 # 配置rocketmq
 rocketmq:
