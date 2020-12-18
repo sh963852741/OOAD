@@ -40,10 +40,11 @@ public class CommentControllerTest {
      */
     @Test
     public void getCommentState() throws Exception{
-        String responseString=this.mvc.perform(get("/comment/comments/states"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn().getResponse().getContentAsString();
+        this.mvc.perform(get("/comment/comments/states"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("application/json;charset=UTF-8"))
+        .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+        .andDo(MockMvcResultHandlers.print());
     }
 
     /**
@@ -57,12 +58,33 @@ public class CommentControllerTest {
         String requestJSON= JacksonUtil.toJson(commentVo);*/
         String requestJSON="{\"type\":0 ,\"content\":\"这个真不错\"}";
 
+
         mvc.perform(post("/comment/orderitems/1/comments").contentType("application/json;charset=UTF-8")
         .header("authorization",adminToken).content(requestJSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
         .andDo(MockMvcResultHandlers.print());
+    }
+
+    /**
+     * 买家新增SKU的评论，该订单条目已评论
+     */
+    @Test
+    public void addGoodCommentGoodType2() throws Exception{
+        /*CommentVo commentVo=new CommentVo();
+        commentVo.setType(0L);
+        commentVo.setContent("这个真不错");
+        String requestJSON= JacksonUtil.toJson(commentVo);*/
+        String requestJSON="{\"type\":0 ,\"content\":\"这个真不错\"}";
+
+
+        mvc.perform(post("/comment/orderitems/1/comments").contentType("application/json;charset=UTF-8")
+                .header("authorization",adminToken).content(requestJSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andDo(MockMvcResultHandlers.print());
     }
 
     /**
@@ -170,5 +192,5 @@ public class CommentControllerTest {
         .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
         .andDo(MockMvcResultHandlers.print());
     }
-    
+
 }

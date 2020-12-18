@@ -35,10 +35,10 @@ public class CommentService {
     @Autowired
     private CommentDao commentDao;
 
-//    @DubboReference
+    //@DubboReference(version = "0.0.1-SNAPSHOT")
     private ICustomerService customerService;
 
-//    @DubboReference
+   //@DubboReference(version = "0.0.1-SNAPSHOT")
     private IDubboOrderService orderService;
 
     @Autowired
@@ -66,15 +66,20 @@ public class CommentService {
             return new ReturnObject(ResponseCode.FIELD_NOTVALID, "用户没有购买此商品");
         }*/
 
+        if(!commentDao.judgeComment(orderItemId)){
+            return new ReturnObject(ResponseCode.COMMENT_EXISTED,"该订单条目已评论");
+        }
+        
         if(!orderServiceMock.isCustomerOwnOrderItem(userId,orderItemId)){
             return new ReturnObject(ResponseCode.FIELD_NOTVALID, "用户没有购买此商品");
         }
 
-        //var customer = customerService.getCustomerById(userId);
+        //var customer = customerService.getCustomer(userId);
         //var orderItem=orderService.getOrderItem(orderItemId);
 
         var orderItem=orderServiceMock.getOrderItem(orderItemId);
         var customer=customerServiceMock.getCustomer(userId);
+
 
         CommentPo commentPo=new CommentPo();
         commentPo.setOrderitemId(orderItemId);
@@ -101,7 +106,7 @@ public class CommentService {
         }
         List<VoObject> commentRetVos=new ArrayList<>();
         for(CommentPo po:ret.getData()){
-            //var customer = customerService.getCustomerById(po.getCustomerId());
+            //var customer = customerService.getCustomer(po.getCustomerId());
 
             var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
@@ -146,7 +151,7 @@ public class CommentService {
         List<CommentPo> commentPos=commentDao.selectAllCommentsOfUser(userId,pageNum,pageSize);
         List<VoObject> commentRetVos=new ArrayList<>();
         for(CommentPo po:commentPos){
-            //var customer = customerService.getCustomerById(po.getCustomerId());
+            //var customer = customerService.getCustomer(po.getCustomerId());
             var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
@@ -175,10 +180,11 @@ public class CommentService {
         if(did!=0){
             return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }
+
         List<CommentPo> commentPos=commentDao.selelctCommentsOfState(state.byteValue(),pageNum,pageSize);
         List<VoObject> commentRetVos=new ArrayList<>();
         for(CommentPo po:commentPos){
-            //var customer = customerService.getCustomerById(po.getCustomerId());
+            //var customer = customerService.getCustomer(po.getCustomerId());
             var customer=customerServiceMock.getCustomer(po.getCustomerId());
             CommentRetVo vo=new CommentRetVo(po,customer.getUserName(),customer.getRealName());
             commentRetVos.add(vo);
