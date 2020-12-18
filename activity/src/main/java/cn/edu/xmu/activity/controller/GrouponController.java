@@ -4,6 +4,7 @@ import cn.edu.xmu.activity.model.bo.GrouponActivity;
 import cn.edu.xmu.activity.model.vo.ActivityFinderVo;
 import cn.edu.xmu.activity.model.vo.GrouponActivityVo;
 import cn.edu.xmu.activity.service.ActivityService;
+import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
@@ -13,6 +14,7 @@ import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 团购控制器
@@ -90,13 +93,24 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "") })
     @GetMapping(value = "/shops/{id}/groupons")
-    public Object queryGrouponByAdmin(@ApiParam(value = "用户token" ,required=true) @RequestHeader(value="authorization", required=true) String authorization, @ApiParam(value = "根据商铺id查询",required=true) @PathVariable("id") Long id, @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state, @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuid", required = false) Long spuid, @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false,defaultValue = "1") Integer page, @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false,defaultValue = "10") Integer pageSize, @RequestParam(value = "state", required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime beginTime, @RequestParam(value = "state", required = false) @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime){
+    @Audit
+    public Object queryGrouponByAdmin(@ApiParam(value = "根据商铺id查询",required=true) @PathVariable("id") Long id, @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state, @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuId", required = false) Long spuid, @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false,defaultValue = "1") Integer page, @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false,defaultValue = "10") Integer pageSize, @RequestParam(value = "beginTime", required = false) String beginTime, @RequestParam(value = "endTime", required = false) String endTime){
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         ActivityFinderVo vo=new ActivityFinderVo();
         vo.setSpuId(spuid);
         vo.setState(state);
         vo.setShopId(id);
-        vo.setBeginTime(beginTime);
-        vo.setEndTime(endTime);
+        try{
+            if(beginTime != null){
+                vo.setBeginTime(LocalDateTime.parse(beginTime,df));
+            }
+            if(endTime != null){
+                vo.setEndTime(LocalDateTime.parse(endTime,df));
+            }
+        }catch (Exception e){
+            ReturnObject ret = new ReturnObject(ResponseCode.FIELD_NOTVALID);
+            return Common.decorateReturnObject(ret);
+        }
         vo.setPage(page);
         vo.setPageSize(pageSize);
         ReturnObject ret=activityService.getGrouponActivitiesByAdmin(vo);

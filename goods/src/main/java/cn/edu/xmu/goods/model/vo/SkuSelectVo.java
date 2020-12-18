@@ -16,4 +16,8 @@ public class SkuSelectVo {
     private Long spuId;
 
     private String skuSn;
+
+    public  Boolean isNull(){
+        return shopId==null && spuSn==null && spuId == null && skuSn == null;
+    }
 }

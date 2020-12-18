@@ -40,18 +40,21 @@ public class CouponActivityVo implements VoObject {
     @ApiModelProperty(value = "优惠券时长，0表示与活动相同，否则表示自领取后几日内有效")
     Byte validTerm;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "开始领优惠券时间")
     LocalDateTime couponTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "活动开始时间")
     LocalDateTime beginTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "活动结束时间")
     LocalDateTime endTime;
 
@@ -64,9 +67,10 @@ public class CouponActivityVo implements VoObject {
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtModified;
     private Byte state;
+    private String imageUrl;
     public HashMap<String, Object> shop = new HashMap<>();
     public UserVo createdBy;
-    public UserVo modiBy;
+    public UserVo ModiBy;
 
     public CouponActivityPo createPo() {
         CouponActivityPo po = new CouponActivityPo();
@@ -94,6 +98,8 @@ public class CouponActivityVo implements VoObject {
         strategy = po.getStrategy();
         gmtCreate = po.getGmtCreate();
         gmtModified = po.getGmtModified();
+        state = po.getState();
+        imageUrl = po.getImageUrl();
     }
 
     @Override

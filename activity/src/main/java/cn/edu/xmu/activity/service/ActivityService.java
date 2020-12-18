@@ -367,7 +367,7 @@ public class ActivityService implements InitializingBean {
         couponActivityVo.shop.put("id", shopDTO.getId());
         couponActivityVo.shop.put("name", shopDTO.getName());
         couponActivityVo.createdBy = new UserVo(createdBy);
-        couponActivityVo.modiBy = new UserVo(modiBy);
+        couponActivityVo.ModiBy = new UserVo(modiBy);
 
         return new ReturnObject<>(couponActivityVo);
     }
@@ -559,6 +559,10 @@ public class ActivityService implements InitializingBean {
      * @return
      */
     public ReturnObject<PageInfo<VoObject>> getSKUInCouponActivity(long activityId, int page, int pageSize){
+        CouponActivityPo po = couponActivityDao.getActivityById(activityId);
+        if(po == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         PageInfo<CouponSKUPo> couponSPUPoPageInfo = couponActivityDao.getSKUsInActivity(activityId, page, pageSize);
         List<VoObject> simpleSkuList = new ArrayList<>();
         for(CouponSKUPo couponSPUPo:couponSPUPoPageInfo.getList()){
