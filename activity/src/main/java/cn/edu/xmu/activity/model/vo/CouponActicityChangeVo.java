@@ -28,13 +28,13 @@ public class CouponActicityChangeVo {
     Integer quantity;
 
     @Future
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     @ApiModelProperty(value = "活动结束时间")
     LocalDateTime endTime;
 
     //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Future
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     @ApiModelProperty(value = "活动开始时间")
     LocalDateTime beginTime;
 

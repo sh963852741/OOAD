@@ -404,7 +404,7 @@ public class ActivityService implements InitializingBean {
         couponActivityVo.shop.put("id", shopDTO.getId());
         couponActivityVo.shop.put("name", shopDTO.getName());
         couponActivityVo.createdBy = new UserVo(createdBy);
-        couponActivityVo.ModiBy = new UserVo(modiBy);
+        couponActivityVo.modiBy = new UserVo(modiBy);
 
         return new ReturnObject<>(couponActivityVo);
     }
@@ -462,6 +462,7 @@ public class ActivityService implements InitializingBean {
         if (couponActivityDao.addActivity(po, shopId)) {
             var ret = new CouponActivityVo(po);
             ret.createdBy = new UserVo(userDTO);
+            ret.modiBy = new UserVo();
             return new ReturnObject<>(ret);
         } else {
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, "无法执行插入程序");
@@ -544,6 +545,9 @@ public class ActivityService implements InitializingBean {
      */
     public ReturnObject addSKUToCouponActivity(List<Long> skuIds, long shopId, long activityId){
         CouponActivityPo couponActivityPo = couponActivityDao.getActivityById(activityId);
+        if(couponActivityPo == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST, "没有这样的SKU");
+        }
         if(!couponActivityPo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())) {
             return new ReturnObject(ResponseCode.COUPONACT_STATENOTALLOW, "只允许修改下线的活动");
         }
@@ -748,15 +752,15 @@ public class ActivityService implements InitializingBean {
             return new ReturnObject(ResponseCode.COUPON_FINISH, "你已经领取过本活动的优惠券了");
         }
         /* 构造优惠券对象 */
-        List<CouponVo> retList = new ArrayList<>();
+        List<String> retList = new ArrayList<>();
         CouponPo po = new CouponPo();
 
-        po.setCouponSn(Common.genSeqNum());
+
         /* 异步要求RocketMQ写入 */
         if (couponActivityPo.getQuantitiyType() == 0) {
             // 每人限领取一定数量，生成quantity张
             for (int i = 0; i < couponActivityPo.getQuantity(); ++i) {
-
+                po.setCouponSn(Common.genSeqNum());
                 if (couponActivityPo.getValidTerm() == 0) {
                     po.setBeginTime(couponActivityPo.getCouponTime());
                     po.setEndTime(couponActivityPo.getEndTime());
@@ -768,7 +772,7 @@ public class ActivityService implements InitializingBean {
                     );
                 }
                 couponDao.addCoupon(po, activityId, userId);
-                retList.add(new CouponVo(po,activityInCouponVo));
+                retList.add(po.getCouponSn());
             }
         } else if (couponActivityPo.getQuantitiyType() == 1) {
             // 总数控制，每人领取一张
@@ -780,6 +784,7 @@ public class ActivityService implements InitializingBean {
             }
 
             redisBloomFilter.addByBloomFilter("Claimed" + activityId.toString(), activityId.toString() + userId.toString());
+            po.setCouponSn(Common.genSeqNum());
             if (couponActivityPo.getValidTerm() == 0) {
                 po.setBeginTime(couponActivityPo.getCouponTime());
                 po.setEndTime(couponActivityPo.getEndTime());
@@ -791,7 +796,7 @@ public class ActivityService implements InitializingBean {
                 );
             }
             couponDao.addCoupon(po, activityId, userId);
-            retList.add(new CouponVo(po,activityInCouponVo));
+            retList.add(po.getCouponSn());
         }
 
         /* 构造返回值 */

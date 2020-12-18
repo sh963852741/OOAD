@@ -10,6 +10,10 @@ public class UserVo {
     private Long id;
     private String userName;
 
+    public UserVo(){
+
+    }
+
     public UserVo(UserDTO dto){
         id = dto.getId();
         userName =dto.getUserName();

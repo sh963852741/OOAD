@@ -73,6 +73,23 @@ public class CommentDao {
     }
 
     /**
+     * 判断某个订单明细是否已被评论
+     */
+    public Boolean judgeComment(Long orderItemId){
+        CommentPoExample example=new CommentPoExample();
+        CommentPoExample.Criteria criteria=example.createCriteria();
+        criteria.andOrderitemIdEqualTo(orderItemId);
+        List<CommentPo> commentPos=commentPoMapper.selectByExample(example);
+        for(CommentPo commentPo:commentPos){
+            if(commentPo.getState()==Comment.State.NOT_AUDIT.getCode()||commentPo.getState()==Comment.State.PASS.getCode()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
      * 分页查询sku下所有已通过审核的评论
      *
      * @param skuId
