@@ -589,6 +589,9 @@ public class GoodsService implements InitializingBean {
             }
         }
         ReturnObject<Sku> skuRet = goodsDao.getSkuById(id);
+        if(skuRet.getCode() != ResponseCode.OK){
+            return skuRet;
+        }
         if(skuRet.getData().getInventory()< floatPriceVo.getQuantity()){
             return new ReturnObject(ResponseCode.SKU_NOTENOUGH);
         }
