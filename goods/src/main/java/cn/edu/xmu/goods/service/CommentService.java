@@ -35,10 +35,10 @@ public class CommentService {
     @Autowired
     private CommentDao commentDao;
 
-    //@DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private ICustomerService customerService;
 
-   //@DubboReference(version = "0.0.1-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IDubboOrderService orderService;
 
     @Autowired

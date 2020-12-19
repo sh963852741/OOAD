@@ -47,7 +47,7 @@ public class GoodsService implements InitializingBean {
 
     private  static  final Logger logger = LoggerFactory.getLogger(GoodsService.class);
 
-    //@DubboReference(version = "1.0.8-SNAPSHOT")
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IFreightService freightService;
 
     @Autowired

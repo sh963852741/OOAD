@@ -38,7 +38,7 @@ public class GoodsController {
 
     private static final Logger logger = LoggerFactory.getLogger(GoodsController.class);
 
-   // @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IBeShareService beShareService;
 
     @Autowired
