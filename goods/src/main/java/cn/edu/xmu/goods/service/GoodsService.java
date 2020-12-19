@@ -12,6 +12,7 @@ import cn.edu.xmu.goods.model.bo.Spu;
 import cn.edu.xmu.goods.model.po.*;
 import cn.edu.xmu.goods.model.vo.*;
 import cn.edu.xmu.goods.utility.OrderAdapter;
+import cn.edu.xmu.goods.utility.OtherAdapter;
 import cn.edu.xmu.ooad.util.ImgHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -19,6 +20,7 @@ import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
 import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
 import cn.edu.xmu.oomall.dto.FreightModelDto;
 import cn.edu.xmu.oomall.service.IFreightService;
+import cn.edu.xmu.privilegeservice.client.IUserService;
 import com.google.common.hash.Funnels;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
@@ -49,6 +51,9 @@ public class GoodsService implements InitializingBean {
 
     @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IFreightService freightService;
+
+    @DubboReference(version = "0.0.1-SHAPSHOT",check = false)
+    private IUserService userService;
 
     @Autowired
     private GoodsDao goodsDao;
@@ -602,7 +607,8 @@ public class GoodsService implements InitializingBean {
         if(ret.getCode() == ResponseCode.OK){
             FloatPrice floatPrice = ret.getData();
             FloatPriceRetVo retVo = floatPrice.createVo();
-            retVo.setModifiedBy(userId);
+            retVo.setModifiedBy(OtherAdapter.adapterSimpleUser(userId,userService.getUserName(userId)));
+            retVo.setCreateBy(OtherAdapter.adapterSimpleUser(userId,userService.getUserName(userId)));
         }
         return ret;
     }

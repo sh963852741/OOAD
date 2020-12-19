@@ -165,7 +165,12 @@
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>cn.edu.xmu</groupId>
+			<artifactId>privilegeservice-client</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>cn.edu.xmu</groupId>
 			<artifactId>other-consumer</artifactId>
