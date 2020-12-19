@@ -305,7 +305,7 @@ public class GoodsDao {
      * @Author: Yifei Wang
      * @Date: 2020/11/26 16:43
      */
-    public ReturnObject getSkuById(Long id){
+    public ReturnObject<Sku> getSkuById(Long id){
         SKUPo skuPo = new SKUPo();
         try {
             if(redisTemplate.hasKey("skuPo_"+id)){

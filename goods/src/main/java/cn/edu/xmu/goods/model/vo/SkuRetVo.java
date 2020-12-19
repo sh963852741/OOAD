@@ -22,4 +22,5 @@ public class SkuRetVo {
     private String gmtModified;
     private Boolean disable;
     private SpuRetVo spu;
+    private Byte state;
 }

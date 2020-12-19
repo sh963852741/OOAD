@@ -23,11 +23,11 @@ public class Sku implements VoObject {
      * 后台Sku状态
      */
     public enum State {
-        OFFSHELF(0,"未上架"),
-        NORM(4, "上架"),
-        FORBID(6, "已删除");
+        OFFSHELF((byte)0,"未上架"),
+        NORM((byte)4, "上架"),
+        FORBID((byte)6, "已删除");
 
-        private static final Map<Integer, Sku.State> stateMap;
+        private static final Map<Byte, Sku.State> stateMap;
 
         static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
             stateMap = new HashMap();
@@ -36,10 +36,10 @@ public class Sku implements VoObject {
             }
         }
 
-        private int code;
+        private byte code;
         private String description;
 
-        State(int code, String description) {
+        State(byte code, String description) {
             this.code = code;
             this.description = description;
         }
@@ -48,7 +48,7 @@ public class Sku implements VoObject {
             return stateMap.get(code);
         }
 
-        public Integer getCode() {
+        public Byte getCode() {
             return code;
         }
 
@@ -104,6 +104,7 @@ public class Sku implements VoObject {
         vo.setSkuSn(this.getSkuSn());
         vo.setWeight(this.getWeight());
         vo.setDisable(this.getDisable() == 1);
+        vo.setState(this.getState());
         return vo;
     }
 

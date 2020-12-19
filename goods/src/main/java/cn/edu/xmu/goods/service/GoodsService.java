@@ -177,7 +177,7 @@ public class GoodsService implements InitializingBean {
      * @Author: Yifei Wang
      * @Date: 2020/11/28 10:03
      */
-    public ReturnObject getSkuDetails(Long skuId){
+    public ReturnObject<SkuRetVo> getSkuDetails(Long skuId){
         if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter, skuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
@@ -192,7 +192,7 @@ public class GoodsService implements InitializingBean {
             vo.setSpu(null);
         }
         vo.setSpu((SpuRetVo) spuRet.getData());
-        return new ReturnObject(vo);
+        return new ReturnObject<>(vo);
     }
 
     /**
@@ -530,6 +530,13 @@ public class GoodsService implements InitializingBean {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
+        var x = goodsDao.getSkuById(id);
+        if(x.getData() == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(x.getData().getState().equals(Sku.State.NORM.getCode())){
+            return new ReturnObject(ResponseCode.STATE_NOCHANGE);
+        }
         Sku sku=new Sku();
         sku.setId(id);
         sku.setState(Sku.State.NORM.getCode().byteValue());
@@ -558,6 +565,13 @@ public class GoodsService implements InitializingBean {
             if(shopId.longValue()!=check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
+        }
+        var x = goodsDao.getSkuById(id);
+        if(x.getData() == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(x.getData().getState().equals(Sku.State.OFFSHELF.getCode())){
+            return new ReturnObject(ResponseCode.STATE_NOCHANGE);
         }
         Sku sku=new Sku();
         sku.setId(id);

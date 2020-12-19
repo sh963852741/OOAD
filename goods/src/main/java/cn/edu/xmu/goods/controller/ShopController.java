@@ -97,14 +97,9 @@ public class ShopController {
             @ApiResponse(code = 200, message = "成功"),
             @ApiResponse(code = 140, message = "该店铺无法修改")})
     @PutMapping(value = "/shops/{id}")
-    public Object modifyShop(@Depart Long did,@PathVariable Long id,@RequestBody @Validated ShopVo shopVo,BindingResult bindingResult){
+    public Object modifyShop(@PathVariable Long id,@RequestBody @Validated ShopVo shopVo,BindingResult bindingResult){
         Object obj = Common.processFieldErrors(bindingResult,httpServletResponse);
         if (null != obj) {
-            return obj;
-        }
-        else if(did != id)
-        {
-            obj = Common.decorateReturnObject(new ReturnObject(httpServletResponse.SC_FORBIDDEN));
             return obj;
         }
         else

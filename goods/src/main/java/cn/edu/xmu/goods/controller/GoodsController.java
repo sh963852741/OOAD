@@ -247,7 +247,7 @@ public class GoodsController {
             return obj;
         }
         ReturnObject ret = goodsService.updateSku(shopId, id, skuChangeVo);
-        return Common.getNullRetObj(ret, httpServletResponse);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
