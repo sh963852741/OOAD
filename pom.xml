@@ -24,6 +24,7 @@
         <module>other-consumer</module>
         <module>other-gateway</module>
         <module>public-test</module>
+        <module>privilegeservice-client</module>
         <module>other-consumer-lichengyang</module>
     </modules>
     <name>oomall</name>
