@@ -140,7 +140,7 @@ public class Spu {
         vo.setName(this.getName());
         vo.setGmtCreate(this.getGmtCreate());
         vo.setGmtModified(this.getGmtModified());
-        vo.setSpec(JacksonUtil.toObj(this.getSpec(), SpecVo.class));
+        vo.setSpec(this.getSpec());
         vo.setBrand(this.getSimpleBrandVo());
         vo.setCategory(this.getSimpleCategory());
         vo.setShop(this.getSimpleShop());
