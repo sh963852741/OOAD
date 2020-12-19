@@ -65,9 +65,9 @@ public class ActivityService implements InitializingBean {
 
     private RedisBloomFilter redisBloomFilter;
 
-    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
+    @DubboReference(version = "0.0.9-SNAPSHOT",check = false)
     IGoodsService goodsService;
-    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
+    @DubboReference(version = "0.0.9-SNAPSHOT",check = false)
     IShopService shopService;
 
     @Autowired

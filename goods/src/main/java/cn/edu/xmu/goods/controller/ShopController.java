@@ -220,6 +220,6 @@ public class ShopController {
             ReturnObject ret=shopService.offShelfShop(id);
             return Common.decorateReturnObject(ret);
         }
-        else return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST));
+        else return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.SHOP_STATENOTALLOW));
     }
 }

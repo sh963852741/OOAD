@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@DubboService(version = "0.0.1-SNAPSHOT")
+@DubboService(version = "0.0.9-SNAPSHOT")
 public class InventoryServiceImpl implements IInventoryService {
 
     @Autowired
