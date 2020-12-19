@@ -216,6 +216,10 @@ public class Spu {
         CategoryDao categoryDao=SpringContextHelper.getBean(CategoryDao.class);
         if(this.getCategoryId()==null){
             return null;
+        }else if(this.getCategoryId()==0){
+            map.put("id",0);
+            map.put("name","未分类");
+            return map;
         }
         ReturnObject ret=categoryDao.getCategoryById(this.getCategoryId());
         if(ret.getCode()!= ResponseCode.OK){

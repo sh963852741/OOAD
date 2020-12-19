@@ -80,6 +80,12 @@ public class CategoryService {
      */
     public ReturnObject deleteCategoryById(Long id) {
         goodsService.setCategoryZero(id);
+        var sub = categoryDao.getSubCategories(id);
+        if(sub.getCode().equals(ResponseCode.OK)){
+            for(CategoryPo categoryPo:sub.getData()){
+                goodsService.setCategoryZero(categoryPo.getId());
+            }
+        }
         ReturnObject ret=categoryDao.deleteCategoryById(id.longValue());
         return ret;
     }
