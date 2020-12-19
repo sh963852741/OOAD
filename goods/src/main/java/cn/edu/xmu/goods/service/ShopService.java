@@ -124,11 +124,16 @@ public class ShopService {
         Shop shop=new Shop();
         shop.setId(id);
         shop.setState(Shop.State.ONLINE.getCode().byteValue());
-        if(getShopByShopId(id).getData().getState()==Shop.State.OFFLINE.getCode().byteValue()) {
+        var x = getShopByShopId(id).getData();
+        if(x == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+
+        if(x.getState()==Shop.State.OFFLINE.getCode().byteValue()) {
             ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
         }
-        else return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        else return new ReturnObject(ResponseCode.SHOP_STATENOTALLOW);
     }
 
     /**
@@ -141,9 +146,13 @@ public class ShopService {
         Shop shop = new Shop();
         shop.setId(id.longValue());
         shop.setState(Shop.State.OFFLINE.getCode().byteValue());
-        if (getShopByShopId(id).getData().getState() == 4 || getShopByShopId(id).getData().getState() == 2) {
+        var x = getShopByShopId(id).getData();
+        if(x == null){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if (x.getState() == 4 || x.getState() == 2) {
             ReturnObject ret = shopDao.updateShopState(shop);
             return ret;
-        } else return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        } else return new ReturnObject(ResponseCode.SHOP_STATENOTALLOW);
     }
 }

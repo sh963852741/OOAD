@@ -97,7 +97,7 @@ public class GrouponController {
     public Object queryGrouponByAdmin(
             @ApiParam(value = "根据商铺id查询",required=true) @PathVariable("id") Long id,
             @ApiParam(value = "") @Valid @RequestParam(value = "state", required = false) Byte state,
-            @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuid", required = false) Long spuid,
+            @ApiParam(value = "根据SPUid查询") @Valid @RequestParam(value = "spuId", required = false) Long spuid,
             @ApiParam(value = "页码") @Valid @RequestParam(value = "page", required = false,defaultValue = "1") Integer page,
             @ApiParam(value = "每页数目") @Valid @RequestParam(value = "pageSize", required = false,defaultValue = "10") Integer pageSize,
             @RequestParam(value = "beginTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime beginTime,

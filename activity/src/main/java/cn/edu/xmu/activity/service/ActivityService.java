@@ -65,9 +65,9 @@ public class ActivityService implements InitializingBean {
 
     private RedisBloomFilter redisBloomFilter;
 
-    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
+    @DubboReference(version = "0.0.9-SNAPSHOT",check = false)
     IGoodsService goodsService;
-    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
+    @DubboReference(version = "0.0.9-SNAPSHOT",check = false)
     IShopService shopService;
 
     @Autowired
@@ -484,20 +484,24 @@ public class ActivityService implements InitializingBean {
         if(!activity.getShopId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "这个优惠活动不属于你");
         }
-        if(!activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
-            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改未下线的优惠活动");
-        }
-        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())
-        && !activity.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())){
-            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许下线未上线的活动");
-        }
-        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())
-                && !activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
-            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许上线未下线的活动");
-        }
-        if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())
-                && !activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
-            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许删除未下线的活动");
+        // 如果要修改优惠活动状态
+        if(couponActivityVo.getState() != null){
+            if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())
+                    && !activity.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())){
+                return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许下线未上线的活动");
+            }
+            if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())
+                    && !activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
+                return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许上线未下线的活动");
+            }
+            if(couponActivityVo.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())
+                    && !activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
+                return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许删除未下线的活动");
+            }
+        }else{
+            if(!activity.getState().equals(CouponActivity.CouponStatus.OFFLINE.getCode())){
+                return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改未下线的优惠活动");
+            }
         }
 //        if(activity.getBeginTime().isAfter(LocalDateTime.now())){
 //            return new ReturnObject<>(ResponseCode.COUPONACT_STATENOTALLOW, "不允许修改已经开始的优惠活动");
@@ -614,6 +618,9 @@ public class ActivityService implements InitializingBean {
     public ReturnObject<PageInfo<VoObject>> getSKUInCouponActivity(long activityId, int page, int pageSize){
         CouponActivityPo po = couponActivityDao.getActivityById(activityId);
         if(po == null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(!po.getState().equals(CouponActivity.CouponStatus.ONLINE.getCode())){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         PageInfo<CouponSKUPo> couponSPUPoPageInfo = couponActivityDao.getSKUsInActivity(activityId, page, pageSize);

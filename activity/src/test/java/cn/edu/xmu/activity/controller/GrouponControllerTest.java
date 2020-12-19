@@ -131,10 +131,46 @@ public class GrouponControllerTest {
                 .andDo(MockMvcResultHandlers.print());
     }
     /**
-     * 修改优惠活动
+     * 新建优惠活动 失败
+     */
+    @Test
+    public void addGrouponActivity2() throws Exception {
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(4);
+        LocalDateTime endTime = time.plusHours(3);
+        String request="{ \"name\":\"团购活动\",\"strategy\": \"\", \"beginTime\": \"" + beginTime.toString()
+                + "\",\"endTime\": \""+ endTime.toString() +"\"}";
+
+        mvc.perform(post("/groupon/shops/1/spus/273/groupons").contentType("application/json;charset=UTF-8")
+                .header("authorization", shopToken).content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+    }
+    /**
+     * 修改优惠活动  错误
      */
     @Test
     public void modifyGrouponActivity1() throws Exception {
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime beginTime = time.plusHours(4);
+        LocalDateTime endTime = time.plusHours(3);
+        String request="{ \"name\":\"团购活动\",\"strategy\": \"\", \"beginTime\": \"" + beginTime.toString()
+                + "\",\"endTime\": \""+ endTime.toString() +"\"}";
+
+        mvc.perform(put("/groupon/shops/{shopId}/groupons/{id}").contentType("application/json;charset=UTF-8")
+                .header("authorization", shopToken).content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.FIELD_NOTVALID.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+    }
+    /**
+     * 修改优惠活动
+     */
+    @Test
+    public void modifyGrouponActivity2() throws Exception {
         LocalDateTime time = LocalDateTime.now();
         LocalDateTime beginTime = time.plusHours(1);
         LocalDateTime endTime = time.plusHours(3);
@@ -160,6 +196,12 @@ public class GrouponControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
+                .andDo(MockMvcResultHandlers.print());
+        mvc.perform(delete("/groupon/shops/1/groupons/100").contentType("application/json;charset=UTF-8")
+                .header("authorization", adminToken))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.errno").value(ResponseCode.RESOURCE_ID_NOTEXIST.getCode()))
                 .andDo(MockMvcResultHandlers.print());
     }
     /**

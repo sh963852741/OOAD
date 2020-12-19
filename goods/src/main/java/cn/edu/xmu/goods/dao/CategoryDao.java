@@ -29,13 +29,13 @@ public class CategoryDao {
      * @Author: Yifei Wang
      * @Date: 2020/11/26 22:15
      */
-    public ReturnObject getSubCategories(Long id){
+    public ReturnObject<List<CategoryPo>> getSubCategories(Long id){
         CategoryPoExample example=new CategoryPoExample();
         CategoryPoExample.Criteria criteria=example.createCriteria();
         criteria.andPidEqualTo(id);
         try {
             List<CategoryPo> categoryPos = categoryPoMapper.selectByExample(example);
-            ReturnObject<List> ret=new ReturnObject<>(categoryPos);
+            ReturnObject<List<CategoryPo>> ret=new ReturnObject<>(categoryPos);
             return ret;
         }catch (Exception e){
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);

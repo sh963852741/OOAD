@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.BrandVo;
 import cn.edu.xmu.goods.model.bo.Brand;
+import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.Depart;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
@@ -32,6 +33,7 @@ public class BrandController {
     private HttpServletResponse httpServletResponse;
 
     @DeleteMapping("/shops/{shopId}/brands/{id}")
+    @Audit
     public Object deleteBrand(@PathVariable("shopId") Long shopId, @PathVariable("id") Long id,
                               @Depart @ApiIgnore @RequestParam(required = false) Long departId){
         departId= Long.valueOf(0);//平台
@@ -60,6 +62,7 @@ public class BrandController {
             @ApiImplicitParam(paramType = "body", dataType = "RoleVo", name = "vo", value = "可修改的用户信息", required = true)
     })
     @PutMapping("/shops/{shopId}/brands/{id}")
+    @Audit
     public Object updateRole(@PathVariable("shopId") Long shopId, @PathVariable("id") Long id, @Validated @RequestBody BrandVo vo, BindingResult bindingResult,
                              @Depart @ApiIgnore @RequestParam(required = false) Long DepartId)
     {
@@ -94,6 +97,7 @@ public class BrandController {
      */
     @ApiOperation(value = "新增品牌", produces = "application/json")
     @PostMapping("/shops/{shopId}/brands")
+    @Audit
     public Object insertBrand(@PathVariable("shopId") Long shopId,@Validated @RequestBody BrandVo vo, BindingResult bindingResult,
                              @LoginUser @ApiIgnore @RequestParam(required = false) Long userId,
                              @Depart @ApiIgnore @RequestParam(required = false) Long departId) {
@@ -122,6 +126,7 @@ public class BrandController {
     }
     @ApiOperation(value = "新增品牌图片", produces = "application/json")
     @PostMapping("/shops/{shopId}/brands/{id}/uploadImg")
+    @Audit
     public Object uploadimage(@PathVariable("shopId") Long shopId, @PathVariable("id") Long id, @RequestParam("img") MultipartFile multipartFile, @Validated @RequestBody BindingResult bindingResult,
                               @LoginUser @ApiIgnore @RequestParam(required = false) Long userId,
                               @Depart @ApiIgnore @RequestParam(required = false) Long departId) {

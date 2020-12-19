@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@DubboService(version = "0.0.1-SNAPSHOT")
+@DubboService(version = "0.0.9-SNAPSHOT")
 public class DiscountServiceImpl implements IDiscountService {
 
     @Autowired
