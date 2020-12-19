@@ -73,7 +73,6 @@ public class ShopController {
         if(did == -1)
         {
             var ret = shopService.newShop(shopvo);
-
             if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
             return Common.decorateReturnObject(ret);
 
@@ -105,7 +104,7 @@ public class ShopController {
         }
         else if(did != id)
         {
-            obj = Common.decorateReturnObject(new ReturnObject(403));
+            obj = Common.decorateReturnObject(new ReturnObject(httpServletResponse.SC_FORBIDDEN));
             return obj;
         }
         else
@@ -131,7 +130,7 @@ public class ShopController {
             @ApiImplicitParam(name = "authorization", value = "shopToken", required = true, dataType = "String", paramType = "header")
     })
     @DeleteMapping(value = "/shops/{id}")
-    public Object deleteShop(@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
+    public Object deleteShop(@Depart Long did,@ApiParam(value = "shop ID",required=true) @PathVariable("id") Long id){
         var shop = shopService.getShopByShopId(id).getData();
         if(shop == null) {
             return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "店铺不存在"));
