@@ -21,7 +21,6 @@ import java.util.HashMap;
 @ApiModel(value = "优惠活动")
 public class CouponActivityVo implements VoObject {
 
-    @NotBlank
     @ApiModelProperty(value = "优惠名称")
     String name;
 

@@ -62,7 +62,7 @@ public class FlashSaleService implements InitializingBean {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,"秒杀活动不存在");
         }
         if(!flashSalePo.getState().equals(FlashState.FalshStatus.OFFLINE.getCode())){
-            return new ReturnObject<>(ResponseCode.DELETE_CHANGAE_NOTALLOW, "仅可上线下线的秒杀活动");
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "仅可上线下线的秒杀活动");
         }
 
         if(flashSaleDao.setFlashSaleStatus(id, FlashState.FalshStatus.ONLINE.getCode())==1){
@@ -122,8 +122,11 @@ public class FlashSaleService implements InitializingBean {
         if (flashSalePo == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
+        if (flashSalePo.getState().equals(FlashState.FalshStatus.DELETE.getCode())){
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         if (!flashSalePo.getState().equals(FlashState.FalshStatus.OFFLINE.getCode())){
-            return new ReturnObject(ResponseCode.DELETE_ONLINE_NOTALLOW);
+            return new ReturnObject(ResponseCode.ACTIVITYALTER_INVALID);
         }
 
         redisTemplate.delete("FlashSale" + flashSalePo.getFlashDate().toLocalDate().toString() + flashSalePo.getTimeSegId());
@@ -139,7 +142,7 @@ public class FlashSaleService implements InitializingBean {
     public ReturnObject modifyFlashSale(long id, LocalDateTime date){
         var flashSale = flashSaleDao.getFlashSale(id);
         if (flashSale == null || !flashSale.getState().equals(FlashState.FalshStatus.OFFLINE.getCode())){
-            return new ReturnObject(ResponseCode.DELETE_CHANGAE_NOTALLOW, "状态错误");
+            return new ReturnObject(ResponseCode.ACTIVITYALTER_INVALID, "状态错误");
         }
 
         if(date.minusHours(24).isBefore(LocalDateTime.now())){

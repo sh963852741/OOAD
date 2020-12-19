@@ -52,7 +52,7 @@ public class GoodsService implements InitializingBean {
     @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IFreightService freightService;
 
-    @DubboReference(version = "0.0.1-SHAPSHOT",check = false)
+    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IUserService userService;
 
     @Autowired
@@ -794,12 +794,12 @@ public class GoodsService implements InitializingBean {
      * @Date: 2020/12/1 10:24
      */
     @Transactional
-    public ReturnObject addSkuToSpu(Long shopId, Long id, SkuVo skuVo) {
-        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+    public ReturnObject addSkuToSpu(Long shopId, Long spuId, SkuVo skuVo) {
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
-            ReturnObject<Long> check = goodsDao.getShopIdBySpuId(id);
+            ReturnObject<Long> check = goodsDao.getShopIdBySpuId(spuId);
             if(check.getCode() != ResponseCode.OK){
                 return check;
             }
@@ -808,6 +808,7 @@ public class GoodsService implements InitializingBean {
             }
         }
         SKUPo po = new SKUPo();
+        po.setGoodsSpuId(spuId);
         po.setName(skuVo.getName());
         po.setState(Sku.State.OFFSHELF.getCode().byteValue());
         po.setConfiguration(skuVo.getConfiguration());

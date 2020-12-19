@@ -67,7 +67,7 @@ public class ActivityService implements InitializingBean {
 
     @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     IGoodsService goodsService;
-    @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
+    @DubboReference(version = "0.0.9-SNAPSHOT",check = false)
     IShopService shopService;
 
     @Autowired
@@ -292,7 +292,7 @@ public class ActivityService implements InitializingBean {
         if (spuDTO == null) {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "指定的SPU不存在");
         }
-        if(spuDTO.getShopId().equals(shopId)){
+        if(!spuDTO.getShopId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "指定的SPU不属于当前商铺");
         }
 
@@ -327,7 +327,7 @@ public class ActivityService implements InitializingBean {
         if(activityPo == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "团购活动不存在");
         }
-        if(!activityPo.getShopId().equals(shopId)){
+        if(!activityPo.getShopId().equals(shopId) && shopId != 0){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "不能修改其他的店铺的团购活动");
         }
         if(activityPo.getBeginTime().isBefore(LocalDateTime.now())){
@@ -480,6 +480,9 @@ public class ActivityService implements InitializingBean {
         var activity = couponActivityDao.getActivityById(id);
         if(activity == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动不存在");
+        }
+        if(activity.getState().equals(CouponActivity.CouponStatus.DELETE.getCode())){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, "优惠活动已删除");
         }
         if(!activity.getShopId().equals(shopId)){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, "这个优惠活动不属于你");

@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
@@ -21,7 +22,6 @@ import java.util.Map;
 public class GrouponActivityVo {
 
     @ApiModelProperty(value = "活动名称")
-    @NotBlank
     String name;
 
     @JsonDeserialize(using = MyDeserializer.class)
@@ -30,21 +30,21 @@ public class GrouponActivityVo {
     String strategy;
 
     @ApiModelProperty(value = "团购开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     @Future
     LocalDateTime beginTime;
 
     @ApiModelProperty(value = "团购结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     @Future
     LocalDateTime endTime;
 
     Long id;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     private LocalDateTime gmtCreate;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
     private LocalDateTime gmtModified;
 
     public SpuInActivityVo goodsSpu;

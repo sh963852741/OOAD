@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CouponActicityChangeVo {
-    @NotBlank
     @ApiModelProperty(value = "优惠名称")
     String name;
 

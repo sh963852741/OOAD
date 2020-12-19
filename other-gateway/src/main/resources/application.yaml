@@ -1,5 +1,5 @@
 server:
-  port: 8078
+  port: 8080
 
 gateway:
   activity: http://localhost:8988/
@@ -23,55 +23,110 @@ spring:
               - HEAD
               - OPTIONS
       routes:
-        - id: presale
+        - id: presale_admin
           uri: ${gateway.activity}
           predicates:
-            - Path=/presales/states,/presales,/shops/{shopId}/skus/{id}/presales,/shops/{shopId}/presales/{id},/shops/{shopId}/presales,/shops/{shopId}/presales/{id}/**
+            - Path=/shops/{shopId}/presales,/shops/{shopId}/skus/{id}/presales,/shops/{shopId}/presales/{id},/shops/{shopId}/presales/{id}/onshelves,/shops/{shopId}/presales/{id}/offshelves
           filters:
             - PrefixPath=/presale
+            - Auth=authorization
+      
+        - id: presale_user
+          uri: ${gateway.activity}
+          predicates:
+            - Path=/presales/states,/presales
+          filters:
+            - PrefixPath=/presale
+
+        - id: shop_user
+          uri: ${gateway.goods}
+          predicates:
+            - Path=/shops/states
+          filters:
+            - PrefixPath=/shop
 
         - id: shop
           uri: ${gateway.goods}
           predicates:
-            - Path=/shops/states,/shops,/shops/{id},/shops/{shopId}/newshops/{id}/audit,/shops/{id}/onshelves,/shops/{id}/offshelves
+            - Path=/shops,/shops/{id},/shops/{shopId}/newshops/{id}/audit,/shops/{id}/onshelves,/shops/{id}/offshelves
           filters:
             - PrefixPath=/shop
-
-        - id: falshsale
+            
+        - id: falshsale_users
           uri: ${gateway.falshsale}
           predicates:
-            - Path=/timesegments/{id}/flashsales,/flashsales/current,/shops/{did}/timesegments/{id}/flashsales,/shops/{did}/flashsales/{id},/shops/{did}/flashsales/{id}/flashitems,/shops/{did}/flashsales/{fid}/flashitems/{id},/shops/{did}/flashsales/{id}/**
+            - Path=/timesegments/{id}/flashsales,/flashsales/current
           filters:
             - PrefixPath=/flashsale
 
-        - id: coupon
+        - id: falshsale_admin
+          uri: ${gateway.falshsale}
+          predicates:
+            - Path=/shops/{did}/timesegments/{id}/flashsales,/shops/{did}/flashsales/{id},/shops/{did}/flashsales/{id}/onshelves,/shops/{did}/flashsales/{id}/offshelves,/shops/{did}/flashsales/{id}/flashitems,/shops/{did}/flashsales/{fid}/flashitems/{id}
+          filters:
+            - PrefixPath=/flashsale
+            - Auth=authorization
+
+        - id: coupon_user
           uri: ${gateway.activity}
           predicates:
-            - Path=/coupons/states,/shops/{shopId}/couponactivities,/shops/{shopId}/couponactivities/{id}/uploadImg,/couponactivities,/shops/{id}/couponactivities/invalid,/couponactivities/{id}/skus,/shops/{shopId}/couponactivities/{id},/shops/{shopId}/couponactivities/{id}/skus,/shops/{shopId}/couponskus/{id},/coupons,/couponactivities/{id}/usercoupons,/shops/{shopId}/couponactivities/{id}/onshelves,/shops/{shopId}/couponactivities/{id}/offshelves
+            - Path=/coupons/states,/couponactivities,/couponactivities/{id}/skus
           filters:
             - PrefixPath=/coupon
 
-        - id: groupon
+        - id: coupon_admin
           uri: ${gateway.activity}
           predicates:
-            - Path=/groupons/states,/groupons,/shops/{id}/groupons,/shops/{shopId}/spus/{id}/groupons,/shops/{shopId}/groupons/{id},/shops/{shopId}/groupons/{id}/onshelves,/shops/{shopId}/groupons/{id}/offshelves
+            - Path=/shops/{shopId}/couponactivities,/shops/{shopId}/couponactivities/{id}/uploadImg,/shops/{id}/couponactivities/invalid,/shops/{shopId}/couponactivities/{id},/shops/{shopId}/couponactivities/{id}/skus,/shops/{shopId}/couponskus/{id},/coupons,/couponactivities/{id}/usercoupons,/shops/{shopId}/couponactivities/{id}/onshelves,/shops/{shopId}/couponactivities/{id}/offshelves
+          filters:
+            - PrefixPath=/coupon
+            - Auth=authorization
+
+        - id: groupon_users
+          uri: ${gateway.activity}
+          predicates:
+            - Path=/groupons/states,/groupons
           filters:
             - PrefixPath=/groupon
+        
+        - id: groupon_admin
+          uri: ${gateway.activity}
+          predicates:
+            - Path=/shops/{id}/groupons,/shops/{shopId}/spus/{id}/groupons,/shops/{shopId}/groupons/{id},/shops/{shopId}/groupons/{id}/onshelves,/shops/{shopId}/groupons/{id}/offshelves
+          filters:
+            - PrefixPath=/groupon
+            - Auth=authorization
 
-        - id: comment
+        - id: comment_user
           uri: ${gateway.goods}
           predicates:
-            - Path=/comments/states,/orderitems/{id}/comments,/skus/{id}/comments,/shops/{did}/comments/{id}/confirm,/comments,/shops/{id}/comments/all
+            - Path=/comments/states,/skus/{id}/comments,/comments
           filters:
             - PrefixPath=/comment
-
-        - id: goods
+            
+        - id: comment_admin
           uri: ${gateway.goods}
           predicates:
-            - Path=/skus/states,/skus,/brands,/shops/{shopId}/brands/**,/skus/**,/spus/**,/shops/{shopId}/floatPrices/**,/shops/{shopId}/spus/**,/shops/{shopId}/skus/**,/categories/{id}/subcategories,/shops/{shopId}/categories/**
+            - Path=/orderitems/{id}/comments,/shops/{did}/comments/{id}/confirm,/shops/{id}/comments/all
+          filters:
+            - PrefixPath=/comment
+            - Auth=authorization
+
+        - id: goods_user
+          uri: ${gateway.goods}
+          predicates:
+            - Path=/skus/states,/skus,/skus/{id},/categories/{id}/subcategories,/spus/{id},/brands
           filters:
             - PrefixPath=/goods
 
+           
+        - id: goods
+          uri: ${gateway.goods}
+          predicates:
+            - Path=/shops/{shopId}/spus/{id}/skus,/shops/{shopId}/skus/{id}/uploadImg,/shops/{shopId}/skus/{id},/shops/{shopId}/categories/{id}/subcategories,/shops/{shopId}/categories/{id},/share/{sid}/skus/{id},/shops​/{id}​/spus,/shops/{shopId}/spus/{id},/shops/{shopId}/skus/{id}/onshelves,/shops/{shopId}/skus/{id}/offshelves,/shops/{shopId}/skus/{id}/floatPrices,/shops/{shopId}/floatPrices/{id},/shops/{id}/brands,/shops/{shopId}/brands/{id}/uploadImg,/shops/{shopId}/brands/{id},/shops/{shopId}/spus/{spuId}/categories/{id},/shops​/{shopId}​/spus​/{spuId}​/brands​/{id}
+          filters:
+            - PrefixPath=/goods
+            - Auth=authorization
 
 
         - id: adminusers
@@ -80,7 +135,6 @@ spring:
             - Path=/adminusers/**,/shops/{shopid}/adminusers/**,/proxies/**,/shops/{shopid}/proxies/**,/shops/{shopid}/roles/**,/shops/{shopid}/roleprivileges/**,/privileges/**,/roles/**,/roles,/shops/{shopid}/roles
           filters:
             - PrefixPath=/privilege
-            - Auth=authorization
 
 
 #        - id: adminusers

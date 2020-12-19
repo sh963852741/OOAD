@@ -147,6 +147,7 @@ public class GrouponController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "成功") })
     @PostMapping(value = "/shops/{shopId}/spus/{id}/groupons")
+    @Audit
     public Object createGrouponofSPU(
             @ApiParam(value = "商铺id",required=true) @PathVariable("shopId") Integer shopId,
             @ApiParam(value = "商品SPUid",required=true) @PathVariable("id") Integer id,
