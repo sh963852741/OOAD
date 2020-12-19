@@ -69,6 +69,8 @@ shopservice:
     password: 123465
     baseUrl: http://localhost:8080/web/
 
+bloom-starter: false
+
 mybatis:
   # 将包中的类添加为类型别名
   type-aliases-package: com.xmu.oomall.domain
@@ -92,7 +94,7 @@ dubbo:
   protocol:
     name: dubbo
     port: 28091
-#    host: 192.168.43.25
+    host: 192.168.43.25
 
 # 配置rocketmq
 rocketmq:

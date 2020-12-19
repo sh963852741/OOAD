@@ -76,6 +76,9 @@ public class GoodsService implements InitializingBean {
     @Value("${goodsservice.webdav.baseUrl}")
     private String baseUrl;
 
+    @Value("${bloom-starter}")
+    private Boolean bloomStart;
+
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -89,21 +92,23 @@ public class GoodsService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.bloomFilterHelper =  new BloomFilterHelper<>(
-                Funnels.longFunnel(),
-                5000, 0.03);
-        this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
-        SKUPoExample example = new SKUPoExample();
-        List<SKUPo> skuPoList = goodsDao.getSkuList();
-        redisTemplate.delete(skuBloomFilter);
-        redisTemplate.delete(spuBloomFilter);
-        for(SKUPo skuPo : skuPoList){
-            redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
-        }
-        SPUPoExample example1 = new SPUPoExample();
-        List<SPUPo> spuPoList = goodsDao.getSpuList();
-        for(SPUPo spuPo : spuPoList){
-            redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
+        if(bloomStart){
+            this.bloomFilterHelper =  new BloomFilterHelper<>(
+                    Funnels.longFunnel(),
+                    5000, 0.03);
+            this.redisBloomFilter = new RedisBloomFilter<>(redisTemplate, bloomFilterHelper);
+            SKUPoExample example = new SKUPoExample();
+            List<SKUPo> skuPoList = goodsDao.getSkuList();
+            redisTemplate.delete(skuBloomFilter);
+            redisTemplate.delete(spuBloomFilter);
+            for(SKUPo skuPo : skuPoList){
+                redisBloomFilter.addByBloomFilter(skuBloomFilter, skuPo.getId());
+            }
+            SPUPoExample example1 = new SPUPoExample();
+            List<SPUPo> spuPoList = goodsDao.getSpuList();
+            for(SPUPo spuPo : spuPoList){
+                redisBloomFilter.addByBloomFilter(spuBloomFilter, spuPo.getId());
+            }
         }
     }
 
@@ -147,7 +152,7 @@ public class GoodsService implements InitializingBean {
         if(vo.getSpuId() == null){
             return goodsDao.getAllSkus(vo, page, pageSize);
         }
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter, vo.getSpuId())){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter, vo.getSpuId())){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         //spuId不为空 且shopId也不空 检查这个spuId是否是这个shopId的 如果不是 直接返回错误
@@ -173,7 +178,7 @@ public class GoodsService implements InitializingBean {
      * @Date: 2020/11/28 10:03
      */
     public ReturnObject getSkuDetails(Long skuId){
-        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter, skuId)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter, skuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         ReturnObject ret=goodsDao.getSkuById(skuId);
@@ -199,7 +204,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject upLoadSkuImg(MultipartFile multipartFile, Long shopId, Long id) {
-        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         //判断是否是属于自己商铺的SKU
@@ -267,7 +272,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject deleteSkuById(Long shopId, Long id) {
-        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -295,7 +300,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject updateSku(Integer shopId, Integer id, SkuChangeVo skuChangeVo) {
-        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id.longValue())){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id.longValue())){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -387,7 +392,7 @@ public class GoodsService implements InitializingBean {
      * @Date: 2020/11/27 17:58
      */
     public ReturnObject upLoadSpuImg(MultipartFile multipartFile, Integer shopId, Integer id) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         //判断是否是属于自己商铺的Spu
@@ -455,7 +460,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject updateSpu(Integer id, Integer shopId, SpuVo spuVo) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId != 0){
@@ -485,7 +490,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject deleteSpuById(Integer id, Integer shopId) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -513,7 +518,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject onShelfSku(Long id, Long shopId) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -542,7 +547,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject offShelfSku(Long id, Long shopId) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId != 0){
@@ -571,7 +576,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject newFloatPrice(Long id, Long shopId, FloatPriceVo floatPriceVo ,Long userId) {
-        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId != 0){
@@ -648,7 +653,7 @@ public class GoodsService implements InitializingBean {
         if(skuId == null){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-        if(!redisBloomFilter.includeByBloomFilter(skuBloomFilter,skuId)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter,skuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         ReturnObject ret = goodsDao.getActivityPrice(skuId);
@@ -667,7 +672,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject addSpuToCategory(Long shopId, Long spuId, Long id) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -703,7 +708,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject removeSpuFromCategory(Long shopId, Long spuId, Long id) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId != 0){
@@ -731,7 +736,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject addSpuToBrand(Long shopId, Long spuId, Long id) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -759,7 +764,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject removeSpuFromBrand(Long shopId, Long spuId, Long id) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,spuId)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -787,7 +792,7 @@ public class GoodsService implements InitializingBean {
      */
     @Transactional
     public ReturnObject addSkuToSpu(Long shopId, Long id, SkuVo skuVo) {
-        if(!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
+        if(bloomStart&&!redisBloomFilter.includeByBloomFilter(spuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(shopId!=0){
@@ -815,7 +820,9 @@ public class GoodsService implements InitializingBean {
             return ret;
         }
         SkuSimpleRetVo vo = (SkuSimpleRetVo)ret.getData();
-        redisBloomFilter.addByBloomFilter(skuBloomFilter,vo.getId());
+        if(bloomStart){
+            redisBloomFilter.addByBloomFilter(skuBloomFilter,vo.getId());
+        }
         return ret;
     }
 
