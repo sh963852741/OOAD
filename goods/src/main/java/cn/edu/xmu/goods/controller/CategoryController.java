@@ -2,6 +2,7 @@ package cn.edu.xmu.goods.controller;
 
 import cn.edu.xmu.goods.model.vo.CategoryVo;
 import cn.edu.xmu.goods.service.CategoryService;
+import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -59,6 +60,7 @@ public class CategoryController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PostMapping("/shops/{shopId}/categories/{id}/subcategories")
+    @Audit
     public Object addCategories(@PathVariable("id") Long id,@Valid @RequestBody CategoryVo vo, BindingResult bindingResult){
         var res = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(res != null){
@@ -88,6 +90,7 @@ public class CategoryController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @PutMapping("/shops/{shopId}/categories/{id}")
+    @Audit
     public Object changeCategories(@PathVariable("id") Long id, @Valid @RequestBody CategoryVo vo, BindingResult bindingResult){
         var res = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(res != null){
@@ -113,6 +116,7 @@ public class CategoryController {
             @ApiResponse(code = 0, message = "成功"),
     })
     @DeleteMapping("/shops/{shopId}/categories/{id}")
+    @Audit
     public Object deleteCategories(@PathVariable("id") Long id){
         ReturnObject ret=categoryService.deleteCategoryById(id);
         return Common.decorateReturnObject(ret);
