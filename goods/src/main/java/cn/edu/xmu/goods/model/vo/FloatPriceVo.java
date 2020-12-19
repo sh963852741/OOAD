@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -22,11 +24,15 @@ public class FloatPriceVo {
     @ApiModelProperty(value = "生效开始时间")
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
+    @DateTimeFormat
     LocalDateTime beginTime;
 
     @ApiModelProperty(value = "生效结束时间")
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
+    @DateTimeFormat
     LocalDateTime endTime;
 
     @Min(0)
