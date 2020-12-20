@@ -77,7 +77,7 @@ public class ShopController {
             return Common.decorateReturnObject(ret);
 
         }
-        else if(did == 1) return Common.decorateReturnObject(new ReturnObject(ResponseCode.USER_HASSHOP, "您已经拥有店铺，无法重新申请"));
+        else if(did != -1&&did !=0) return Common.decorateReturnObject(new ReturnObject(ResponseCode.USER_HASSHOP, "您已经拥有店铺，无法重新申请"));
         else return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID, "商铺名称不能为空"));
 
     }
