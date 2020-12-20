@@ -40,12 +40,12 @@ public class CommentService {
 
     @DubboReference(version = "0.0.1-SNAPSHOT",check = false)
     private IDubboOrderService orderService;
-
-    @Autowired
-    private CustomerServiceMock customerServiceMock;
-
-    @Autowired
-    private OrderServiceMock orderServiceMock;
+//
+//    @Autowired
+//    private CustomerServiceMock customerServiceMock;
+//
+//    @Autowired
+//    private OrderServiceMock orderServiceMock;
     /**
      * 获取评论所有状态
      * @return
@@ -63,7 +63,7 @@ public class CommentService {
      */
     public ReturnObject newComment(Long orderItemId, CommentVo commentVo, Long userId){
         if(!orderService.isCustomerOwnOrderItem(userId, orderItemId)){
-            return new ReturnObject(ResponseCode.FIELD_NOTVALID, "用户没有购买此商品");
+            return new ReturnObject(ResponseCode.USER_NOTBUY, "用户没有购买此商品");
         }
 
         if(!commentDao.judgeComment(orderItemId)){

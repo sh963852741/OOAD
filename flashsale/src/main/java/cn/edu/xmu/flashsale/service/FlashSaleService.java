@@ -210,7 +210,11 @@ public class FlashSaleService implements InitializingBean {
         log.debug("SetKey: " + setKey);
         log.debug("HashKey: " + hashKey);
 
-        Set<Object> skus = Objects.requireNonNull(redisTemplate.opsForSet().members(setKey)).stream().map(x -> x.toString()).collect(Collectors.toSet());
+        var keys = redisTemplate.opsForSet().members(setKey);
+        if(keys == null || keys.isEmpty()){
+            return Mono.just(new ArrayList<>());
+        }
+        Set<Object> skus = keys.stream().map(Object::toString).collect(Collectors.toSet());
         log.debug("skus:" + skus);
         if(skus.isEmpty()){
             return Mono.just(new ArrayList<>());

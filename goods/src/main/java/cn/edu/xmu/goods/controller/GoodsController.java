@@ -504,7 +504,7 @@ public class GoodsController {
     public Object addFloatPrices(@PathVariable Long id, @PathVariable Long shopId, @LoginUser Long userId, @RequestBody @Validated FloatPriceVo floatPriceVo, BindingResult bindingResult) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.Log_Bigger));
         }
         Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
         if (null != obj) {

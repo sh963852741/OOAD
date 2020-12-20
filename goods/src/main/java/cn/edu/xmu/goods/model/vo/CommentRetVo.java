@@ -93,11 +93,11 @@ public class CommentRetVo implements VoObject {
 class Customer{
     private Long id;
     private String userName;
-    private String realName;
+    private String name;
 
     public void set(Long id,String userName,String realName){
         this.id=id;
         this.userName=userName;
-        this.realName=realName;
+        this.name =realName;
     }
 }
