@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@DubboService(version = "0.0.9-SNAPSHOT")
+@DubboService(version = "0.0.1-SNAPSHOT")
 public class ActivityServiceImpl implements IActivityService {
     @Autowired
     GrouponActivityDao grouponActivityDao;

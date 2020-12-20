@@ -111,7 +111,7 @@ public class CommentController {
             return obj;
         }*/
         ReturnObject ret=commentService.selectAllPassCommentBySkuId(id,page,pageSize);
-        return Common.getPageRetObject(ret);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
