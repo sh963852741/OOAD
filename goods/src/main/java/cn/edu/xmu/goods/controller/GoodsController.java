@@ -215,7 +215,7 @@ public class GoodsController {
             return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
         ReturnObject ret = goodsService.deleteSkuById(shopId, id);
-        return Common.getNullRetObj(ret, httpServletResponse);
+        return Common.decorateReturnObject(ret);
     }
 
     /**

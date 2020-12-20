@@ -348,7 +348,7 @@ public class GoodsDao {
      * @Author: Yifei Wang
      * @Date: 2020/12/15 10:18
      */
-    public ReturnObject getSkuByDubbo(Long id){
+    public ReturnObject<Sku> getSkuByDubbo(Long id){
         SKUPo skuPo = new SKUPo();
         try {
             if(redisTemplate.hasKey("skuPo_"+id)){
@@ -592,12 +592,12 @@ public class GoodsDao {
         FloatPricePoExample.Criteria criteria2 = example.createCriteria();
         try{
             criteria1.andGoodsSkuIdEqualTo(po.getGoodsSkuId());
-            criteria1.andBeginTimeGreaterThanOrEqualTo(po.getBeginTime());
-            criteria1.andBeginTimeLessThan(po.getEndTime());
+            criteria1.andBeginTimeLessThanOrEqualTo(po.getBeginTime());
+            criteria1.andEndTimeGreaterThan(po.getBeginTime());
             criteria1.andValidEqualTo((byte)1);
             criteria2.andGoodsSkuIdEqualTo(po.getGoodsSkuId());
-            criteria2.andEndTimeGreaterThan(po.getBeginTime());
-            criteria2.andEndTimeLessThanOrEqualTo(po.getEndTime());
+            criteria2.andBeginTimeLessThan(po.getEndTime());
+            criteria2.andEndTimeGreaterThanOrEqualTo(po.getEndTime());
             criteria2.andValidEqualTo((byte)1);
             example.or(criteria2);
             List<FloatPricePo> list=floatPricePoMapper.selectByExample(example);

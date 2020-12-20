@@ -530,8 +530,8 @@ public class GoodsService implements InitializingBean {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        var x = goodsDao.getSkuById(id);
-        if(x.getData() == null){
+        var x = goodsDao.getSkuByDubbo(id);
+        if(x.getData() == null || x.getData().getState().equals(Sku.State.FORBID)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(x.getData().getState().equals(Sku.State.NORM.getCode())){
@@ -546,7 +546,7 @@ public class GoodsService implements InitializingBean {
     }
 
     /**
-     * 功能描述: 下架spu
+     * 功能描述: 下架sku
      * @Param: [id, shopId]
      * @Return: cn.edu.xmu.ooad.util.ReturnObject
      * @Author: Yifei Wang
@@ -566,8 +566,8 @@ public class GoodsService implements InitializingBean {
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
         }
-        var x = goodsDao.getSkuById(id);
-        if(x.getData() == null){
+        var x = goodsDao.getSkuByDubbo(id);
+        if(x.getData() == null || x.getData().getState().equals(Sku.State.FORBID)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         if(x.getData().getState().equals(Sku.State.OFFSHELF.getCode())){
@@ -593,7 +593,7 @@ public class GoodsService implements InitializingBean {
         if(bloomStart&&!redisBloomFilter.includeByBloomFilter(skuBloomFilter,id)){
             return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-        if(shopId != 0){
+//        if(shopId != 0){
             ReturnObject<Long> check=goodsDao.getShopIdBySkuId(id.longValue());
             if(check.getCode()!=ResponseCode.OK){
                 return check;
@@ -601,7 +601,7 @@ public class GoodsService implements InitializingBean {
             if(shopId.longValue() != check.getData().longValue()){
                 return new ReturnObject(ResponseCode.RESOURCE_ID_OUTSCOPE);
             }
-        }
+//        }
         ReturnObject<Sku> skuRet = goodsDao.getSkuById(id);
         if(skuRet.getCode() != ResponseCode.OK){
             return skuRet;
@@ -627,7 +627,8 @@ public class GoodsService implements InitializingBean {
             FloatPrice floatPrice = ret.getData();
             FloatPriceRetVo retVo = floatPrice.createVo();
             retVo.setModifiedBy(OtherAdapter.adapterSimpleUser(userId,userService.getUserName(userId)));
-            retVo.setCreateBy(OtherAdapter.adapterSimpleUser(userId,userService.getUserName(userId)));
+            retVo.setCreatedBy(OtherAdapter.adapterSimpleUser(userId,userService.getUserName(userId)));
+            return new ReturnObject(retVo);
         }
         return ret;
     }
