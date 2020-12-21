@@ -171,7 +171,7 @@ public class ShopController {
         }
         else
         {
-            return Common.decorateReturnObject(new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST));
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.SHOP_STATENOTALLOW));
         }
     }
 

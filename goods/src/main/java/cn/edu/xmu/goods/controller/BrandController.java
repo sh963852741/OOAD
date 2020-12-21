@@ -44,18 +44,6 @@ public class BrandController {
         else return Common.getNullRetObj(new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE,String.format("无权限操作：" + shopId)), httpServletResponse);
     }
 
-
-    /**
-     * 修改品牌信息
-     *
-     * @author 24320182203281 王纬策
-     * @param id 角色id
-     * @param vo 角色视图
-     * @param bindingResult 校验数据
-     * @return Object 角色返回视图
-     * createdBy 王纬策 2020/11/04 13:57
-     * modifiedBy 王纬策 2020/11/7 19:20
-     */
     @ApiOperation(value = "修改品牌信息", produces = "application/json")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "header", dataType = "String", name = "authorization", value = "Token", required = true),

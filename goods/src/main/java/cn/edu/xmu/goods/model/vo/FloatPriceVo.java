@@ -23,13 +23,11 @@ public class FloatPriceVo {
 
     @ApiModelProperty(value = "生效开始时间")
     @NotNull
-    @Future
     @DateTimeFormat
     LocalDateTime beginTime;
 
     @ApiModelProperty(value = "生效结束时间")
     @NotNull
-    @Future
     @DateTimeFormat
     LocalDateTime endTime;
 

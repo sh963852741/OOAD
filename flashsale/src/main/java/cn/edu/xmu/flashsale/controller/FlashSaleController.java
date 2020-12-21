@@ -8,6 +8,7 @@ import cn.edu.xmu.flashsale.service.FlashSaleService;
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.patterns.HasThisTypePatternTriedToSneakInSomeGenericOrParameterizedTypePatternMatchingStuffAnywhereVisitor;
@@ -19,6 +20,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 秒杀控制器
@@ -77,8 +80,11 @@ public class FlashSaleController {
         if(res != null){
             return res;
         }
-
-        var ret = flashSaleService.addFlashSale(id, flashDate.getFlashDate().atStartOfDay());
+        if(flashDate.getFlashDate().isBefore(LocalDateTime.now())){
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        LocalDate date = LocalDate.of(flashDate.getFlashDate().getYear(),flashDate.getFlashDate().getMonth(),flashDate.getFlashDate().getDayOfMonth());
+        var ret = flashSaleService.addFlashSale(id, date.atStartOfDay());
 
         if(ret.getCode().equals(ResponseCode.OK))httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.decorateReturnObject(ret);
@@ -146,7 +152,12 @@ public class FlashSaleController {
     @Audit
     @PutMapping("/shops/{did}/flashsales/{id}")
     public Object changeFlashsale(@PathVariable Long id,@RequestBody FlashSaleVo flashDate){
-        var ret = flashSaleService.modifyFlashSale(id, flashDate.getFlashDate().atStartOfDay());
+
+        if(flashDate.getFlashDate().isBefore(LocalDateTime.now())){
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        LocalDate date = LocalDate.of(flashDate.getFlashDate().getYear(),flashDate.getFlashDate().getMonth(),flashDate.getFlashDate().getDayOfMonth());
+        var ret = flashSaleService.modifyFlashSale(id, date.atStartOfDay());
         return Common.decorateReturnObject(ret);
     }
 

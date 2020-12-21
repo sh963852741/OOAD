@@ -289,6 +289,17 @@ public class GoodsDao {
             if(ret==0){
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
             }
+            SKUPoExample skuPoExample = new SKUPoExample();
+
+            SKUPoExample.Criteria criteria = skuPoExample.createCriteria();
+            if(po.getSkuSn() != null){
+                criteria.andSkuSnEqualTo(po.getSkuSn());
+                List<SKUPo> list = skuPoMapper.selectByExample(skuPoExample);
+                if(list.size()>0){
+                    return new ReturnObject(ResponseCode.SKUSN_SAME);
+                }
+            }
+
             Sku sku=new Sku(po);
             SkuSimpleRetVo vo=sku.createSimpleVo();
             vo.setPrice(vo.getOriginalPrice());

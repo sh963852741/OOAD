@@ -144,7 +144,9 @@ public class FlashSaleService implements InitializingBean {
         if (flashSale == null || !flashSale.getState().equals(FlashState.FalshStatus.OFFLINE.getCode())){
             return new ReturnObject(ResponseCode.ACTIVITYALTER_INVALID, "状态错误");
         }
-
+        if(flashSale.getFlashDate().isBefore(LocalDateTime.now())){
+            return new ReturnObject(ResponseCode.ACTIVITYALTER_INVALID);
+        }
         if(date.minusHours(24).isBefore(LocalDateTime.now())){
             return new ReturnObject(ResponseCode.FIELD_NOTVALID, "不能修改24小时内开始的活动");
         }

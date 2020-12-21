@@ -309,7 +309,7 @@ public class CouponController {
     public Object shopsShopIdCouponactivitiesIdSpusPost(
             @ApiParam(value = "商店ID",required=true) @PathVariable("shopId") Long shopId,
             @ApiParam(value = "活动ID",required=true) @PathVariable("id") Long activityId,
-            @ApiParam(value = "SPU的ID列表" ,required=true )  @RequestBody List<Long> ids,
+            @ApiParam(value = "SkU的ID列表" ,required=true )  @RequestBody List<Long> ids,
             BindingResult bindingResult){
         var res = Common.processFieldErrors(bindingResult,httpServletResponse);
         if(res != null){

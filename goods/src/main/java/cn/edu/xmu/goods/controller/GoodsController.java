@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -504,12 +506,18 @@ public class GoodsController {
     public Object addFloatPrices(@PathVariable Long id, @PathVariable Long shopId, @LoginUser Long userId, @RequestBody @Validated FloatPriceVo floatPriceVo, BindingResult bindingResult) {
         if (id == null || shopId == null) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.Log_Bigger));
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.FIELD_NOTVALID));
         }
         Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
         if (null != obj) {
             logger.info("validate fail");
             return obj;
+        }
+        if(floatPriceVo.getBeginTime().isAfter(floatPriceVo.getEndTime())){
+            return Common.decorateReturnObject(new ReturnObject<>(ResponseCode.Log_Bigger));
+        }
+        if(floatPriceVo.getBeginTime().isBefore(LocalDateTime.now()) || floatPriceVo.getEndTime().isBefore(LocalDateTime.now())){
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
         var ret =  goodsService.newFloatPrice(id, shopId, floatPriceVo, userId);
 
