@@ -170,6 +170,12 @@ public class Spu {
         if(this.getBrandId()==null){
             return null;
         }
+        if(this.getBrandId().equals(1)){
+            map.put("id",0);
+            map.put("name","");
+            map.put("imageUrl","");
+            return map;
+        }
         ReturnObject ret=bean.getBrandById(this.getBrandId());
         if(ret.getCode()!=ResponseCode.OK){
             return null;

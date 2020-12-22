@@ -115,9 +115,7 @@ public class CommentDao {
             criteria.andGoodsSkuIdEqualTo(skuId);
             criteria.andStateEqualTo(Comment.State.PASS.getCode());
             commentPos=commentPoMapper.selectByExample(example);
-            if(commentPos.size()==0){
-                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
-            }
+
         }catch (DataAccessException e){
             logger.error("selectAllCommentBySkuId:DataAccessException:"+e.getMessage());
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
