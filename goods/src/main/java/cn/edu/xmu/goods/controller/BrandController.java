@@ -51,7 +51,7 @@ public class BrandController {
     })
     @PutMapping("/shops/{shopId}/brands/{id}")
     @Audit
-    public Object updateRole(@PathVariable("shopId") Long shopId, @PathVariable("id") Long id, @Validated @RequestBody BrandVo vo, BindingResult bindingResult,
+    public Object updateBrand(@PathVariable("shopId") Long shopId, @PathVariable("id") Long id, @Validated @RequestBody BrandVo vo, BindingResult bindingResult,
                              @Depart @ApiIgnore @RequestParam(required = false) Long DepartId)
     {
         Object returnObject = Common.processFieldErrors(bindingResult, httpServletResponse);
@@ -104,7 +104,7 @@ public class BrandController {
 
 
     @GetMapping("/brands")
-    public Object selectAllRoles(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) {
+    public Object selectAllBrands(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer pageSize) {
 
         page = (page == null)?1:page;
         pageSize = (pageSize == null)?10:pageSize;
