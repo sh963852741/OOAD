@@ -74,7 +74,7 @@ class CouponControllerTest {
                 .header("authorization", adminToken));
 
         String responseString = response.andExpect((status().isOk()))
-                // .andExpect(content().contentType("application/json;charset=UTF-8"))
+             
                 .andExpect(jsonPath("$.errno").value(ResponseCode.OK.getCode()))
                 .andExpect(jsonPath("$.errmsg").value("成功"))
                 .andExpect(jsonPath("$.data").isMap())
