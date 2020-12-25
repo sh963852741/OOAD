@@ -286,8 +286,5 @@ public class PresaleControllerTest {
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
     }
-    @Test
-    public void delPresaleActivity(){
-
-    }
+   
 }
